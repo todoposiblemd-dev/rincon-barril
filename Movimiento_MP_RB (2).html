@@ -810,10 +810,10 @@
             { nombre: 'Makro', telefono: '+57 300 9012345' }
         ];
 
-        // URL DE GOOGLE APPS SCRIPT PARA SINCRONIZAR MOVIMIENTOS
-        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzS-TAtOaRdF81rJu7IMk-cpGpga_FXrjCrQ6QKZpV6qAagux2iqMqTQn05TZfPoey-/exec';
+        // URL DE GOOGLE APPS SCRIPT ACTUALIZADA
+        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbx0QrrAdIoDjvrHelSwvdqPVi9zu-ydrMah5A8pCxyzmHUmvYfpOiWhibwWAj7qFpwO/exec';
 
-        // VARIABLES
+        // VARIABLES GLOBALES
         let usuarioActual = {};
         let saldos = [];
         let movimientos = [];
@@ -821,68 +821,41 @@
         let responsables = ['Bodega', 'Cocinero', 'Cajero', 'Salón'];
         let categorias = { ...CATEGORIAS_INICIALES };
         let saldoEnEdicion = null;
-        let productosNoSincronizados = [];
         let estadoConexion = true;
-        let ultimaSincronizacion = new Date().toISOString();
 
-        function limpiarLocalStorage() {
-            console.log('🧹 Limpiando localStorage...');
-            localStorage.removeItem('datosMateriasPrimas');
-            console.log('✅ localStorage limpiado');
-        }
-
-        function verificarIntegridad() {
+        // Función para cargar movimientos desde Google Sheets
+        async function cargarMovimientosDesdeGoogle() {
             try {
-                const datosGuardados = localStorage.getItem('datosMateriasPrimas');
-                if (datosGuardados) {
-                    const datos = JSON.parse(datosGuardados);
-                    if (datos.saldos && datos.saldos.length > 100) {
-                        console.warn('⚠️ Datos corruptos detectados');
-                        limpiarLocalStorage();
-                        return false;
+                const response = await fetch(GOOGLE_SHEET_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getMovimientos' }),
+                    mode: 'no-cors'
+                });
+                
+                const text = await response.text();
+                console.log('📥 Respuesta de movimientos:', text);
+                
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success && data.movimientos) {
+                        movimientos = data.movimientos;
+                        console.log('✅ Movimientos cargados desde Google:', movimientos.length);
+                        actualizarSaldos();
+                        actualizarListaEntradas();
+                        actualizarListaSalidas();
                     }
+                } catch(e) {
+                    console.warn('⚠️ Respuesta no JSON (esperado en no-cors)');
                 }
-                return true;
             } catch(error) {
-                console.error('❌ Error verificando integridad:', error);
-                limpiarLocalStorage();
-                return false;
+                console.log('⚠️ No se pudieron cargar movimientos desde Google');
             }
         }
 
+        // INICIALIZACIÓN
         function inicializar() {
             console.log('✅ Sistema Iniciando...');
-            localStorage.clear();
             cargarDatos();
-            if (saldos.length === 0) {
-                saldos = PRODUCTOS_INICIALES.map((p, i) => {
-                    const base = {
-                        id: 'saldo_' + i,
-                        nombre: p.nombre,
-                        categoria: p.categoria,
-                        unidad: p.unidad,
-                        stockMinimo: p.stockMin,
-                        fechaCreacion: new Date().toISOString(),
-                        sincronizado: false
-                    };
-                    if (p.categoria === 'proteinas') {
-                        return { ...base, cantidadCruda: p.cantCruda, cantidadCocida: p.cantCocida };
-                    } else {
-                        return { ...base, cantidad: p.cantidad };
-                    }
-                });
-                guardarDatos();
-            }
-            if (proveedores.length === 0) {
-                proveedores = PROVEEDORES_INICIALES.map((p, i) => ({
-                    id: 'prov_' + i,
-                    nombre: p.nombre,
-                    telefono: p.telefono,
-                    observaciones: '',
-                    fechaCreacion: new Date().toISOString()
-                }));
-                guardarDatos();
-            }
             detectarUsuario();
             actualizarSelectoCategorias();
             actualizarSelectos();
@@ -892,23 +865,23 @@
             establecerFechasActuales();
             detectarConexion();
             
-            // Sincronizar SOLO los 72 saldos iniciales
+            // Cargar movimientos desde Google después de 1.5 segundos
             setTimeout(() => {
-                console.log('🔄 Sincronizando ' + saldos.length + ' productos iniciales a Google...');
-                saldos.forEach(saldo => {
-                    enviarSaldoAGoogleSheets(saldo);
-                });
-            }, 2000);
+                console.log('📥 Cargando movimientos desde Google Sheets...');
+                cargarMovimientosDesdeGoogle();
+            }, 1500);
         }
 
         function detectarUsuario() {
             const usuario = prompt('👤 Ingresa tu nombre:', '');
             const rolNum = prompt('🎯 Tu rol?\n1. Bodega\n2. Cocinero\n3. Cajero\n4. Gerente', '1');
             const rolesMap = { '1': 'Bodega', '2': 'Cocinero', '3': 'Cajero', '4': 'Gerente' };
+            
             usuarioActual = {
                 nombre: usuario || 'Usuario',
                 rol: rolesMap[rolNum] || 'Bodega'
             };
+
             document.getElementById('nombre-usuario').textContent = usuarioActual.nombre;
             document.getElementById('rol-usuario').textContent = usuarioActual.rol;
         }
@@ -931,32 +904,26 @@
                     proveedores = [];
                 }
             } else {
-                saldos = [];
-                movimientos = [];
-                proveedores = [];
-                responsables = ['Bodega', 'Cocinero', 'Cajero', 'Salón'];
-                categorias = { ...CATEGORIAS_INICIALES };
+                saldos = PRODUCTOS_INICIALES.map((p, i) => ({
+                    id: 'saldo_' + i,
+                    nombre: p.nombre,
+                    categoria: p.categoria,
+                    unidad: p.unidad,
+                    stockMinimo: p.stockMin,
+                    cantidad: p.cantidad || 0,
+                    cantidadCruda: p.cantCruda || 0,
+                    cantidadCocida: p.cantCocida || 0,
+                    fechaCreacion: new Date().toISOString()
+                }));
+                proveedores = PROVEEDORES_INICIALES.map((p, i) => ({
+                    id: 'prov_' + i,
+                    nombre: p.nombre,
+                    telefono: p.telefono,
+                    observaciones: '',
+                    fechaCreacion: new Date().toISOString()
+                }));
+                guardarDatos();
             }
-            PRODUCTOS_INICIALES.forEach((producto, indice) => {
-                const existe = saldos.find(s => s.nombre === producto.nombre);
-                if (!existe) {
-                    const nuevoSaldo = {
-                        id: 'saldo_' + indice + '_' + Date.now(),
-                        nombre: producto.nombre,
-                        categoria: producto.categoria,
-                        unidad: producto.unidad,
-                        stockMinimo: producto.stockMin,
-                        cantidad: producto.cantidad || 0,
-                        cantidadCruda: producto.cantCruda || 0,
-                        cantidadCocida: producto.cantCocida || 0,
-                        fechaCreacion: new Date().toISOString(),
-                        sincronizado: false
-                    };
-                    saldos.push(nuevoSaldo);
-                }
-            });
-            console.log('✅ Total productos cargados: ' + saldos.length);
-            guardarDatos();
         }
 
         function guardarDatos() {
@@ -971,6 +938,12 @@
             document.getElementById('fecha-hasta').value = hoy;
         }
 
+        function limpiarLocalStorage() {
+            console.log('🧹 Limpiando localStorage...');
+            localStorage.removeItem('datosMateriasPrimas');
+            console.log('✅ localStorage limpiado');
+        }
+
         function limpiarFiltroFechas() {
             document.getElementById('fecha-desde').value = '';
             document.getElementById('fecha-hasta').value = '';
@@ -980,21 +953,26 @@
         function actualizarSaldos() {
             const lista = document.getElementById('lista-saldos');
             const porCategoria = {};
+
             saldos.forEach(saldo => {
                 if (!porCategoria[saldo.categoria]) porCategoria[saldo.categoria] = [];
                 porCategoria[saldo.categoria].push(saldo);
             });
+
             let html = '';
             Object.keys(porCategoria).forEach(cat => {
                 html += `<div class="area-saldos"><div class="area-titulo">${categorias[cat] || cat}</div>`;
+
                 porCategoria[cat].forEach(saldo => {
                     let stockHtml = '';
                     let alertaHTML = '';
+
                     if (saldo.categoria === 'proteinas') {
                         const saldoCrudo = calcularSaldoCrudo(saldo.id);
                         const saldoCocido = calcularSaldoCocido(saldo.id);
                         const total = saldoCrudo + saldoCocido;
                         const alerta = total < (saldo.stockMinimo || 0);
+
                         stockHtml = `<div style="font-size: 10px; color: #666; margin-top: 3px;">🔵 Crudo: ${saldoCrudo.toFixed(2)} | 🔴 Cocido: ${saldoCocido.toFixed(2)}</div>`;
                         if (alerta) alertaHTML = `<div class="alerta-stock">⚠️ ${total.toFixed(2)}/${saldo.stockMinimo}</div>`;
                     } else {
@@ -1003,10 +981,13 @@
                         stockHtml = `<div style="font-size: 10px; color: #666; margin-top: 3px;">Stock: ${cantidad.toFixed(2)} ${saldo.unidad}</div>`;
                         if (alerta) alertaHTML = `<div class="alerta-stock">⚠️ ${cantidad.toFixed(2)}/${saldo.stockMinimo}</div>`;
                     }
+
                     html += `<div class="saldo-item"><div class="saldo-info"><div class="saldo-nombre">${saldo.nombre}</div><div class="saldo-det"><span class="tag-categoria">${categorias[saldo.categoria]}</span></div>${stockHtml}${alertaHTML}</div><div style="display: flex; gap: 4px;"><button class="btn btn-small btn-edit" onclick="abrirEditarSaldo('${saldo.id}')">✏️</button><button class="btn btn-small btn-delete" onclick="abrirEliminarSaldo('${saldo.id}')">🗑️</button></div></div>`;
                 });
+
                 html += '</div>';
             });
+
             lista.innerHTML = html;
         }
 
@@ -1039,17 +1020,20 @@
         function calcularSaldoActual(productoId) {
             const saldo = saldos.find(s => s.id === productoId);
             let cantidad = 0;
+
             if (saldo?.categoria === 'proteinas') {
                 cantidad = (parseFloat(saldo?.cantidadCruda) || 0) + (parseFloat(saldo?.cantidadCocida) || 0);
             } else {
                 cantidad = parseFloat(saldo?.cantidad) || 0;
             }
+
             movimientos.forEach(mov => {
                 if (mov.producto === productoId) {
                     if (mov.tipo === 'entrada') cantidad += parseFloat(mov.cantidad) || 0;
                     else cantidad -= parseFloat(mov.cantidad) || 0;
                 }
             });
+
             return cantidad;
         }
 
@@ -1059,8 +1043,6 @@
             document.getElementById('saldo-categoria').value = '';
             document.getElementById('saldo-stock-minimo').value = '';
             document.getElementById('saldo-cantidad-inicial').value = '0';
-            document.getElementById('saldo-cant-cruda').value = '';
-            document.getElementById('saldo-cant-cocida').value = '';
             document.getElementById('grupo-cantidades').style.display = 'none';
             document.getElementById('modalSaldo').classList.add('active');
         }
@@ -1068,10 +1050,12 @@
         function abrirEditarSaldo(id) {
             const saldo = saldos.find(s => s.id === id);
             if (!saldo) return;
+
             saldoEnEdicion = id;
             document.getElementById('saldo-nombre').value = saldo.nombre;
             document.getElementById('saldo-categoria').value = saldo.categoria;
             document.getElementById('saldo-stock-minimo').value = saldo.stockMinimo || '';
+
             if (saldo.categoria === 'proteinas') {
                 const totalCantidad = (saldo.cantidadCruda || 0) + (saldo.cantidadCocida || 0);
                 document.getElementById('saldo-cantidad-inicial').value = totalCantidad.toFixed(2);
@@ -1082,6 +1066,7 @@
                 document.getElementById('saldo-cantidad-inicial').value = (saldo.cantidad || 0).toFixed(2);
                 document.getElementById('grupo-cantidades').style.display = 'none';
             }
+
             document.getElementById('modalSaldo').classList.add('active');
         }
 
@@ -1090,57 +1075,44 @@
             const categoria = document.getElementById('saldo-categoria').value;
             const stockMin = parseFloat(document.getElementById('saldo-stock-minimo').value);
             const cantidadInicial = parseFloat(document.getElementById('saldo-cantidad-inicial').value) || 0;
+
             if (!nombre || !categoria || isNaN(stockMin)) {
                 mostrarAlerta('⚠️ Completa todos los campos', 'error');
                 return;
             }
+
             if (saldoEnEdicion) {
                 const index = saldos.findIndex(s => s.id === saldoEnEdicion);
-                if (categoria === 'proteinas') {
-                    const cantCruda = parseFloat(document.getElementById('saldo-cant-cruda').value) || 0;
-                    const cantCocida = parseFloat(document.getElementById('saldo-cant-cocida').value) || 0;
-                    const usarCrudaCocida = cantCruda > 0 || cantCocida > 0;
-                    saldos[index] = {
-                        id: saldoEnEdicion,
-                        nombre, categoria, unidad: saldos[index].unidad, stockMinimo: stockMin,
-                        cantidadCruda: usarCrudaCocida ? cantCruda : cantidadInicial,
-                        cantidadCocida: usarCrudaCocida ? cantCocida : 0,
-                        fechaActualizacion: new Date().toISOString()
-                    };
-                } else {
-                    saldos[index] = {
-                        id: saldoEnEdicion,
-                        nombre, categoria, unidad: saldos[index].unidad, stockMinimo: stockMin,
-                        cantidad: cantidadInicial,
-                        fechaActualizacion: new Date().toISOString()
-                    };
+                if (index !== -1) {
+                    saldos[index].nombre = nombre;
+                    saldos[index].categoria = categoria;
+                    saldos[index].stockMinimo = stockMin;
+                    if (categoria === 'proteinas') {
+                        saldos[index].cantidadCruda = parseFloat(document.getElementById('saldo-cant-cruda').value) || cantidadInicial;
+                        saldos[index].cantidadCocida = parseFloat(document.getElementById('saldo-cant-cocida').value) || 0;
+                    } else {
+                        saldos[index].cantidad = cantidadInicial;
+                    }
                 }
                 mostrarAlerta('✅ Actualizado', 'success');
             } else {
-                let unidadDefault = 'kg';
-                if (categoria === 'gaseosas' || categoria === 'cervezas') unidadDefault = 'und';
-                if (categoria === 'papeleria') unidadDefault = 'und';
-                if (categoria === 'proteinas') {
-                    const cantCruda = parseFloat(document.getElementById('saldo-cant-cruda').value) || 0;
-                    const cantCocida = parseFloat(document.getElementById('saldo-cant-cocida').value) || 0;
-                    const usarCrudaCocida = cantCruda > 0 || cantCocida > 0;
-                    saldos.push({
-                        id: 'saldo_' + Date.now(),
-                        nombre, categoria, unidad: unidadDefault, stockMinimo: stockMin,
-                        cantidadCruda: usarCrudaCocida ? cantCruda : cantidadInicial,
-                        cantidadCocida: usarCrudaCocida ? cantCocida : 0,
-                        fechaCreacion: new Date().toISOString()
-                    });
-                } else {
-                    saldos.push({
-                        id: 'saldo_' + Date.now(),
-                        nombre, categoria, unidad: unidadDefault, stockMinimo: stockMin,
-                        cantidad: cantidadInicial,
-                        fechaCreacion: new Date().toISOString()
-                    });
-                }
+                let unidad = 'kg';
+                if (['gaseosas', 'cervezas', 'papeleria'].includes(categoria)) unidad = 'und';
+
+                saldos.push({
+                    id: 'saldo_' + Date.now(),
+                    nombre,
+                    categoria,
+                    unidad,
+                    stockMinimo: stockMin,
+                    cantidad: categoria === 'proteinas' ? 0 : cantidadInicial,
+                    cantidadCruda: categoria === 'proteinas' ? cantidadInicial : 0,
+                    cantidadCocida: 0,
+                    fechaCreacion: new Date().toISOString()
+                });
                 mostrarAlerta('✅ Agregado', 'success');
             }
+
             guardarDatos();
             cerrarModalSaldo();
             actualizarSaldos();
@@ -1181,27 +1153,30 @@
             const nombre = document.getElementById('prod-rapido-nombre').value.trim();
             const categoria = document.getElementById('prod-rapido-categoria').value;
             const minimo = parseFloat(document.getElementById('prod-rapido-minimo').value) || 0;
+
             if (!nombre || !categoria) {
                 mostrarAlerta('⚠️ Completa nombre y categoría', 'error');
                 return;
             }
+
             let unidad = 'kg';
-            if (categoria === 'gaseosas' || categoria === 'cervezas' || categoria === 'papeleria') {
-                unidad = 'und';
-            }
-            const nuevoSaldo = {
+            if (['gaseosas', 'cervezas', 'papeleria'].includes(categoria)) unidad = 'und';
+
+            saldos.push({
                 id: 'saldo_' + Date.now(),
                 nombre,
                 categoria,
                 unidad,
                 stockMinimo: minimo,
                 cantidad: 0,
+                cantidadCruda: 0,
+                cantidadCocida: 0,
                 fechaCreacion: new Date().toISOString()
-            };
-            saldos.push(nuevoSaldo);
+            });
+
             guardarDatos();
             actualizarSelectos();
-            mostrarAlerta('✅ Producto creado (local)', 'success');
+            mostrarAlerta('✅ Producto creado', 'success');
             cerrarModalNuevoProducto();
         }
 
@@ -1218,18 +1193,20 @@
         function guardarProveedorRapido() {
             const nombre = document.getElementById('prov-rapido-nombre').value.trim();
             const telefono = document.getElementById('prov-rapido-telefono').value.trim();
+
             if (!nombre) {
-                mostrarAlerta('⚠️ Ingresa nombre del proveedor', 'error');
+                mostrarAlerta('⚠️ Ingresa nombre', 'error');
                 return;
             }
-            const nuevoProveedor = {
+
+            proveedores.push({
                 id: 'prov_' + Date.now(),
                 nombre,
                 telefono,
                 observaciones: '',
                 fechaCreacion: new Date().toISOString()
-            };
-            proveedores.push(nuevoProveedor);
+            });
+
             guardarDatos();
             actualizarSelectos();
             mostrarAlerta('✅ Proveedor creado', 'success');
@@ -1238,8 +1215,14 @@
 
         function agregarResponsable() {
             const nombre = document.getElementById('nuevo-responsable').value.trim();
-            if (!nombre) { mostrarAlerta('⚠️ Ingresa nombre', 'error'); return; }
-            if (responsables.includes(nombre)) { mostrarAlerta('⚠️ Ya existe', 'error'); return; }
+            if (!nombre) {
+                mostrarAlerta('⚠️ Ingresa nombre', 'error');
+                return;
+            }
+            if (responsables.includes(nombre)) {
+                mostrarAlerta('⚠️ Ya existe', 'error');
+                return;
+            }
             responsables.push(nombre);
             guardarDatos();
             document.getElementById('nuevo-responsable').value = '';
@@ -1269,9 +1252,15 @@
 
         function agregarCategoria() {
             const nombre = document.getElementById('nueva-categoria').value.trim();
-            if (!nombre) { mostrarAlerta('⚠️ Ingresa nombre', 'error'); return; }
+            if (!nombre) {
+                mostrarAlerta('⚠️ Ingresa nombre', 'error');
+                return;
+            }
             const key = nombre.toLowerCase().replace(/\s+/g, '-');
-            if (categorias[key]) { mostrarAlerta('⚠️ Ya existe', 'error'); return; }
+            if (categorias[key]) {
+                mostrarAlerta('⚠️ Ya existe', 'error');
+                return;
+            }
             categorias[key] = '📌 ' + nombre;
             guardarDatos();
             document.getElementById('nueva-categoria').value = '';
@@ -1302,71 +1291,16 @@
         function actualizarSelectoCategorias() {
             const select = document.getElementById('saldo-categoria');
             const selectRapido = document.getElementById('prod-rapido-categoria');
-            const opciones = '<option value="">-- Selecciona --</option>' +
-                Object.entries(categorias).map(([key, nombre]) => `<option value="${key}">${nombre}</option>`).join('');
+            const opciones = '<option value="">-- Selecciona --</option>' + Object.entries(categorias).map(([key, nombre]) => `<option value="${key}">${nombre}</option>`).join('');
             select.innerHTML = opciones;
             if (selectRapido) selectRapido.innerHTML = opciones;
-        }
-
-        async function enviarSaldoAGoogleSheets(saldo) {
-            try {
-                const datos = {
-                    action: 'addMovimiento',
-                    nombre: saldo.nombre,
-                    categoria: saldo.categoria,
-                    unidad: saldo.unidad,
-                    stockMinimo: saldo.stockMinimo,
-                    cantidad: saldo.cantidad || 0,
-                    cantidadCruda: saldo.cantidadCruda || 0,
-                    cantidadCocida: saldo.cantidadCocida || 0,
-                    usuario: usuarioActual.nombre,
-                    timestamp: new Date().toISOString(),
-                    esSaldoInicial: true
-                };
-                const respuesta = await fetch(GOOGLE_SHEET_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(datos),
-                    mode: 'no-cors'
-                });
-                const saldoSync = {
-                    ...saldo,
-                    sincronizado: true,
-                    fechaSincronizacion: new Date().toISOString()
-                };
-                const indice = saldos.findIndex(s => s.id === saldo.id);
-                if (indice !== -1) {
-                    saldos[indice] = saldoSync;
-                    guardarDatos();
-                }
-                productosNoSincronizados = productosNoSincronizados.filter(p => p.id !== saldo.id);
-                console.log('✅ Saldo sincronizado:', datos);
-                return true;
-            } catch(error) {
-                console.error('⚠️ Error al sincronizar saldo:', error);
-                if (!productosNoSincronizados.find(p => p.id === saldo.id)) {
-                    productosNoSincronizados.push(saldo);
-                }
-                return false;
-            }
-        }
-
-        function detectarConexion() {
-            window.addEventListener('online', async () => {
-                console.log('📡 Reconexión detectada');
-                estadoConexion = true;
-                mostrarAlerta('📡 Conectado', 'info');
-            });
-            window.addEventListener('offline', () => {
-                console.log('⚠️ Modo offline');
-                estadoConexion = false;
-                mostrarAlerta('⚠️ Sin conexión', 'warning');
-            });
         }
 
         async function enviarAGoogleSheets(movimiento) {
             try {
                 const saldo = saldos.find(s => s.id === movimiento.producto);
                 const proveedor = proveedores.find(p => p.id === movimiento.proveedor);
+
                 const datos = {
                     action: 'addMovimiento',
                     fecha: movimiento.fecha || new Date().toISOString().split('T')[0],
@@ -1380,27 +1314,41 @@
                     destino: movimiento.destino || '',
                     tipoEntrada: movimiento.tipoEntrada || '',
                     proveedor: proveedor?.nombre || movimiento.proveedor || '',
-                    valor: Number(movimiento.totalCosto) || 0,
-                    unidad: saldo?.unidad || 'kg',
-                    categoria: saldo?.categoria || ''
+                    valor: Number(movimiento.totalCosto) || 0
                 };
+
                 console.log('📤 ENVIANDO A GOOGLE:', datos);
+
                 const response = await fetch(GOOGLE_SHEET_URL, {
                     method: 'POST',
                     body: JSON.stringify(datos),
                     mode: 'no-cors'
                 });
+
                 console.log('✅ Respuesta:', response.status);
             } catch(error) {
                 console.error('❌ Error al enviar:', error);
             }
         }
 
+        function detectarConexion() {
+            window.addEventListener('online', () => {
+                console.log('📡 Conectado');
+                estadoConexion = true;
+                mostrarAlerta('📡 Conectado', 'success');
+            });
+
+            window.addEventListener('offline', () => {
+                console.log('⚠️ Sin conexión');
+                estadoConexion = false;
+                mostrarAlerta('⚠️ Sin conexión', 'error');
+            });
+        }
+
         function actualizarEstadoEntrada() {
             const productoId = document.getElementById('producto-entrada').value;
             const saldo = saldos.find(s => s.id === productoId);
             const esProteina = saldo?.categoria?.includes('🍖');
-            console.log('DEBUG Entrada:', {producto: saldo?.nombre, categoria: saldo?.categoria, esProteina});
             document.getElementById('estado-entrada-grupo').style.display = esProteina ? 'block' : 'none';
         }
 
@@ -1418,14 +1366,17 @@
             const costo = parseFloat(document.getElementById('costo-entrada').value);
             const responsable = document.getElementById('responsable-entrada').value;
             const saldo = saldos.find(s => s.id === producto);
+
             if (!proveedor || !producto || isNaN(cantidad) || isNaN(costo) || !responsable) {
                 mostrarAlerta('⚠️ Completa campos', 'error');
                 return;
             }
+
             const hoy = new Date().toISOString().split('T')[0];
             const ahora = new Date().toTimeString().slice(0, 5);
             const esProteina = saldo?.categoria?.includes('🍖');
             const estado = esProteina ? document.getElementById('estado-entrada').value : '';
+
             let cantidadCruda = 0, cantidadCocida = 0;
             if (esProteina) {
                 if (estado === 'crudo') {
@@ -1436,6 +1387,7 @@
             } else {
                 cantidadCruda = cantidad;
             }
+
             movimientos.push({
                 id: 'mov_' + Date.now(),
                 tipo: 'entrada',
@@ -1453,6 +1405,7 @@
                 responsable,
                 timestamp: new Date().toISOString()
             });
+
             const ultimoMovimiento = movimientos[movimientos.length - 1];
             guardarDatos();
             enviarAGoogleSheets(ultimoMovimiento);
@@ -1501,24 +1454,29 @@
             const cantidad = parseFloat(document.getElementById('cantidad-salida').value);
             const responsable = document.getElementById('responsable-salida').value;
             const saldo = saldos.find(s => s.id === producto);
+
             if (!destino || !producto || isNaN(cantidad) || !responsable) {
                 mostrarAlerta('⚠️ Completa campos', 'error');
                 return;
             }
+
             const hoy = new Date().toISOString().split('T')[0];
             const ahora = new Date().toTimeString().slice(0, 5);
             const esProteina = saldo?.categoria?.includes('🍖');
             const estado = esProteina ? document.getElementById('estado-salida').value : '';
+
             let saldoActual = 0;
             if (esProteina) {
                 saldoActual = estado === 'crudo' ? calcularSaldoCrudo(producto) : calcularSaldoCocido(producto);
             } else {
                 saldoActual = calcularSaldoActual(producto);
             }
+
             if (cantidad > saldoActual) {
                 mostrarAlerta(`⚠️ Stock insuficiente: ${saldoActual}`, 'error');
                 return;
             }
+
             let cantidadCruda = 0, cantidadCocida = 0;
             if (esProteina) {
                 if (estado === 'crudo') {
@@ -1529,6 +1487,7 @@
             } else {
                 cantidadCruda = cantidad;
             }
+
             movimientos.push({
                 id: 'mov_' + Date.now(),
                 tipo: 'salida',
@@ -1543,6 +1502,7 @@
                 responsable,
                 timestamp: new Date().toISOString()
             });
+
             const ultimoMovimiento = movimientos[movimientos.length - 1];
             guardarDatos();
             enviarAGoogleSheets(ultimoMovimiento);
@@ -1575,18 +1535,24 @@
             const desde = document.getElementById('fecha-desde').value;
             const hasta = document.getElementById('fecha-hasta').value;
             const movsFiltrados = !desde || !hasta ? movimientos : movimientos.filter(m => m.fecha >= desde && m.fecha <= hasta);
+
+            // ALERTAS
             const alertasDiv = document.getElementById('alertas-stock');
             const alertas = saldos.filter(s => {
                 const total = (s.categoria === 'proteinas') ? (calcularSaldoCrudo(s.id) + calcularSaldoCocido(s.id)) : calcularSaldoActual(s.id);
                 return total < (s.stockMinimo || 0);
             });
+
             alertasDiv.innerHTML = alertas.length === 0 ? '<div style="color: #28a745; font-weight: 600;">✅ Sin alertas</div>' : alertas.map(s => {
                 const total = (s.categoria === 'proteinas') ? (calcularSaldoCrudo(s.id) + calcularSaldoCocido(s.id)) : calcularSaldoActual(s.id);
                 return `<div class="resumen-box"><strong>${s.nombre}</strong><br>Stock: ${total.toFixed(2)} | Mín: ${s.stockMinimo}</div>`;
             }).join('');
+
+            // COSTOS
             const costosDiv = document.getElementById('resumen-costos');
             let costoTotal = 0;
             const costosPorCat = {};
+
             movsFiltrados.filter(m => m.tipo === 'entrada').forEach(mov => {
                 const saldo = saldos.find(s => s.id === mov.producto);
                 const cat = saldo?.categoria || 'otros';
@@ -1594,10 +1560,14 @@
                 costosPorCat[cat] += mov.totalCosto || 0;
                 costoTotal += mov.totalCosto || 0;
             });
+
             costosDiv.innerHTML = `<div class="resumen-box"><div class="resumen-titulo">TOTAL INVERTIDO: $${costoTotal.toLocaleString('es-CO')}</div>${Object.entries(costosPorCat).map(([cat, costo]) => `<div class="resumen-item"><span>${categorias[cat] || cat}</span><span class="resumen-valor">$${costo.toLocaleString('es-CO')}</span></div>`).join('')}</div>`;
+
+            // STOCK
             const stockDiv = document.getElementById('tabla-stock-actual');
             const proteinas = saldos.filter(s => s.categoria === 'proteinas');
             const otros = saldos.filter(s => s.categoria !== 'proteinas');
+
             let html = '';
             if (proteinas.length > 0) {
                 html += '<div style="margin-bottom: 20px;"><h4 style="color: #8B0000; margin-bottom: 10px;">🍖 PROTEÍNAS</h4>';
@@ -1610,6 +1580,7 @@
                 });
                 html += '</tbody></table></div>';
             }
+
             if (otros.length > 0) {
                 html += '<div><h4 style="color: #666; margin-bottom: 10px;">📦 OTROS PRODUCTOS</h4>';
                 html += '<table class="tabla-reportes"><thead><tr><th>Producto</th><th>Categoría</th><th>Stock</th></tr></thead><tbody>';
@@ -1619,7 +1590,10 @@
                 });
                 html += '</tbody></table></div>';
             }
+
             stockDiv.innerHTML = html;
+
+            // MOVIMIENTOS
             const movsDiv = document.getElementById('tabla-movimientos');
             html = '<table class="tabla-reportes"><thead><tr><th>Fecha</th><th>Tipo</th><th>Producto</th><th>Cantidad</th><th>Responsable</th></tr></thead><tbody>';
             movsFiltrados.slice().reverse().forEach(mov => {
@@ -1634,9 +1608,12 @@
         async function descargarExcel() {
             try {
                 mostrarAlerta('⏳ Generando EXCEL...', 'success');
+
                 const desde = document.getElementById('fecha-desde').value;
                 const hasta = document.getElementById('fecha-hasta').value;
                 const movsFiltrados = movimientos.filter(m => m.fecha >= desde && m.fecha <= hasta);
+
+                // Datos
                 const stockData = saldos.map(s => ({
                     Producto: s.nombre,
                     Categoría: categorias[s.categoria] || s.categoria,
@@ -1644,6 +1621,7 @@
                     Unidad: s.unidad,
                     Mínimo: s.stockMinimo
                 }));
+
                 const movsData = movsFiltrados.map(m => ({
                     Fecha: m.fecha,
                     Hora: m.hora,
@@ -1656,8 +1634,10 @@
                     Costo: m.totalCosto || '',
                     Proveedor: m.proveedor ? proveedores.find(p => p.id === m.proveedor)?.nombre || '' : ''
                 }));
-                const sheet1XML = arrayToXML(stockData);
-                const sheet2XML = arrayToXML(movsData);
+
+                const sheet1XML = arrayToXML(stockData, 'Stock Actual');
+                const sheet2XML = arrayToXML(movsData, 'Movimientos');
+
                 const zip = new JSZip();
                 zip.file('[Content_Types].xml', getContentTypesXML());
                 zip.file('_rels/.rels', getRelsXML());
@@ -1667,6 +1647,7 @@
                 zip.file('xl/worksheets/sheet2.xml', sheet2XML);
                 zip.file('xl/theme/theme1.xml', getThemeXML());
                 zip.file('docProps/core.xml', getCorePropsXML());
+
                 const content = await zip.generateAsync({type: 'blob'});
                 const url = URL.createObjectURL(content);
                 const link = document.createElement('a');
@@ -1676,19 +1657,17 @@
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
-                mostrarAlerta('✅ EXCEL descargado correctamente', 'success');
+
+                mostrarAlerta('✅ EXCEL descargado', 'success');
             } catch (error) {
-                console.error(error);
                 mostrarAlerta('❌ Error: ' + error.message, 'error');
             }
         }
 
-        function arrayToXML(data) {
-            if (!data || data.length === 0) {
-                data = [{resultado: 'Sin datos'}];
-            }
+        function arrayToXML(data, sheetName) {
+            if (!data || data.length === 0) data = [{resultado: 'Sin datos'}];
             const headers = Object.keys(data[0]);
-            let xml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">\n<sheetData>\n<row r="1">`;
+            let xml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData><row r="1">`;
             headers.forEach((h, i) => {
                 xml += `<c r="${String.fromCharCode(65+i)}1" t="inlineStr"><is><t>${escapeXML(h)}</t></is></c>`;
             });
@@ -1710,34 +1689,35 @@
         }
 
         function getContentTypesXML() {
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n<Default Extension="xml" ContentType="application/xml"/>\n<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>\n<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>\n<Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>\n<Override PartName="/xl/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>\n<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>\n</Types>`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`;
         }
 
         function getRelsXML() {
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>\n<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>\n</Relationships>`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>`;
         }
 
         function getWorkbookRelsXML() {
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>\n<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>\n<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>\n</Relationships>`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/></Relationships>`;
         }
 
         function getWorkbookXML() {
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">\n<sheets>\n<sheet name="Stock Actual" sheetId="1" r:id="rId1" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>\n<sheet name="Movimientos" sheetId="2" r:id="rId2" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>\n</sheets>\n</workbook>`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheets><sheet name="Stock Actual" sheetId="1" r:id="rId1" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/><sheet name="Movimientos" sheetId="2" r:id="rId2" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/></sheets></workbook>`;
         }
 
         function getThemeXML() {
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Office"><a:themeElements/></a:theme>`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Office"><a:themeElements/></a:theme>`;
         }
 
         function getCorePropsXML() {
             const now = new Date().toISOString();
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n<dc:title>Rincón del Barril</dc:title>\n<dc:creator>Sistema Gestión</dc:creator>\n<cp:lastModifiedBy>Sistema</cp:lastModifiedBy>\n<dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created>\n<dcterms:modified xsi:type="dcterms:W3CDTF">${now}</dcterms:modified>\n</cp:coreProperties>`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>Rincón del Barril</dc:title><dc:creator>Sistema Gestión</dc:creator><cp:lastModifiedBy>Sistema</cp:lastModifiedBy><dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">${now}</dcterms:modified></cp:coreProperties>`;
         }
 
         function actualizarSelectos() {
             const opcionesProductos = saldos.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
             const opcionesProveedores = proveedores.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
             const opcionesResponsables = responsables.map(r => `<option value="${r}">${r}</option>`).join('');
+
             document.getElementById('producto-entrada').innerHTML = '<option value="">-- Selecciona --</option>' + opcionesProductos;
             document.getElementById('producto-salida').innerHTML = '<option value="">-- Selecciona --</option>' + opcionesProductos;
             document.getElementById('proveedor-entrada').innerHTML = '<option value="">-- Selecciona --</option>' + opcionesProveedores;
@@ -1756,6 +1736,7 @@
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tab).classList.add('active');
             event.target.classList.add('active');
+            
             if (tab === 'reportes') {
                 actualizarReportes();
             }
