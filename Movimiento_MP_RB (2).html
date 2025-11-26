@@ -811,7 +811,7 @@
         ];
 
         // URL DE GOOGLE APPS SCRIPT PARA SINCRONIZAR MOVIMIENTOS
-        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzBcMmnE7y7eFesjNPUZ_A9uyOZYt2eDstU6x6aRSR87xz5O2XJzTEWc58M3fdVCS6u/exec';
+        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwm-dIvHgZgQpTL4li_WbwRjoxcyhuc5cYUC9KTBoP_aau0IHZCsgdvWlc3_lWiNsDO/exec';
 
         // VARIABLES
         let usuarioActual = {};
@@ -821,32 +821,26 @@
         let responsables = ['Bodega', 'Cocinero', 'Cajero', 'Salón'];
         let categorias = { ...CATEGORIAS_INICIALES };
         let saldoEnEdicion = null;
-        let productosNoSincronizados = []; // Guardar productos que no se sincronizaron
+        let productosNoSincronizados = [];
         let estadoConexion = true;
         let ultimaSincronizacion = new Date().toISOString();
 
-        // Función para limpiar localStorage completamente
         function limpiarLocalStorage() {
             console.log('🧹 Limpiando localStorage...');
             localStorage.removeItem('datosMateriasPrimas');
             console.log('✅ localStorage limpiado');
         }
 
-        // Función para verificar integridad de datos
         function verificarIntegridad() {
             try {
                 const datosGuardados = localStorage.getItem('datosMateriasPrimas');
                 if (datosGuardados) {
                     const datos = JSON.parse(datosGuardados);
-                    
-                    // Si hay más de 100 productos, hay un error
                     if (datos.saldos && datos.saldos.length > 100) {
                         console.warn('⚠️ Datos corruptos detectados: ' + datos.saldos.length + ' productos (debería ser 31)');
                         limpiarLocalStorage();
                         return false;
                     }
-                    
-                    // Si los datos no tienen la estructura correcta
                     if (datos.saldos && !datos.saldos[0]?.nombre) {
                         console.warn('⚠️ Estructura de datos inválida');
                         limpiarLocalStorage();
@@ -861,15 +855,10 @@
             }
         }
 
-        // INICIALIZACIÓN
         function inicializar() {
             console.log('✅ Sistema Iniciando...');
-            
-            // ⚠️ BORRA SIEMPRE localStorage (sin excepciones)
-            console.log('🧹 Borrando localStorage completamente...');
             localStorage.clear();
             console.log('✅ localStorage limpio');
-            
             cargarDatos();
             if (saldos.length === 0) {
                 saldos = PRODUCTOS_INICIALES.map((p, i) => {
@@ -907,9 +896,7 @@
             actualizarListaResponsables();
             actualizarListaCategorias();
             establecerFechasActuales();
-            detectarConexion(); // ✅ Activar detección de conexión
-            
-            // Sincronizar automáticamente todos los saldos a Google Sheets
+            detectarConexion();
             setTimeout(() => {
                 if (saldos.length > 0) {
                     console.log('🔄 Iniciando sincronización automática de ' + saldos.length + ' productos...');
@@ -924,18 +911,15 @@
             const usuario = prompt('👤 Ingresa tu nombre:', '');
             const rolNum = prompt('🎯 Tu rol?\n1. Bodega\n2. Cocinero\n3. Cajero\n4. Gerente', '1');
             const rolesMap = { '1': 'Bodega', '2': 'Cocinero', '3': 'Cajero', '4': 'Gerente' };
-            
             usuarioActual = {
                 nombre: usuario || 'Usuario',
                 rol: rolesMap[rolNum] || 'Bodega'
             };
-
             document.getElementById('nombre-usuario').textContent = usuarioActual.nombre;
             document.getElementById('rol-usuario').textContent = usuarioActual.rol;
         }
 
         function cargarDatos() {
-            // Primero intenta cargar del localStorage
             const datosGuardados = localStorage.getItem('datosMateriasPrimas');
             if (datosGuardados) {
                 try {
@@ -959,12 +943,9 @@
                 responsables = ['Bodega', 'Cocinero', 'Cajero', 'Salón'];
                 categorias = { ...CATEGORIAS_INICIALES };
             }
-            
-            // Ahora agregar TODOS los PRODUCTOS_INICIALES que no estén en saldos
             PRODUCTOS_INICIALES.forEach((producto, indice) => {
                 const existe = saldos.find(s => s.nombre === producto.nombre);
                 if (!existe) {
-                    // Crear nuevo saldo para este producto
                     const nuevoSaldo = {
                         id: 'saldo_' + indice + '_' + Date.now(),
                         nombre: producto.nombre,
@@ -981,7 +962,6 @@
                     console.log('✅ Agregado producto: ' + producto.nombre);
                 }
             });
-            
             console.log('✅ Total productos cargados: ' + saldos.length);
             guardarDatos();
         }
@@ -1004,35 +984,25 @@
             actualizarReportes();
         }
 
-        // SALDOS
         function actualizarSaldos() {
             const lista = document.getElementById('lista-saldos');
             const porCategoria = {};
-
             saldos.forEach(saldo => {
                 if (!porCategoria[saldo.categoria]) porCategoria[saldo.categoria] = [];
                 porCategoria[saldo.categoria].push(saldo);
             });
-
             let html = '';
             Object.keys(porCategoria).forEach(cat => {
-                html += `<div class="area-saldos">
-                    <div class="area-titulo">${categorias[cat] || cat}</div>`;
-
+                html += `<div class="area-saldos"><div class="area-titulo">${categorias[cat] || cat}</div>`;
                 porCategoria[cat].forEach(saldo => {
                     let stockHtml = '';
                     let alertaHTML = '';
-
                     if (saldo.categoria === 'proteinas') {
                         const saldoCrudo = calcularSaldoCrudo(saldo.id);
                         const saldoCocido = calcularSaldoCocido(saldo.id);
                         const total = saldoCrudo + saldoCocido;
                         const alerta = total < (saldo.stockMinimo || 0);
-
-                        stockHtml = `
-                            <div style="font-size: 10px; color: #666; margin-top: 3px;">
-                                🔵 Crudo: ${saldoCrudo.toFixed(2)} | 🔴 Cocido: ${saldoCocido.toFixed(2)}
-                            </div>`;
+                        stockHtml = `<div style="font-size: 10px; color: #666; margin-top: 3px;">🔵 Crudo: ${saldoCrudo.toFixed(2)} | 🔴 Cocido: ${saldoCocido.toFixed(2)}</div>`;
                         if (alerta) alertaHTML = `<div class="alerta-stock">⚠️ ${total.toFixed(2)}/${saldo.stockMinimo}</div>`;
                     } else {
                         const cantidad = calcularSaldoActual(saldo.id);
@@ -1040,25 +1010,10 @@
                         stockHtml = `<div style="font-size: 10px; color: #666; margin-top: 3px;">Stock: ${cantidad.toFixed(2)} ${saldo.unidad}</div>`;
                         if (alerta) alertaHTML = `<div class="alerta-stock">⚠️ ${cantidad.toFixed(2)}/${saldo.stockMinimo}</div>`;
                     }
-
-                    html += `
-                        <div class="saldo-item">
-                            <div class="saldo-info">
-                                <div class="saldo-nombre">${saldo.nombre}</div>
-                                <div class="saldo-det"><span class="tag-categoria">${categorias[saldo.categoria]}</span></div>
-                                ${stockHtml}
-                                ${alertaHTML}
-                            </div>
-                            <div style="display: flex; gap: 4px;">
-                                <button class="btn btn-small btn-edit" onclick="abrirEditarSaldo('${saldo.id}')">✏️</button>
-                                <button class="btn btn-small btn-delete" onclick="abrirEliminarSaldo('${saldo.id}')">🗑️</button>
-                            </div>
-                        </div>`;
+                    html += `<div class="saldo-item"><div class="saldo-info"><div class="saldo-nombre">${saldo.nombre}</div><div class="saldo-det"><span class="tag-categoria">${categorias[saldo.categoria]}</span></div>${stockHtml}${alertaHTML}</div><div style="display: flex; gap: 4px;"><button class="btn btn-small btn-edit" onclick="abrirEditarSaldo('${saldo.id}')">✏️</button><button class="btn btn-small btn-delete" onclick="abrirEliminarSaldo('${saldo.id}')">🗑️</button></div></div>`;
                 });
-
                 html += '</div>';
             });
-
             lista.innerHTML = html;
         }
 
@@ -1090,18 +1045,12 @@
 
         function calcularSaldoActual(productoId) {
             const saldo = saldos.find(s => s.id === productoId);
-            
-            // Obtener cantidad inicial según categoría
             let cantidad = 0;
             if (saldo?.categoria === 'proteinas') {
-                // Para proteínas: suma de cruda + cocida
                 cantidad = (parseFloat(saldo?.cantidadCruda) || 0) + (parseFloat(saldo?.cantidadCocida) || 0);
             } else {
-                // Para otros: campo cantidad
                 cantidad = parseFloat(saldo?.cantidad) || 0;
             }
-            
-            // Aplicar movimientos (entradas/salidas)
             movimientos.forEach(mov => {
                 if (mov.producto === productoId) {
                     if (mov.tipo === 'entrada') cantidad += parseFloat(mov.cantidad) || 0;
@@ -1130,8 +1079,6 @@
             document.getElementById('saldo-nombre').value = saldo.nombre;
             document.getElementById('saldo-categoria').value = saldo.categoria;
             document.getElementById('saldo-stock-minimo').value = saldo.stockMinimo || '';
-            
-            // Mostrar cantidad inicial
             if (saldo.categoria === 'proteinas') {
                 const totalCantidad = (saldo.cantidadCruda || 0) + (saldo.cantidadCocida || 0);
                 document.getElementById('saldo-cantidad-inicial').value = totalCantidad.toFixed(2);
@@ -1142,7 +1089,6 @@
                 document.getElementById('saldo-cantidad-inicial').value = (saldo.cantidad || 0).toFixed(2);
                 document.getElementById('grupo-cantidades').style.display = 'none';
             }
-            
             document.getElementById('modalSaldo').classList.add('active');
         }
 
@@ -1151,21 +1097,16 @@
             const categoria = document.getElementById('saldo-categoria').value;
             const stockMin = parseFloat(document.getElementById('saldo-stock-minimo').value);
             const cantidadInicial = parseFloat(document.getElementById('saldo-cantidad-inicial').value) || 0;
-
             if (!nombre || !categoria || isNaN(stockMin)) {
                 mostrarAlerta('⚠️ Completa todos los campos', 'error');
                 return;
             }
-
             if (saldoEnEdicion) {
                 const index = saldos.findIndex(s => s.id === saldoEnEdicion);
                 if (categoria === 'proteinas') {
                     const cantCruda = parseFloat(document.getElementById('saldo-cant-cruda').value) || 0;
                     const cantCocida = parseFloat(document.getElementById('saldo-cant-cocida').value) || 0;
-                    
-                    // Si hay valores en cruda/cocida, usar eso; si no, usar cantidad inicial
                     const usarCrudaCocida = cantCruda > 0 || cantCocida > 0;
-                    
                     saldos[index] = {
                         id: saldoEnEdicion,
                         nombre, categoria, unidad: saldos[index].unidad, stockMinimo: stockMin,
@@ -1183,18 +1124,13 @@
                 }
                 mostrarAlerta('✅ Actualizado', 'success');
             } else {
-                // Determinar unidad por defecto según categoría
                 let unidadDefault = 'kg';
                 if (categoria === 'gaseosas' || categoria === 'cervezas') unidadDefault = 'und';
                 if (categoria === 'papeleria') unidadDefault = 'und';
-
                 if (categoria === 'proteinas') {
                     const cantCruda = parseFloat(document.getElementById('saldo-cant-cruda').value) || 0;
                     const cantCocida = parseFloat(document.getElementById('saldo-cant-cocida').value) || 0;
-                    
-                    // Si hay valores específicos, usar eso; si no, usar cantidad inicial
                     const usarCrudaCocida = cantCruda > 0 || cantCocida > 0;
-                    
                     saldos.push({
                         id: 'saldo_' + Date.now(),
                         nombre, categoria, unidad: unidadDefault, stockMinimo: stockMin,
@@ -1213,8 +1149,6 @@
                 mostrarAlerta('✅ Agregado', 'success');
             }
             guardarDatos();
-            
-            // Enviar el saldo a Google Sheets
             let saldoGuardado;
             if (saldoEnEdicion) {
                 saldoGuardado = saldos.find(s => s.id === saldoEnEdicion);
@@ -1224,7 +1158,6 @@
             if (saldoGuardado) {
                 enviarSaldoAGoogleSheets(saldoGuardado);
             }
-            
             cerrarModalSaldo();
             actualizarSaldos();
             actualizarSelectos();
@@ -1245,7 +1178,6 @@
             document.getElementById('modalSaldo').classList.remove('active');
         }
 
-        // PRODUCTO RÁPIDO (DESDE ENTRADAS/SALIDAS)
         function abrirNuevoProductoEntrada() {
             document.getElementById('prod-rapido-nombre').value = '';
             document.getElementById('prod-rapido-categoria').value = '';
@@ -1254,7 +1186,7 @@
         }
 
         function abrirNuevoProductoSalida() {
-            abrirNuevoProductoEntrada(); // Mismo modal
+            abrirNuevoProductoEntrada();
         }
 
         function cerrarModalNuevoProducto() {
@@ -1265,19 +1197,14 @@
             const nombre = document.getElementById('prod-rapido-nombre').value.trim();
             const categoria = document.getElementById('prod-rapido-categoria').value;
             const minimo = parseFloat(document.getElementById('prod-rapido-minimo').value) || 0;
-
             if (!nombre || !categoria) {
                 mostrarAlerta('⚠️ Completa nombre y categoría', 'error');
                 return;
             }
-
-            // Determinar unidad por defecto
             let unidad = 'kg';
             if (categoria === 'gaseosas' || categoria === 'cervezas' || categoria === 'papeleria') {
                 unidad = 'und';
             }
-
-            // Crear saldo nuevo
             const nuevoSaldo = {
                 id: 'saldo_' + Date.now(),
                 nombre,
@@ -1287,21 +1214,14 @@
                 cantidad: 0,
                 fechaCreacion: new Date().toISOString()
             };
-
             saldos.push(nuevoSaldo);
             guardarDatos();
-            
-            // Enviar a Google Sheets
             enviarSaldoAGoogleSheets(nuevoSaldo);
-            
-            // Actualizar dropdowns
             actualizarSelectos();
-            
             mostrarAlerta('✅ Producto creado', 'success');
             cerrarModalNuevoProducto();
         }
 
-        // PROVEEDOR RÁPIDO
         function abrirNuevoProveedor() {
             document.getElementById('prov-rapido-nombre').value = '';
             document.getElementById('prov-rapido-telefono').value = '';
@@ -1315,13 +1235,10 @@
         function guardarProveedorRapido() {
             const nombre = document.getElementById('prov-rapido-nombre').value.trim();
             const telefono = document.getElementById('prov-rapido-telefono').value.trim();
-
             if (!nombre) {
                 mostrarAlerta('⚠️ Ingresa nombre del proveedor', 'error');
                 return;
             }
-
-            // Crear proveedor nuevo
             const nuevoProveedor = {
                 id: 'prov_' + Date.now(),
                 nombre,
@@ -1329,18 +1246,13 @@
                 observaciones: '',
                 fechaCreacion: new Date().toISOString()
             };
-
             proveedores.push(nuevoProveedor);
             guardarDatos();
-            
-            // Actualizar dropdown
             actualizarSelectos();
-            
             mostrarAlerta('✅ Proveedor creado', 'success');
             cerrarModalNuevoProveedor();
         }
 
-        // RESPONSABLES
         function agregarResponsable() {
             const nombre = document.getElementById('nuevo-responsable').value.trim();
             if (!nombre) { mostrarAlerta('⚠️ Ingresa nombre', 'error'); return; }
@@ -1369,14 +1281,9 @@
                 lista.innerHTML = '<p style="color: #999;">Sin responsables</p>';
                 return;
             }
-            lista.innerHTML = responsables.map(r => `
-                <div class="area-saldos" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <div style="font-weight: 600;">👤 ${r}</div>
-                    <button class="btn btn-small btn-delete" onclick="eliminarResponsable('${r}')">🗑️</button>
-                </div>`).join('');
+            lista.innerHTML = responsables.map(r => `<div class="area-saldos" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><div style="font-weight: 600;">👤 ${r}</div><button class="btn btn-small btn-delete" onclick="eliminarResponsable('${r}')">🗑️</button></div>`).join('');
         }
 
-        // CATEGORÍAS
         function agregarCategoria() {
             const nombre = document.getElementById('nueva-categoria').value.trim();
             if (!nombre) { mostrarAlerta('⚠️ Ingresa nombre', 'error'); return; }
@@ -1406,11 +1313,7 @@
 
         function actualizarListaCategorias() {
             const lista = document.getElementById('lista-categorias');
-            lista.innerHTML = Object.entries(categorias).map(([key, nombre]) => `
-                <div class="area-saldos" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <div style="font-weight: 600;">${nombre}</div>
-                    <button class="btn btn-small btn-delete" onclick="eliminarCategoria('${key}')">🗑️</button>
-                </div>`).join('');
+            lista.innerHTML = Object.entries(categorias).map(([key, nombre]) => `<div class="area-saldos" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><div style="font-weight: 600;">${nombre}</div><button class="btn btn-small btn-delete" onclick="eliminarCategoria('${key}')">🗑️</button></div>`).join('');
         }
 
         function actualizarSelectoCategorias() {
@@ -1422,10 +1325,10 @@
             if (selectRapido) selectRapido.innerHTML = opciones;
         }
 
-        // ENTRADAS
         async function enviarSaldoAGoogleSheets(saldo) {
             try {
                 const datos = {
+                    action: 'addMovimiento',
                     nombre: saldo.nombre,
                     categoria: saldo.categoria,
                     unidad: saldo.unidad,
@@ -1437,39 +1340,29 @@
                     timestamp: new Date().toISOString(),
                     esSaldoInicial: true
                 };
-                
-                const respuesta = await fetch(GOOGLE_SHEET_URL + '?action=addMovimiento', {
+                const respuesta = await fetch(GOOGLE_SHEET_URL, {
                     method: 'POST',
                     body: JSON.stringify(datos),
                     mode: 'no-cors'
                 });
-                
-                // Marcar como sincronizado en localStorage
                 const saldoSync = {
                     ...saldo,
                     sincronizado: true,
                     fechaSincronizacion: new Date().toISOString()
                 };
-                
                 const indice = saldos.findIndex(s => s.id === saldo.id);
                 if (indice !== -1) {
                     saldos[indice] = saldoSync;
                     guardarDatos();
                 }
-                
-                // Remover de la lista de no sincronizados
                 productosNoSincronizados = productosNoSincronizados.filter(p => p.id !== saldo.id);
-                
                 console.log('✅ Saldo sincronizado:', datos);
                 return true;
             } catch(error) {
                 console.error('⚠️ Error al sincronizar saldo:', error);
-                
-                // Guardar para reintento
                 if (!productosNoSincronizados.find(p => p.id === saldo.id)) {
                     productosNoSincronizados.push(saldo);
                 }
-                
                 return false;
             }
         }
@@ -1479,12 +1372,9 @@
                 mostrarAlerta('⚠️ No hay productos para sincronizar', 'error');
                 return;
             }
-
             mostrarAlerta('⏳ Sincronizando ' + saldos.length + ' productos...', 'success');
-            
             let sincronizados = 0;
             let fallidos = 0;
-            
             for (const saldo of saldos) {
                 const resultado = await enviarSaldoAGoogleSheets(saldo);
                 if (resultado) {
@@ -1494,9 +1384,7 @@
                 }
                 mostrarAlerta(`⏳ Progreso: ${sincronizados}/${saldos.length} (${fallidos} pendientes)`, 'info');
             }
-
             ultimaSincronizacion = new Date().toISOString();
-            
             if (fallidos > 0) {
                 mostrarAlerta(`✅ ${sincronizados}/${saldos.length} sincronizados. ${fallidos} en cola para reintentar.`, 'warning');
             } else {
@@ -1504,14 +1392,10 @@
             }
         }
 
-        // Actualizar indicadores de sincronización en el UI
         function actualizarIndicadoresSincronizacion() {
             const sincronizados = saldos.filter(s => s.sincronizado).length;
-            const total = 31; // Número fijo, no variable
-            
+            const total = 31;
             document.getElementById('indicador-sincronizacion').textContent = `Sincronizados: ${sincronizados}/${total}`;
-            
-            // Cambiar color según estado
             const statusDiv = document.getElementById('status-sync');
             if (estadoConexion) {
                 document.getElementById('indicador-conexion').textContent = '✅ En línea';
@@ -1535,7 +1419,6 @@
                 estadoConexion = true;
                 actualizarIndicadoresSincronizacion();
                 mostrarAlerta('📡 Conectado. Reintentando sincronización...', 'info');
-                
                 if (productosNoSincronizados.length > 0) {
                     for (const producto of productosNoSincronizados) {
                         await enviarSaldoAGoogleSheets(producto);
@@ -1543,7 +1426,6 @@
                     }
                 }
             });
-
             window.addEventListener('offline', () => {
                 console.log('⚠️ Modo offline detectado');
                 estadoConexion = false;
@@ -1556,39 +1438,39 @@
             try {
                 const saldo = saldos.find(s => s.id === movimiento.producto);
                 const proveedor = proveedores.find(p => p.id === movimiento.proveedor);
-                
                 const datos = {
-                    fecha: movimiento.fecha,
-                    hora: movimiento.hora,
-                    tipo: movimiento.tipo,
-                    producto: saldo?.nombre || '',
-                    cantidadCruda: movimiento.cantidadCruda || 0,
-                    cantidadCocida: movimiento.cantidadCocida || 0,
+                    action: 'addMovimiento',
+                    fecha: movimiento.fecha || new Date().toISOString().split('T')[0],
+                    hora: movimiento.hora || new Date().toTimeString().slice(0, 5),
+                    tipo: movimiento.tipo || 'entrada',
+                    producto: saldo?.nombre || movimiento.producto || '',
+                    cantidadCruda: Number(movimiento.cantidadCruda) || 0,
+                    cantidadCocida: Number(movimiento.cantidadCocida) || 0,
                     estado: movimiento.estado || '',
-                    responsable: movimiento.responsable,
+                    responsable: movimiento.responsable || '',
                     destino: movimiento.destino || '',
                     tipoEntrada: movimiento.tipoEntrada || '',
-                    proveedor: proveedor?.nombre || '',
-                    totalCosto: movimiento.totalCosto || 0,
-                    unidad: saldo?.unidad || ''
+                    proveedor: proveedor?.nombre || movimiento.proveedor || '',
+                    valor: Number(movimiento.totalCosto) || 0
                 };
-                
-                await fetch(GOOGLE_SHEET_URL + '?action=addMovimiento', {
+                console.log('📤 ENVIANDO A GOOGLE:', datos);
+                const response = await fetch(GOOGLE_SHEET_URL, {
                     method: 'POST',
                     body: JSON.stringify(datos),
                     mode: 'no-cors'
                 });
-                
-                console.log('✅ Enviado a Google Sheets:', datos);
+                console.log('✅ Respuesta:', response.status);
             } catch(error) {
-                console.error('Error al enviar a Google Sheets:', error);
+                console.error('❌ Error al enviar:', error);
             }
         }
 
         function actualizarEstadoEntrada() {
             const productoId = document.getElementById('producto-entrada').value;
             const saldo = saldos.find(s => s.id === productoId);
-            document.getElementById('estado-entrada-grupo').style.display = saldo?.categoria === 'proteinas' ? 'block' : 'none';
+            const esProteina = saldo?.categoria?.includes('🍖');
+            console.log('DEBUG Entrada:', {producto: saldo?.nombre, categoria: saldo?.categoria, esProteina});
+            document.getElementById('estado-entrada-grupo').style.display = esProteina ? 'block' : 'none';
         }
 
         function seleccionarEstadoEntrada(estado) {
@@ -1605,26 +1487,24 @@
             const costo = parseFloat(document.getElementById('costo-entrada').value);
             const responsable = document.getElementById('responsable-entrada').value;
             const saldo = saldos.find(s => s.id === producto);
-
             if (!proveedor || !producto || isNaN(cantidad) || isNaN(costo) || !responsable) {
                 mostrarAlerta('⚠️ Completa campos', 'error');
                 return;
             }
-
             const hoy = new Date().toISOString().split('T')[0];
             const ahora = new Date().toTimeString().slice(0, 5);
-            const estado = saldo?.categoria === 'proteinas' ? document.getElementById('estado-entrada').value : '';
-
-            // Para proteínas: separar en Cruda o Cocida
+            const esProteina = saldo?.categoria?.includes('🍖');
+            const estado = esProteina ? document.getElementById('estado-entrada').value : '';
             let cantidadCruda = 0, cantidadCocida = 0;
-            if (saldo?.categoria === 'proteinas') {
+            if (esProteina) {
                 if (estado === 'crudo') {
                     cantidadCruda = cantidad;
                 } else {
                     cantidadCocida = cantidad;
                 }
+            } else {
+                cantidadCruda = cantidad;
             }
-
             movimientos.push({
                 id: 'mov_' + Date.now(),
                 tipo: 'entrada',
@@ -1642,7 +1522,6 @@
                 responsable,
                 timestamp: new Date().toISOString()
             });
-
             const ultimoMovimiento = movimientos[movimientos.length - 1];
             guardarDatos();
             enviarAGoogleSheets(ultimoMovimiento);
@@ -1655,21 +1534,14 @@
         function actualizarListaEntradas() {
             const lista = document.getElementById('lista-entradas');
             const ultimas = movimientos.filter(m => m.tipo === 'entrada').slice(-5).reverse();
-
             if (ultimas.length === 0) {
                 lista.innerHTML = '<p style="color: #999;">Sin entradas</p>';
                 return;
             }
-
             lista.innerHTML = ultimas.map(mov => {
                 const saldo = saldos.find(s => s.id === mov.producto);
                 const prov = proveedores.find(p => p.id === mov.proveedor);
-                return `<div class="area-saldos" style="padding: 8px; margin-bottom: 6px;">
-                    <div style="font-weight: 600; font-size: 11px;">${saldo?.nombre}</div>
-                    <div style="font-size: 9px; color: #666;">
-                        ${mov.cantidad} ${saldo?.unidad} | ${mov.estado || ''} | ${prov?.nombre}
-                    </div>
-                </div>`;
+                return `<div class="area-saldos" style="padding: 8px; margin-bottom: 6px;"><div style="font-weight: 600; font-size: 11px;">${saldo?.nombre}</div><div style="font-size: 9px; color: #666;">${mov.cantidad} ${saldo?.unidad} | ${mov.estado || ''} | ${prov?.nombre}</div></div>`;
             }).join('');
         }
 
@@ -1679,11 +1551,11 @@
             document.getElementById('costo-entrada').value = '';
         }
 
-        // SALIDAS
         function actualizarEstadoSalida() {
             const productoId = document.getElementById('producto-salida').value;
             const saldo = saldos.find(s => s.id === productoId);
-            document.getElementById('estado-salida-grupo').style.display = saldo?.categoria === 'proteinas' ? 'block' : 'none';
+            const esProteina = saldo?.categoria?.includes('🍖');
+            document.getElementById('estado-salida-grupo').style.display = esProteina ? 'block' : 'none';
         }
 
         function seleccionarEstadoSalida(estado) {
@@ -1698,38 +1570,34 @@
             const cantidad = parseFloat(document.getElementById('cantidad-salida').value);
             const responsable = document.getElementById('responsable-salida').value;
             const saldo = saldos.find(s => s.id === producto);
-
             if (!destino || !producto || isNaN(cantidad) || !responsable) {
                 mostrarAlerta('⚠️ Completa campos', 'error');
                 return;
             }
-
             const hoy = new Date().toISOString().split('T')[0];
             const ahora = new Date().toTimeString().slice(0, 5);
-            const estado = saldo?.categoria === 'proteinas' ? document.getElementById('estado-salida').value : '';
-
+            const esProteina = saldo?.categoria?.includes('🍖');
+            const estado = esProteina ? document.getElementById('estado-salida').value : '';
             let saldoActual = 0;
-            if (saldo?.categoria === 'proteinas') {
+            if (esProteina) {
                 saldoActual = estado === 'crudo' ? calcularSaldoCrudo(producto) : calcularSaldoCocido(producto);
             } else {
                 saldoActual = calcularSaldoActual(producto);
             }
-
             if (cantidad > saldoActual) {
                 mostrarAlerta(`⚠️ Stock insuficiente: ${saldoActual}`, 'error');
                 return;
             }
-
-            // Para proteínas: separar en Cruda o Cocida
             let cantidadCruda = 0, cantidadCocida = 0;
-            if (saldo?.categoria === 'proteinas') {
+            if (esProteina) {
                 if (estado === 'crudo') {
                     cantidadCruda = cantidad;
                 } else {
                     cantidadCocida = cantidad;
                 }
+            } else {
+                cantidadCruda = cantidad;
             }
-
             movimientos.push({
                 id: 'mov_' + Date.now(),
                 tipo: 'salida',
@@ -1744,7 +1612,6 @@
                 responsable,
                 timestamp: new Date().toISOString()
             });
-
             const ultimoMovimiento = movimientos[movimientos.length - 1];
             guardarDatos();
             enviarAGoogleSheets(ultimoMovimiento);
@@ -1757,22 +1624,14 @@
         function actualizarListaSalidas() {
             const lista = document.getElementById('lista-salidas');
             const ultimas = movimientos.filter(m => m.tipo === 'salida').slice(-5).reverse();
-
             if (ultimas.length === 0) {
                 lista.innerHTML = '<p style="color: #999;">Sin salidas</p>';
                 return;
             }
-
             const destinos = {'cocina': '👨‍🍳', 'barril': '🍖', 'caja': '💰', 'consumo': '🥘', 'barril-venta': '💵', 'merma': '📉', 'danio': '🔥'};
-
             lista.innerHTML = ultimas.map(mov => {
                 const saldo = saldos.find(s => s.id === mov.producto);
-                return `<div class="area-saldos" style="padding: 8px; margin-bottom: 6px;">
-                    <div style="font-weight: 600; font-size: 11px;">${saldo?.nombre}</div>
-                    <div style="font-size: 9px; color: #666;">
-                        ${destinos[mov.destino] || '📍'} ${mov.cantidad} ${saldo?.unidad} | ${mov.estado || ''}
-                    </div>
-                </div>`;
+                return `<div class="area-saldos" style="padding: 8px; margin-bottom: 6px;"><div style="font-weight: 600; font-size: 11px;">${saldo?.nombre}</div><div style="font-size: 9px; color: #666;">${destinos[mov.destino] || '📍'} ${mov.cantidad} ${saldo?.unidad} | ${mov.estado || ''}</div></div>`;
             }).join('');
         }
 
@@ -1781,42 +1640,22 @@
             document.getElementById('cantidad-salida').value = '';
         }
 
-        // REPORTES
         function actualizarReportes() {
             const desde = document.getElementById('fecha-desde').value;
             const hasta = document.getElementById('fecha-hasta').value;
-
-            // Si no hay fechas, mostrar TODOS los movimientos
-            const movsFiltrados = !desde || !hasta 
-                ? movimientos 
-                : movimientos.filter(m => m.fecha >= desde && m.fecha <= hasta);
-
-            // ALERTAS
+            const movsFiltrados = !desde || !hasta ? movimientos : movimientos.filter(m => m.fecha >= desde && m.fecha <= hasta);
             const alertasDiv = document.getElementById('alertas-stock');
             const alertas = saldos.filter(s => {
-                const total = (s.categoria === 'proteinas') 
-                    ? (calcularSaldoCrudo(s.id) + calcularSaldoCocido(s.id))
-                    : calcularSaldoActual(s.id);
+                const total = (s.categoria === 'proteinas') ? (calcularSaldoCrudo(s.id) + calcularSaldoCocido(s.id)) : calcularSaldoActual(s.id);
                 return total < (s.stockMinimo || 0);
             });
-
-            alertasDiv.innerHTML = alertas.length === 0 
-                ? '<div style="color: #28a745; font-weight: 600;">✅ Sin alertas</div>'
-                : alertas.map(s => {
-                    const total = (s.categoria === 'proteinas') 
-                        ? (calcularSaldoCrudo(s.id) + calcularSaldoCocido(s.id))
-                        : calcularSaldoActual(s.id);
-                    return `<div class="resumen-box">
-                        <strong>${s.nombre}</strong><br>
-                        Stock: ${total.toFixed(2)} | Mín: ${s.stockMinimo}
-                    </div>`;
-                }).join('');
-
-            // COSTOS
+            alertasDiv.innerHTML = alertas.length === 0 ? '<div style="color: #28a745; font-weight: 600;">✅ Sin alertas</div>' : alertas.map(s => {
+                const total = (s.categoria === 'proteinas') ? (calcularSaldoCrudo(s.id) + calcularSaldoCocido(s.id)) : calcularSaldoActual(s.id);
+                return `<div class="resumen-box"><strong>${s.nombre}</strong><br>Stock: ${total.toFixed(2)} | Mín: ${s.stockMinimo}</div>`;
+            }).join('');
             const costosDiv = document.getElementById('resumen-costos');
             let costoTotal = 0;
             const costosPorCat = {};
-
             movsFiltrados.filter(m => m.tipo === 'entrada').forEach(mov => {
                 const saldo = saldos.find(s => s.id === mov.producto);
                 const cat = saldo?.categoria || 'otros';
@@ -1824,108 +1663,56 @@
                 costosPorCat[cat] += mov.totalCosto || 0;
                 costoTotal += mov.totalCosto || 0;
             });
-
-            costosDiv.innerHTML = `
-                <div class="resumen-box">
-                    <div class="resumen-titulo">TOTAL INVERTIDO: $${costoTotal.toLocaleString('es-CO')}</div>
-                    ${Object.entries(costosPorCat).map(([cat, costo]) => `
-                        <div class="resumen-item">
-                            <span>${categorias[cat] || cat}</span>
-                            <span class="resumen-valor">$${costo.toLocaleString('es-CO')}</span>
-                        </div>
-                    `).join('')}
-                </div>`;
-
-            // STOCK ACTUAL
+            costosDiv.innerHTML = `<div class="resumen-box"><div class="resumen-titulo">TOTAL INVERTIDO: $${costoTotal.toLocaleString('es-CO')}</div>${Object.entries(costosPorCat).map(([cat, costo]) => `<div class="resumen-item"><span>${categorias[cat] || cat}</span><span class="resumen-valor">$${costo.toLocaleString('es-CO')}</span></div>`).join('')}</div>`;
             const stockDiv = document.getElementById('tabla-stock-actual');
-            
-            // Separar proteínas de otros productos
             const proteinas = saldos.filter(s => s.categoria === 'proteinas');
             const otros = saldos.filter(s => s.categoria !== 'proteinas');
-            
             let html = '';
-            
-            // Tabla de PROTEÍNAS (con columnas separadas para cruda y cocida)
             if (proteinas.length > 0) {
                 html += '<div style="margin-bottom: 20px;"><h4 style="color: #8B0000; margin-bottom: 10px;">🍖 PROTEÍNAS</h4>';
                 html += '<table class="tabla-reportes"><thead><tr><th>Producto</th><th>Cruda (kg) 🔵</th><th>Cocida (kg) 🔴</th><th>Total</th></tr></thead><tbody>';
-                
                 proteinas.forEach(s => {
                     const cruda = calcularSaldoCrudo(s.id).toFixed(2);
                     const cocida = calcularSaldoCocido(s.id).toFixed(2);
                     const total = (parseFloat(cruda) + parseFloat(cocida)).toFixed(2);
-                    
-                    html += `<tr style="${parseFloat(total) < s.stockMinimo ? 'background: #fff3cd;' : ''}">
-                        <td><strong>${s.nombre}</strong></td>
-                        <td style="text-align: center; color: #0066cc;">${cruda}</td>
-                        <td style="text-align: center; color: #cc0000;">${cocida}</td>
-                        <td style="text-align: center; font-weight: bold;">${total} ${s.unidad}</td>
-                    </tr>`;
+                    html += `<tr style="${parseFloat(total) < s.stockMinimo ? 'background: #fff3cd;' : ''}"><td><strong>${s.nombre}</strong></td><td style="text-align: center; color: #0066cc;">${cruda}</td><td style="text-align: center; color: #cc0000;">${cocida}</td><td style="text-align: center; font-weight: bold;">${total} ${s.unidad}</td></tr>`;
                 });
-                
                 html += '</tbody></table></div>';
             }
-            
-            // Tabla de OTROS PRODUCTOS
             if (otros.length > 0) {
                 html += '<div><h4 style="color: #666; margin-bottom: 10px;">📦 OTROS PRODUCTOS</h4>';
                 html += '<table class="tabla-reportes"><thead><tr><th>Producto</th><th>Categoría</th><th>Stock</th></tr></thead><tbody>';
-                
                 otros.forEach(s => {
                     const total = calcularSaldoActual(s.id).toFixed(2);
-                    html += `<tr style="${parseFloat(total) < s.stockMinimo ? 'background: #fff3cd;' : ''}">
-                        <td><strong>${s.nombre}</strong></td>
-                        <td>${categorias[s.categoria]}</td>
-                        <td style="text-align: center; font-weight: bold;">${total} ${s.unidad}</td>
-                    </tr>`;
+                    html += `<tr style="${parseFloat(total) < s.stockMinimo ? 'background: #fff3cd;' : ''}"><td><strong>${s.nombre}</strong></td><td>${categorias[s.categoria]}</td><td style="text-align: center; font-weight: bold;">${total} ${s.unidad}</td></tr>`;
                 });
-                
                 html += '</tbody></table></div>';
             }
-            
             stockDiv.innerHTML = html;
-
-            // MOVIMIENTOS
             const movsDiv = document.getElementById('tabla-movimientos');
             html = '<table class="tabla-reportes"><thead><tr><th>Fecha</th><th>Tipo</th><th>Producto</th><th>Cantidad</th><th>Responsable</th></tr></thead><tbody>';
-
             movsFiltrados.slice().reverse().forEach(mov => {
                 const saldo = saldos.find(s => s.id === mov.producto);
                 const tipo = mov.tipo === 'entrada' ? '📥' : '📤';
-                html += `<tr>
-                    <td>${mov.fecha} ${mov.hora}</td>
-                    <td>${tipo}</td>
-                    <td>${saldo?.nombre}</td>
-                    <td>${mov.cantidad} ${mov.estado || ''}</td>
-                    <td>${mov.responsable}</td>
-                </tr>`;
+                html += `<tr><td>${mov.fecha} ${mov.hora}</td><td>${tipo}</td><td>${saldo?.nombre}</td><td>${mov.cantidad} ${mov.estado || ''}</td><td>${mov.responsable}</td></tr>`;
             });
-
             html += '</tbody></table>';
             movsDiv.innerHTML = html;
         }
 
-        // DESCARGAR EXCEL CON JSZIP + XML
         async function descargarExcel() {
             try {
                 mostrarAlerta('⏳ Generando EXCEL...', 'success');
-                
                 const desde = document.getElementById('fecha-desde').value;
                 const hasta = document.getElementById('fecha-hasta').value;
                 const movsFiltrados = movimientos.filter(m => m.fecha >= desde && m.fecha <= hasta);
-
-                // Preparar datos HOJA 1
                 const stockData = saldos.map(s => ({
                     Producto: s.nombre,
                     Categoría: categorias[s.categoria] || s.categoria,
-                    Stock: (s.categoria === 'proteinas') 
-                        ? (calcularSaldoCrudo(s.id) + calcularSaldoCocido(s.id)).toFixed(2)
-                        : calcularSaldoActual(s.id).toFixed(2),
+                    Stock: (s.categoria === 'proteinas') ? (calcularSaldoCrudo(s.id) + calcularSaldoCocido(s.id)).toFixed(2) : calcularSaldoActual(s.id).toFixed(2),
                     Unidad: s.unidad,
                     Mínimo: s.stockMinimo
                 }));
-
-                // Preparar datos HOJA 2
                 const movsData = movsFiltrados.map(m => ({
                     Fecha: m.fecha,
                     Hora: m.hora,
@@ -1938,16 +1725,9 @@
                     Costo: m.totalCosto || '',
                     Proveedor: m.proveedor ? proveedores.find(p => p.id === m.proveedor)?.nombre || '' : ''
                 }));
-
-                // Crear XML para HOJA 1
                 const sheet1XML = arrayToXML(stockData, 'Stock Actual');
-                // Crear XML para HOJA 2
                 const sheet2XML = arrayToXML(movsData, 'Movimientos');
-
-                // Crear EXCEL como ZIP
                 const zip = new JSZip();
-
-                // Agregar estructura
                 zip.file('[Content_Types].xml', getContentTypesXML());
                 zip.file('_rels/.rels', getRelsXML());
                 zip.file('xl/_rels/workbook.xml.rels', getWorkbookRelsXML());
@@ -1956,8 +1736,6 @@
                 zip.file('xl/worksheets/sheet2.xml', sheet2XML);
                 zip.file('xl/theme/theme1.xml', getThemeXML());
                 zip.file('docProps/core.xml', getCorePropsXML());
-
-                // Generar EXCEL
                 const content = await zip.generateAsync({type: 'blob'});
                 const url = URL.createObjectURL(content);
                 const link = document.createElement('a');
@@ -1967,9 +1745,7 @@
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
-
                 mostrarAlerta('✅ EXCEL descargado correctamente', 'success');
-
             } catch (error) {
                 console.error(error);
                 mostrarAlerta('❌ Error: ' + error.message, 'error');
@@ -1980,18 +1756,12 @@
             if (!data || data.length === 0) {
                 data = [{resultado: 'Sin datos'}];
             }
-
             const headers = Object.keys(data[0]);
-            let xml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-<sheetData>
-<row r="1">`;
-
+            let xml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">\n<sheetData>\n<row r="1">`;
             headers.forEach((h, i) => {
                 xml += `<c r="${String.fromCharCode(65+i)}1" t="inlineStr"><is><t>${escapeXML(h)}</t></is></c>`;
             });
             xml += `</row>`;
-
             data.forEach((row, rowIdx) => {
                 xml += `<row r="${rowIdx + 2}">`;
                 headers.forEach((h, colIdx) => {
@@ -2000,87 +1770,43 @@
                 });
                 xml += `</row>`;
             });
-
             xml += `</sheetData></worksheet>`;
             return xml;
         }
 
         function escapeXML(str) {
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&apos;');
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
         }
 
         function getContentTypesXML() {
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-<Default Extension="xml" ContentType="application/xml"/>
-<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
-<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
-<Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
-<Override PartName="/xl/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>
-<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
-</Types>`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n<Default Extension="xml" ContentType="application/xml"/>\n<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>\n<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>\n<Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>\n<Override PartName="/xl/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>\n<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>\n</Types>`;
         }
 
         function getRelsXML() {
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
-<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
-</Relationships>`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>\n<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>\n</Relationships>`;
         }
 
         function getWorkbookRelsXML() {
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
-<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>
-<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>
-</Relationships>`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>\n<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>\n<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>\n</Relationships>`;
         }
 
         function getWorkbookXML() {
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-<sheets>
-<sheet name="Stock Actual" sheetId="1" r:id="rId1" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>
-<sheet name="Movimientos" sheetId="2" r:id="rId2" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>
-</sheets>
-</workbook>`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">\n<sheets>\n<sheet name="Stock Actual" sheetId="1" r:id="rId1" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>\n<sheet name="Movimientos" sheetId="2" r:id="rId2" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>\n</sheets>\n</workbook>`;
         }
 
         function getThemeXML() {
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Office"><a:themeElements/></a:theme>`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Office"><a:themeElements/></a:theme>`;
         }
 
         function getCorePropsXML() {
             const now = new Date().toISOString();
-            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<dc:title>Rincón del Barril</dc:title>
-<dc:creator>Sistema Gestión</dc:creator>
-<cp:lastModifiedBy>Sistema</cp:lastModifiedBy>
-<dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created>
-<dcterms:modified xsi:type="dcterms:W3CDTF">${now}</dcterms:modified>
-</cp:coreProperties>`;
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n<dc:title>Rincón del Barril</dc:title>\n<dc:creator>Sistema Gestión</dc:creator>\n<cp:lastModifiedBy>Sistema</cp:lastModifiedBy>\n<dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created>\n<dcterms:modified xsi:type="dcterms:W3CDTF">${now}</dcterms:modified>\n</cp:coreProperties>`;
         }
 
-        // UTILIDADES
         function actualizarSelectos() {
-            const opcionesProductos = saldos.map(s => 
-                `<option value="${s.id}">${s.nombre}</option>`
-            ).join('');
-            const opcionesProveedores = proveedores.map(p => 
-                `<option value="${p.id}">${p.nombre}</option>`
-            ).join('');
+            const opcionesProductos = saldos.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
+            const opcionesProveedores = proveedores.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
             const opcionesResponsables = responsables.map(r => `<option value="${r}">${r}</option>`).join('');
-
             document.getElementById('producto-entrada').innerHTML = '<option value="">-- Selecciona --</option>' + opcionesProductos;
             document.getElementById('producto-salida').innerHTML = '<option value="">-- Selecciona --</option>' + opcionesProductos;
             document.getElementById('proveedor-entrada').innerHTML = '<option value="">-- Selecciona --</option>' + opcionesProveedores;
@@ -2099,36 +1825,16 @@
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tab).classList.add('active');
             event.target.classList.add('active');
-            
-            // Si es reportes, actualizar los datos
             if (tab === 'reportes') {
                 actualizarReportes();
             }
         }
 
-        // DETECTAR SI ESTÁ EN MODO ARCHIVO LOCAL
         function verificarModoArchivo() {
             if (window.location.protocol === 'file:') {
                 const alerta = document.createElement('div');
-                alerta.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    background: #ff6b6b;
-                    color: white;
-                    padding: 15px;
-                    text-align: center;
-                    font-weight: 600;
-                    z-index: 9999;
-                    border-bottom: 3px solid #d32f2f;
-                `;
-                alerta.innerHTML = `
-                    ⚠️ ATENCIÓN: Estás usando archivo local. Los datos NO persisten entre sesiones.
-                    <br><small style="display: block; margin-top: 5px;">
-                    Solución: Usa servidor local (iniciar_servidor.bat/sh) o Google Drive
-                    </small>
-                `;
+                alerta.style.cssText = `position: fixed; top: 0; left: 0; right: 0; background: #ff6b6b; color: white; padding: 15px; text-align: center; font-weight: 600; z-index: 9999; border-bottom: 3px solid #d32f2f;`;
+                alerta.innerHTML = `⚠️ ATENCIÓN: Estás usando archivo local. Los datos NO persisten entre sesiones.<br><small style="display: block; margin-top: 5px;">Solución: Usa servidor local (iniciar_servidor.bat/sh) o Google Drive</small>`;
                 document.body.insertBefore(alerta, document.body.firstChild);
                 document.body.style.paddingTop = '60px';
             }
