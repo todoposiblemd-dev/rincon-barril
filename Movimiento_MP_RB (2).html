@@ -811,7 +811,7 @@
         ];
 
         // URL DE GOOGLE APPS SCRIPT PARA SINCRONIZAR MOVIMIENTOS
-        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxo6D-bjcEZx5HgbR2G2pfppZ9qLg8eZco6nqFUJWXc3PgwJ0CFh0c-FyOO_-jHWwfzXA/exec';
+        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzBcMmnE7y7eFesjNPUZ_A9uyOZYt2eDstU6x6aRSR87xz5O2XJzTEWc58M3fdVCS6u/exec';
 
         // VARIABLES
         let usuarioActual = {};
@@ -1438,7 +1438,7 @@
                     esSaldoInicial: true
                 };
                 
-                const respuesta = await fetch(GOOGLE_SHEET_URL, {
+                const respuesta = await fetch(GOOGLE_SHEET_URL + '?action=addMovimiento', {
                     method: 'POST',
                     body: JSON.stringify(datos),
                     mode: 'no-cors'
@@ -1573,7 +1573,7 @@
                     unidad: saldo?.unidad || ''
                 };
                 
-                await fetch(GOOGLE_SHEET_URL, {
+                await fetch(GOOGLE_SHEET_URL + '?action=addMovimiento', {
                     method: 'POST',
                     body: JSON.stringify(datos),
                     mode: 'no-cors'
