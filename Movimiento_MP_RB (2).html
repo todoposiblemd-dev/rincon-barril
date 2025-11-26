@@ -811,7 +811,7 @@
         ];
 
         // URL DE GOOGLE APPS SCRIPT PARA SINCRONIZAR MOVIMIENTOS
-        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwm-dIvHgZgQpTL4li_WbwRjoxcyhuc5cYUC9KTBoP_aau0IHZCsgdvWlc3_lWiNsDO/exec';
+        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzS-TAtOaRdF81rJu7IMk-cpGpga_FXrjCrQ6QKZpV6qAagux2iqMqTQn05TZfPoey-/exec';
 
         // VARIABLES
         let usuarioActual = {};
@@ -837,12 +837,7 @@
                 if (datosGuardados) {
                     const datos = JSON.parse(datosGuardados);
                     if (datos.saldos && datos.saldos.length > 100) {
-                        console.warn('⚠️ Datos corruptos detectados: ' + datos.saldos.length + ' productos (debería ser 31)');
-                        limpiarLocalStorage();
-                        return false;
-                    }
-                    if (datos.saldos && !datos.saldos[0]?.nombre) {
-                        console.warn('⚠️ Estructura de datos inválida');
+                        console.warn('⚠️ Datos corruptos detectados');
                         limpiarLocalStorage();
                         return false;
                     }
@@ -858,7 +853,6 @@
         function inicializar() {
             console.log('✅ Sistema Iniciando...');
             localStorage.clear();
-            console.log('✅ localStorage limpio');
             cargarDatos();
             if (saldos.length === 0) {
                 saldos = PRODUCTOS_INICIALES.map((p, i) => {
@@ -897,13 +891,13 @@
             actualizarListaCategorias();
             establecerFechasActuales();
             detectarConexion();
+            
+            // Sincronizar SOLO los 72 saldos iniciales
             setTimeout(() => {
-                if (saldos.length > 0) {
-                    console.log('🔄 Iniciando sincronización automática de ' + saldos.length + ' productos...');
-                    saldos.forEach(saldo => {
-                        enviarSaldoAGoogleSheets(saldo);
-                    });
-                }
+                console.log('🔄 Sincronizando ' + saldos.length + ' productos iniciales a Google...');
+                saldos.forEach(saldo => {
+                    enviarSaldoAGoogleSheets(saldo);
+                });
             }, 2000);
         }
 
@@ -959,7 +953,6 @@
                         sincronizado: false
                     };
                     saldos.push(nuevoSaldo);
-                    console.log('✅ Agregado producto: ' + producto.nombre);
                 }
             });
             console.log('✅ Total productos cargados: ' + saldos.length);
@@ -1149,15 +1142,6 @@
                 mostrarAlerta('✅ Agregado', 'success');
             }
             guardarDatos();
-            let saldoGuardado;
-            if (saldoEnEdicion) {
-                saldoGuardado = saldos.find(s => s.id === saldoEnEdicion);
-            } else {
-                saldoGuardado = saldos[saldos.length - 1];
-            }
-            if (saldoGuardado) {
-                enviarSaldoAGoogleSheets(saldoGuardado);
-            }
             cerrarModalSaldo();
             actualizarSaldos();
             actualizarSelectos();
@@ -1216,9 +1200,8 @@
             };
             saldos.push(nuevoSaldo);
             guardarDatos();
-            enviarSaldoAGoogleSheets(nuevoSaldo);
             actualizarSelectos();
-            mostrarAlerta('✅ Producto creado', 'success');
+            mostrarAlerta('✅ Producto creado (local)', 'success');
             cerrarModalNuevoProducto();
         }
 
@@ -1367,70 +1350,16 @@
             }
         }
 
-        async function sincronizarTodosSaldos() {
-            if (saldos.length === 0) {
-                mostrarAlerta('⚠️ No hay productos para sincronizar', 'error');
-                return;
-            }
-            mostrarAlerta('⏳ Sincronizando ' + saldos.length + ' productos...', 'success');
-            let sincronizados = 0;
-            let fallidos = 0;
-            for (const saldo of saldos) {
-                const resultado = await enviarSaldoAGoogleSheets(saldo);
-                if (resultado) {
-                    sincronizados++;
-                } else {
-                    fallidos++;
-                }
-                mostrarAlerta(`⏳ Progreso: ${sincronizados}/${saldos.length} (${fallidos} pendientes)`, 'info');
-            }
-            ultimaSincronizacion = new Date().toISOString();
-            if (fallidos > 0) {
-                mostrarAlerta(`✅ ${sincronizados}/${saldos.length} sincronizados. ${fallidos} en cola para reintentar.`, 'warning');
-            } else {
-                mostrarAlerta(`✅ ¡${sincronizados} productos sincronizados correctamente!`, 'success');
-            }
-        }
-
-        function actualizarIndicadoresSincronizacion() {
-            const sincronizados = saldos.filter(s => s.sincronizado).length;
-            const total = 31;
-            document.getElementById('indicador-sincronizacion').textContent = `Sincronizados: ${sincronizados}/${total}`;
-            const statusDiv = document.getElementById('status-sync');
-            if (estadoConexion) {
-                document.getElementById('indicador-conexion').textContent = '✅ En línea';
-                if (sincronizados === total) {
-                    statusDiv.style.background = '#d4edda';
-                    statusDiv.style.color = '#155724';
-                } else {
-                    statusDiv.style.background = '#fff3cd';
-                    statusDiv.style.color = '#856404';
-                }
-            } else {
-                document.getElementById('indicador-conexion').textContent = '⚠️ Sin conexión';
-                statusDiv.style.background = '#f8d7da';
-                statusDiv.style.color = '#721c24';
-            }
-        }
-
         function detectarConexion() {
             window.addEventListener('online', async () => {
-                console.log('📡 Reconexión detectada. Reintentando sincronización...');
+                console.log('📡 Reconexión detectada');
                 estadoConexion = true;
-                actualizarIndicadoresSincronizacion();
-                mostrarAlerta('📡 Conectado. Reintentando sincronización...', 'info');
-                if (productosNoSincronizados.length > 0) {
-                    for (const producto of productosNoSincronizados) {
-                        await enviarSaldoAGoogleSheets(producto);
-                        actualizarIndicadoresSincronizacion();
-                    }
-                }
+                mostrarAlerta('📡 Conectado', 'info');
             });
             window.addEventListener('offline', () => {
-                console.log('⚠️ Modo offline detectado');
+                console.log('⚠️ Modo offline');
                 estadoConexion = false;
-                actualizarIndicadoresSincronizacion();
-                mostrarAlerta('⚠️ Trabajando sin conexión. Los cambios se sincronizarán después.', 'warning');
+                mostrarAlerta('⚠️ Sin conexión', 'warning');
             });
         }
 
@@ -1451,7 +1380,9 @@
                     destino: movimiento.destino || '',
                     tipoEntrada: movimiento.tipoEntrada || '',
                     proveedor: proveedor?.nombre || movimiento.proveedor || '',
-                    valor: Number(movimiento.totalCosto) || 0
+                    valor: Number(movimiento.totalCosto) || 0,
+                    unidad: saldo?.unidad || 'kg',
+                    categoria: saldo?.categoria || ''
                 };
                 console.log('📤 ENVIANDO A GOOGLE:', datos);
                 const response = await fetch(GOOGLE_SHEET_URL, {
@@ -1725,8 +1656,8 @@
                     Costo: m.totalCosto || '',
                     Proveedor: m.proveedor ? proveedores.find(p => p.id === m.proveedor)?.nombre || '' : ''
                 }));
-                const sheet1XML = arrayToXML(stockData, 'Stock Actual');
-                const sheet2XML = arrayToXML(movsData, 'Movimientos');
+                const sheet1XML = arrayToXML(stockData);
+                const sheet2XML = arrayToXML(movsData);
                 const zip = new JSZip();
                 zip.file('[Content_Types].xml', getContentTypesXML());
                 zip.file('_rels/.rels', getRelsXML());
@@ -1752,7 +1683,7 @@
             }
         }
 
-        function arrayToXML(data, sheetName) {
+        function arrayToXML(data) {
             if (!data || data.length === 0) {
                 data = [{resultado: 'Sin datos'}];
             }
@@ -1834,7 +1765,7 @@
             if (window.location.protocol === 'file:') {
                 const alerta = document.createElement('div');
                 alerta.style.cssText = `position: fixed; top: 0; left: 0; right: 0; background: #ff6b6b; color: white; padding: 15px; text-align: center; font-weight: 600; z-index: 9999; border-bottom: 3px solid #d32f2f;`;
-                alerta.innerHTML = `⚠️ ATENCIÓN: Estás usando archivo local. Los datos NO persisten entre sesiones.<br><small style="display: block; margin-top: 5px;">Solución: Usa servidor local (iniciar_servidor.bat/sh) o Google Drive</small>`;
+                alerta.innerHTML = `⚠️ ATENCIÓN: Estás usando archivo local. Los datos NO persisten entre sesiones.<br><small style="display: block; margin-top: 5px;">Solución: Usa servidor local o GitHub Pages</small>`;
                 document.body.insertBefore(alerta, document.body.firstChild);
                 document.body.style.paddingTop = '60px';
             }
