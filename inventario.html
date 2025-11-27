@@ -421,6 +421,11 @@
 
             <!-- TAB ENTRADAS -->
             <div id="entradas" class="tab-content">
+                <div style="margin-bottom: 10px; display: flex; gap: 8px;">
+                    <button class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 10px;" onclick="mostrarModalProducto()">➕ Agregar Producto</button>
+                    <button class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 10px;" onclick="mostrarModalProveedor()">➕ Proveedor</button>
+                </div>
+
                 <div class="form-group">
                     <label>Proveedor *</label>
                     <select id="entrada-proveedor" required>
@@ -535,6 +540,60 @@
         </div>
     </div>
 
+    <!-- MODAL NUEVO PRODUCTO -->
+    <div id="modalProducto" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; padding-top: 50px;">
+        <div style="background: white; width: 90%; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #8B0000; margin-bottom: 15px; font-size: 14px;">➕ Nuevo Producto</h2>
+            <div class="form-group">
+                <label>Nombre *</label>
+                <input type="text" id="nuevoProductoNombre" placeholder="Ej: Cilantro">
+            </div>
+            <div class="form-group">
+                <label>Categoría *</label>
+                <select id="nuevoProductoCategoria">
+                    <option value="">-- Selecciona --</option>
+                    <option value="🍖 Proteínas">🍖 Proteínas</option>
+                    <option value="🧀 Lácteos">🧀 Lácteos</option>
+                    <option value="❄️ Congelados">❄️ Congelados</option>
+                    <option value="🌾 Secos">🌾 Secos</option>
+                    <option value="🥬 Verduras">🥬 Verduras</option>
+                    <option value="🥤 Gaseosas">🥤 Gaseosas</option>
+                    <option value="🍺 Cervezas">🍺 Cervezas</option>
+                    <option value="🧂 Condimentos/Salsas">🧂 Condimentos/Salsas</option>
+                    <option value="🧋 Bebidas">🧋 Bebidas</option>
+                    <option value="📦 Empaques">📦 Empaques</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Mínimo</label>
+                <input type="number" id="nuevoProductoMinimo" placeholder="0" step="0.1" value="0">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button class="btn btn-primary" onclick="guardarProductoNuevo()">Guardar</button>
+                <button class="btn btn-secondary" onclick="cerrarModalProducto()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NUEVO PROVEEDOR -->
+    <div id="modalProveedor" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; padding-top: 50px;">
+        <div style="background: white; width: 90%; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #8B0000; margin-bottom: 15px; font-size: 14px;">➕ Nuevo Proveedor</h2>
+            <div class="form-group">
+                <label>Nombre *</label>
+                <input type="text" id="nuevoProveedorNombre" placeholder="Ej: Fruver Centro">
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" id="nuevoProveedorTelefono" placeholder="+57 300 1234567">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button class="btn btn-primary" onclick="guardarProveedorNuevo()">Guardar</button>
+                <button class="btn btn-secondary" onclick="cerrarModalProveedor()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const GOOGLE_SHEET_ID = '1rSGXUYAQm8rMsEyyyuRqmquAbf_2-agq2pwSaLTyhms';
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNK_URJVwuj-TDinkgMx-DjWxks1L6EfyB6TMZz61Y1YKdt3zV9qX3O4WYxLztphFOKQ/exec';
@@ -623,8 +682,38 @@
             }
         }
 
-        // SALDOS
+        // SALDOS - CÁLCULO EN VIVO
         function actualizarSaldos() {
+            const productosMejorados = productos.map(p => {
+                let saldoCrudo = p.saldoCrudo;
+                let saldoCocido = p.saldoCocido;
+
+                // Sumar movimientos existentes
+                movimientos.forEach(m => {
+                    if (m.producto === p.producto) {
+                        if (m.tipo === 'entrada') {
+                            saldoCrudo += m.cantidadCrudo;
+                            saldoCocido += m.cantidadCocido;
+                        } else if (m.tipo === 'salida') {
+                            saldoCrudo -= m.cantidadCrudo;
+                            saldoCocido -= m.cantidadCocido;
+                        }
+                    }
+                });
+
+                // No permitir negativos
+                saldoCrudo = Math.max(0, saldoCrudo);
+                saldoCocido = Math.max(0, saldoCocido);
+
+                return {
+                    ...p,
+                    saldoCrudo,
+                    saldoCocido,
+                    total: saldoCrudo + saldoCocido
+                };
+            });
+
+            productos = productosMejorados;
             filtrarSaldos();
         }
 
@@ -869,6 +958,73 @@
             const div = document.getElementById('alerta');
             div.innerHTML = `<div class="alerta ${tipo}">${msg}</div>`;
             setTimeout(() => { div.innerHTML = ''; }, 2500);
+        }
+
+        function mostrarModalProducto() {
+            document.getElementById('modalProducto').style.display = 'block';
+        }
+
+        function cerrarModalProducto() {
+            document.getElementById('modalProducto').style.display = 'none';
+        }
+
+        function guardarProductoNuevo() {
+            const nombre = document.getElementById('nuevoProductoNombre').value.trim();
+            const categoria = document.getElementById('nuevoProductoCategoria').value;
+            const minimo = parseFloat(document.getElementById('nuevoProductoMinimo').value) || 0;
+
+            if (!nombre || !categoria) {
+                mostrarAlerta('⚠️ Completa nombre y categoría', 'error');
+                return;
+            }
+
+            const nuevoProducto = {
+                id: productos.length + 1,
+                producto: nombre,
+                categoria: categoria,
+                saldoCrudo: 0,
+                saldoCocido: 0,
+                total: 0,
+                unidad: 'kg',
+                minimo: minimo
+            };
+
+            productos.push(nuevoProducto);
+            actualizarSelects();
+            actualizarFiltros();
+            filtrarSaldos();
+            mostrarAlerta('✅ Producto creado', 'success');
+            document.getElementById('nuevoProductoNombre').value = '';
+            document.getElementById('nuevoProductoCategoria').value = '';
+            document.getElementById('nuevoProductoMinimo').value = '0';
+            cerrarModalProducto();
+        }
+
+        function mostrarModalProveedor() {
+            document.getElementById('modalProveedor').style.display = 'block';
+        }
+
+        function cerrarModalProveedor() {
+            document.getElementById('modalProveedor').style.display = 'none';
+        }
+
+        function guardarProveedorNuevo() {
+            const nombre = document.getElementById('nuevoProveedorNombre').value.trim();
+            if (!nombre) {
+                mostrarAlerta('⚠️ Ingresa nombre', 'error');
+                return;
+            }
+
+            const selectProveedor = document.getElementById('entrada-proveedor');
+            const option = document.createElement('option');
+            option.value = nombre;
+            option.text = nombre;
+            selectProveedor.appendChild(option);
+
+            mostrarAlerta('✅ Proveedor creado', 'success');
+            document.getElementById('nuevoProveedorNombre').value = '';
+            document.getElementById('nuevoProveedorTelefono').value = '';
+            cerrarModalProveedor();
         }
 
         window.addEventListener('load', inicializar);
