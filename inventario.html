@@ -712,21 +712,32 @@
 
         async function cargarProductos() {
             try {
+                console.log('🔄 Solicitando productos...');
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'getProductos' })
                 });
-                const data = await response.json();
                 
-                if (Array.isArray(data)) {
+                console.log('📡 Respuesta recibida, status:', response.status);
+                const text = await response.text();
+                console.log('📝 Texto de respuesta:', text.substring(0, 200));
+                
+                const data = JSON.parse(text);
+                console.log('📦 Datos parseados:', data);
+                console.log('📦 ¿Es array?:', Array.isArray(data));
+                console.log('📦 Tipo:', typeof data);
+                console.log('📦 Longitud:', data.length);
+                
+                if (Array.isArray(data) && data.length > 0) {
                     productos = data;
-                    console.log('✅ Productos cargados:', productos.length);
-                } else if (data.error) {
+                    console.log('✅ Productos cargados:', productos.length, 'productos');
+                    console.log('🎯 Primer producto:', productos[0]);
+                } else if (data && data.error) {
                     console.error('❌ Error del servidor:', data.error);
-                    mostrarAlerta('❌ Error cargando productos', 'error');
+                    mostrarAlerta('❌ Error: ' + data.error, 'error');
                 } else {
-                    console.error('❌ Respuesta inesperada:', data);
-                    mostrarAlerta('❌ Formato de respuesta inválido', 'error');
+                    console.error('❌ Respuesta no es un array:', data);
+                    productos = Array.isArray(data) ? data : [];
                 }
                 
                 actualizarSelects();
@@ -734,7 +745,7 @@
                 filtrarSaldos();
             } catch(error) {
                 console.error('❌ Error cargando productos:', error);
-                mostrarAlerta('❌ No se pudo conectar con Google', 'error');
+                mostrarAlerta('❌ Error: ' + error.message, 'error');
             }
         }
 
