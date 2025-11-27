@@ -532,10 +532,7 @@
 
             <!-- TAB REPORTES -->
             <div id="reportes" class="tab-content">
-                <h3 style="color: #8B0000; margin-bottom: 10px; font-size: 13px;">📊 Stock Actual</h3>
-                <div id="tabla-stock-reportes"></div>
-
-                <h3 style="color: #8B0000; margin: 15px 0 10px 0; font-size: 13px;">📋 Últimos Movimientos</h3>
+                <h3 style="color: #8B0000; margin-bottom: 10px; font-size: 13px;">📋 Últimos 13 Movimientos Hoy</h3>
                 <div id="tabla-movimientos-reportes"></div>
             </div>
         </div>
@@ -620,6 +617,7 @@
 
         let usuarioActual = { nombre: 'Usuario', rol: 'Bodega' };
         let productos = [];
+        let productosIniciales = []; // Guardar los iniciales sin cambios
         let movimientos = [];
         let filtroCategoria = 'Todos';
         let filtroEstado = {};
@@ -691,7 +689,8 @@
                     method: 'POST',
                     body: JSON.stringify({ action: 'getProductos' })
                 });
-                productos = await response.json();
+                productosIniciales = await response.json();
+                productos = JSON.parse(JSON.stringify(productosIniciales)); // Copia profunda
                 actualizarSelects();
                 actualizarFiltros();
                 filtrarSaldos();
@@ -713,21 +712,22 @@
             }
         }
 
-        // SALDOS - CÁLCULO EN VIVO
+        // SALDOS - CÁLCULO EN VIVO SIN DUPLICACIÓN
         function actualizarSaldos() {
-            const productosMejorados = productos.map(p => {
-                let saldoCrudo = p.saldoCrudo;
-                let saldoCocido = p.saldoCocido;
+            // Siempre comenzar desde los saldos iniciales
+            productos = productosIniciales.map(p => {
+                let saldoCrudo = p.saldoCrudo || 0;
+                let saldoCocido = p.saldoCocido || 0;
 
-                // Sumar movimientos existentes
+                // Sumar movimientos UNA sola vez
                 movimientos.forEach(m => {
                     if (m.producto === p.producto) {
                         if (m.tipo === 'entrada') {
-                            saldoCrudo += m.cantidadCrudo;
-                            saldoCocido += m.cantidadCocido;
+                            saldoCrudo += m.cantidadCrudo || 0;
+                            saldoCocido += m.cantidadCocido || 0;
                         } else if (m.tipo === 'salida') {
-                            saldoCrudo -= m.cantidadCrudo;
-                            saldoCocido -= m.cantidadCocido;
+                            saldoCrudo -= m.cantidadCrudo || 0;
+                            saldoCocido -= m.cantidadCocido || 0;
                         }
                     }
                 });
@@ -744,7 +744,6 @@
                 };
             });
 
-            productos = productosMejorados;
             filtrarSaldos();
         }
 
@@ -950,39 +949,27 @@
             }
         }
 
-        // REPORTES
+        // REPORTES - SOLO MOVIMIENTOS
         function actualizarReportes() {
-            const hoy = new Date().toISOString().split('T')[0];
-            const movHoy = movimientos.filter(m => {
+            const movimientos_hoy = movimientos.filter(m => {
                 const fecha = m.fecha;
                 // Convertir si viene como objeto Date
                 if (typeof fecha === 'object') {
-                    return new Date(fecha).toISOString().split('T')[0] === hoy;
+                    return new Date(fecha).toISOString().split('T')[0] >= '2025-11-26';
                 }
-                return fecha === hoy || fecha.includes('2025-11-26');
+                return fecha === '2025-11-26' || fecha.includes('2025-11-26');
             });
-
-            // Stock actual
-            let html = '<table class="tabla"><thead><tr><th>Producto</th><th>Crudo</th><th>Cocido</th><th>Total</th></tr></thead><tbody>';
-            productos.forEach(p => {
-                if (p.categoria.includes('Proteínas')) {
-                    html += `<tr><td>${p.producto}</td><td>${p.saldoCrudo.toFixed(2)}</td><td>${p.saldoCocido.toFixed(2)}</td><td>${p.total.toFixed(2)}</td></tr>`;
-                } else {
-                    html += `<tr><td>${p.producto}</td><td colspan="2">-</td><td>${p.total.toFixed(2)}</td></tr>`;
-                }
-            });
-            html += '</tbody></table>';
-            document.getElementById('tabla-stock-reportes').innerHTML = html;
 
             // Últimos movimientos
-            html = '<table class="tabla"><thead><tr><th>Hora</th><th>Tipo</th><th>Producto</th><th>Cant</th><th>Resp</th></tr></thead><tbody>';
+            let html = '<table class="tabla"><thead><tr><th>Hora</th><th>Tipo</th><th>Producto</th><th>Cantidad</th><th>Resp</th><th>Costo</th></tr></thead><tbody>';
             
-            if (movHoy.length === 0) {
-                html += '<tr><td colspan="5" style="text-align: center; padding: 10px;">No hay movimientos hoy</td></tr>';
+            if (movimientos_hoy.length === 0) {
+                html += '<tr><td colspan="6" style="text-align: center; padding: 10px;">No hay movimientos</td></tr>';
             } else {
-                movHoy.slice(-20).reverse().forEach(m => {
+                movimientos_hoy.reverse().forEach(m => {
                     const cantidad = (m.cantidadCrudo || 0) + (m.cantidadCocido || 0);
-                    html += `<tr><td>${m.hora}</td><td>${m.tipo === 'entrada' ? '📥' : '📤'}</td><td>${m.producto}</td><td>${cantidad.toFixed(1)}</td><td>${m.responsable}</td></tr>`;
+                    const costo = m.costo ? m.costo.toLocaleString() : '-';
+                    html += `<tr><td>${m.hora}</td><td>${m.tipo === 'entrada' ? '📥 Entrada' : '📤 Salida'}</td><td><strong>${m.producto}</strong></td><td>${cantidad.toFixed(2)}</td><td>${m.responsable}</td><td>$${costo}</td></tr>`;
                 });
             }
             
