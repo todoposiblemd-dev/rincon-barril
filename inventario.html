@@ -910,23 +910,52 @@
         }
 
         async function registrarEntrada() {
+            console.log('🔄 Registrando entrada...');
+            
             const producto = document.getElementById('entrada-producto').value;
             const cantidad = parseFloat(document.getElementById('entrada-cantidad').value);
             const costo = parseFloat(document.getElementById('entrada-costo').value) || 0;
             const proveedor = document.getElementById('entrada-proveedor').value;
             const responsable = document.getElementById('entrada-responsable').value;
+            const estadoInput = document.getElementById('estado-entrada');
+            const estado = estadoInput ? estadoInput.value : '';
 
-            if (!producto || isNaN(cantidad)) {
-                mostrarAlerta('⚠️ Completa los campos', 'error');
+            console.log('📝 Datos:', {producto, cantidad, costo, proveedor, responsable, estado});
+
+            if (!producto || producto === '' || isNaN(cantidad) || cantidad === 0) {
+                mostrarAlerta('⚠️ Completa: Producto y Cantidad son obligatorios', 'error');
+                return;
+            }
+
+            if (!responsable || responsable === '') {
+                mostrarAlerta('⚠️ Selecciona un Responsable', 'error');
                 return;
             }
 
             const p = productos.find(x => x.producto === producto);
             const esProteina = p && p.categoria.includes('Proteínas');
-            const cantidadCrudo = esProteina && document.getElementById('estado-entrada').value === 'crudo' ? cantidad : 0;
-            const cantidadCocido = esProteina && document.getElementById('estado-entrada').value === 'cocido' ? cantidad : cantidad;
+            
+            let cantidadCrudo = 0;
+            let cantidadCocido = 0;
+            
+            if (esProteina) {
+                if (estado === 'crudo') {
+                    cantidadCrudo = cantidad;
+                    cantidadCocido = 0;
+                } else if (estado === 'cocido') {
+                    cantidadCrudo = 0;
+                    cantidadCocido = cantidad;
+                } else {
+                    cantidadCrudo = cantidad;
+                    cantidadCocido = 0;
+                }
+            } else {
+                cantidadCrudo = cantidad;
+                cantidadCocido = 0;
+            }
 
             try {
+                console.log('📤 Enviando a Google...');
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify({
@@ -936,40 +965,84 @@
                         cantidadCrudo,
                         cantidadCocido,
                         destinoOrigen: 'compra',
-                        estado: esProteina ? document.getElementById('estado-entrada').value : '',
+                        estado: esProteina ? estado : '',
                         responsable,
                         costo,
                         proveedor
                     })
                 });
 
-                mostrarAlerta('✅ Entrada registrada', 'success');
-                document.getElementById('entrada-producto').value = '';
-                document.getElementById('entrada-cantidad').value = '';
-                document.getElementById('entrada-costo').value = '';
-                await sincronizar();
+                const data = await response.json();
+                console.log('✅ Respuesta:', data);
+
+                if (data.success || data.mensaje) {
+                    mostrarAlerta('✅ Entrada registrada correctamente', 'success');
+                    document.getElementById('entrada-producto').value = '';
+                    document.getElementById('entrada-cantidad').value = '';
+                    document.getElementById('entrada-costo').value = '';
+                    if (estadoInput) estadoInput.value = '';
+                    
+                    await sincronizar();
+                } else {
+                    mostrarAlerta('❌ ' + (data.error || 'Error desconocido'), 'error');
+                }
             } catch(error) {
-                mostrarAlerta('❌ Error registrando', 'error');
+                console.error('❌ Error:', error);
+                mostrarAlerta('❌ Error: ' + error.message, 'error');
             }
         }
 
         async function registrarSalida() {
+            console.log('🔄 Registrando salida...');
+            
             const producto = document.getElementById('salida-producto').value;
             const cantidad = parseFloat(document.getElementById('salida-cantidad').value);
             const destino = document.getElementById('salida-destino').value;
             const responsable = document.getElementById('salida-responsable').value;
+            const estadoInput = document.getElementById('estado-salida');
+            const estado = estadoInput ? estadoInput.value : '';
 
-            if (!producto || isNaN(cantidad) || !destino) {
-                mostrarAlerta('⚠️ Completa los campos', 'error');
+            console.log('📝 Datos:', {producto, cantidad, destino, responsable, estado});
+
+            if (!producto || producto === '' || isNaN(cantidad) || cantidad === 0) {
+                mostrarAlerta('⚠️ Completa: Producto y Cantidad son obligatorios', 'error');
+                return;
+            }
+
+            if (!destino || destino === '') {
+                mostrarAlerta('⚠️ Selecciona un Destino', 'error');
+                return;
+            }
+
+            if (!responsable || responsable === '') {
+                mostrarAlerta('⚠️ Selecciona un Responsable', 'error');
                 return;
             }
 
             const p = productos.find(x => x.producto === producto);
             const esProteina = p && p.categoria.includes('Proteínas');
-            const cantidadCrudo = esProteina && document.getElementById('estado-salida').value === 'crudo' ? cantidad : 0;
-            const cantidadCocido = esProteina && document.getElementById('estado-salida').value === 'cocido' ? cantidad : cantidad;
+            
+            let cantidadCrudo = 0;
+            let cantidadCocido = 0;
+            
+            if (esProteina) {
+                if (estado === 'crudo') {
+                    cantidadCrudo = cantidad;
+                    cantidadCocido = 0;
+                } else if (estado === 'cocido') {
+                    cantidadCrudo = 0;
+                    cantidadCocido = cantidad;
+                } else {
+                    cantidadCrudo = cantidad;
+                    cantidadCocido = 0;
+                }
+            } else {
+                cantidadCrudo = cantidad;
+                cantidadCocido = 0;
+            }
 
             try {
+                console.log('📤 Enviando a Google...');
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify({
@@ -979,17 +1052,27 @@
                         cantidadCrudo,
                         cantidadCocido,
                         destinoOrigen: destino,
-                        estado: esProteina ? document.getElementById('estado-salida').value : '',
+                        estado: esProteina ? estado : '',
                         responsable
                     })
                 });
 
-                mostrarAlerta('✅ Salida registrada', 'success');
-                document.getElementById('salida-producto').value = '';
-                document.getElementById('salida-cantidad').value = '';
-                await sincronizar();
+                const data = await response.json();
+                console.log('✅ Respuesta:', data);
+
+                if (data.success || data.mensaje) {
+                    mostrarAlerta('✅ Salida registrada correctamente', 'success');
+                    document.getElementById('salida-producto').value = '';
+                    document.getElementById('salida-cantidad').value = '';
+                    if (estadoInput) estadoInput.value = '';
+                    
+                    await sincronizar();
+                } else {
+                    mostrarAlerta('❌ ' + (data.error || 'Error desconocido'), 'error');
+                }
             } catch(error) {
-                mostrarAlerta('❌ Error registrando', 'error');
+                console.error('❌ Error:', error);
+                mostrarAlerta('❌ Error: ' + error.message, 'error');
             }
         }
 
