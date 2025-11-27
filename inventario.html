@@ -382,12 +382,17 @@
             <h1>🍖 El Rincón del Barril</h1>
             <h3>Gestión de Inventario v8.0</h3>
             <div class="user-info">
-                <div>
+                <div style="display: flex; align-items: center; gap: 6px; flex: 1;">
                     <span style="font-weight: 600;">👤</span>
                     <span id="usuario-nombre">Cargando...</span>
+                    <button class="btn-cambiar" onclick="cambiarUsuario()" style="margin-left: auto;">✎ Cambiar</button>
                 </div>
-                <button class="btn-cambiar" onclick="cambiarUsuario()">Cambiar</button>
-                <div class="user-badge" id="usuario-rol">Rol</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 4px; margin-top: 8px;">
+                <button onclick="cambiarRol('Bodega')" class="rol-btn" data-rol="Bodega" style="padding: 6px; border: 2px solid #ddd; background: #f0f0f0; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600;">🏚️ Bodega</button>
+                <button onclick="cambiarRol('Cocinero')" class="rol-btn" data-rol="Cocinero" style="padding: 6px; border: 2px solid #ddd; background: #f0f0f0; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600;">👨‍🍳 Cocinero</button>
+                <button onclick="cambiarRol('Cajero')" class="rol-btn" data-rol="Cajero" style="padding: 6px; border: 2px solid #ddd; background: #f0f0f0; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600;">💰 Cajero</button>
+                <button onclick="cambiarRol('Gerente')" class="rol-btn" data-rol="Gerente" style="padding: 6px; border: 2px solid #ddd; background: #f0f0f0; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600;">📊 Gerente</button>
             </div>
             <div class="status">
                 <span id="status-conexion">📡 Conectando...</span> • 
@@ -613,7 +618,7 @@
 
     <script>
         const GOOGLE_SHEET_ID = '1rSGXUYAQm8rMsEyyyuRqmquAbf_2-agq2pwSaLTyhms';
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIv54scvmi2bGUh8VT0nrXO6PFFyEKqTmB51UuZItWASTzZ9u6HUAyvdMdVf__XWILog/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyMLuuFPAzbZniEm_j51mpsMmIhcFIZdjVZNRLEiM8wND1nR6ESmOYFMVLX4c8exq5C4w/exec';
 
         let usuarioActual = { nombre: 'Usuario', rol: 'Bodega' };
         let productos = [];
@@ -663,9 +668,32 @@
             mostrarAlerta('✅ Usuario actualizado', 'success');
         }
 
+        function cambiarRol(nuevoRol) {
+            usuarioActual.rol = nuevoRol;
+            localStorage.setItem('usuario-rincon', JSON.stringify(usuarioActual));
+            actualizarUIUsuario();
+            mostrarAlerta(`✅ Rol: ${nuevoRol}`, 'success');
+        }
+
         function actualizarUIUsuario() {
             document.getElementById('usuario-nombre').textContent = usuarioActual.nombre;
-            document.getElementById('usuario-rol').textContent = usuarioActual.rol;
+            
+            // Actualizar botones de rol
+            const roles = ['Bodega', 'Cocinero', 'Cajero', 'Gerente'];
+            roles.forEach(r => {
+                const btn = document.querySelector(`button[data-rol="${r}"]`);
+                if (btn) {
+                    if (r === usuarioActual.rol) {
+                        btn.style.background = '#8B0000';
+                        btn.style.color = 'white';
+                        btn.style.borderColor = '#8B0000';
+                    } else {
+                        btn.style.background = '#f0f0f0';
+                        btn.style.color = '#333';
+                        btn.style.borderColor = '#ddd';
+                    }
+                }
+            });
         }
 
         // SINCRONIZACIÓN CON GOOGLE SHEETS
