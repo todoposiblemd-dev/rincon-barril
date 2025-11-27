@@ -613,11 +613,10 @@
 
     <script>
         const GOOGLE_SHEET_ID = '1rSGXUYAQm8rMsEyyyuRqmquAbf_2-agq2pwSaLTyhms';
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNK_URJVwuj-TDinkgMx-DjWxks1L6EfyB6TMZz61Y1YKdt3zV9qX3O4WYxLztphFOKQ/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIv54scvmi2bGUh8VT0nrXO6PFFyEKqTmB51UuZItWASTzZ9u6HUAyvdMdVf__XWILog/exec';
 
         let usuarioActual = { nombre: 'Usuario', rol: 'Bodega' };
         let productos = [];
-        let productosIniciales = []; // Guardar los iniciales sin cambios
         let movimientos = [];
         let filtroCategoria = 'Todos';
         let filtroEstado = {};
@@ -627,14 +626,14 @@
             console.log('✅ Sistema v8.0 iniciando...');
             cargarUsuario();
             sincronizar();
-            // Polling suave cada 5 segundos (sin refrescar UI constantemente)
+            // Polling suave cada 5 segundos - solo carga productos (ya calculados en Google)
             setInterval(sincronizarSilencioso, 5000);
         }
 
         async function sincronizarSilencioso() {
             try {
+                await cargarProductos(); // Los saldos ya vienen calculados
                 await cargarMovimientos();
-                actualizarSaldos();
                 document.getElementById('status-movimientos').textContent = `Movimientos: ${movimientos.length}`;
             } catch(error) {
                 console.log('Sync error (no critical):', error);
@@ -689,8 +688,7 @@
                     method: 'POST',
                     body: JSON.stringify({ action: 'getProductos' })
                 });
-                productosIniciales = await response.json();
-                productos = JSON.parse(JSON.stringify(productosIniciales)); // Copia profunda
+                productos = await response.json();
                 actualizarSelects();
                 actualizarFiltros();
                 filtrarSaldos();
@@ -712,38 +710,8 @@
             }
         }
 
-        // SALDOS - CÁLCULO EN VIVO SIN DUPLICACIÓN
+        // SALDOS - SIN CÁLCULOS (Google ya los calcula)
         function actualizarSaldos() {
-            // Siempre comenzar desde los saldos iniciales
-            productos = productosIniciales.map(p => {
-                let saldoCrudo = p.saldoCrudo || 0;
-                let saldoCocido = p.saldoCocido || 0;
-
-                // Sumar movimientos UNA sola vez
-                movimientos.forEach(m => {
-                    if (m.producto === p.producto) {
-                        if (m.tipo === 'entrada') {
-                            saldoCrudo += m.cantidadCrudo || 0;
-                            saldoCocido += m.cantidadCocido || 0;
-                        } else if (m.tipo === 'salida') {
-                            saldoCrudo -= m.cantidadCrudo || 0;
-                            saldoCocido -= m.cantidadCocido || 0;
-                        }
-                    }
-                });
-
-                // No permitir negativos
-                saldoCrudo = Math.max(0, saldoCrudo);
-                saldoCocido = Math.max(0, saldoCocido);
-
-                return {
-                    ...p,
-                    saldoCrudo,
-                    saldoCocido,
-                    total: saldoCrudo + saldoCocido
-                };
-            });
-
             filtrarSaldos();
         }
 
