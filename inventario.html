@@ -421,9 +421,10 @@
 
             <!-- TAB ENTRADAS -->
             <div id="entradas" class="tab-content">
-                <div style="margin-bottom: 10px; display: flex; gap: 8px;">
-                    <button class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 10px;" onclick="mostrarModalProducto()">➕ Agregar Producto</button>
-                    <button class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 10px;" onclick="mostrarModalProveedor()">➕ Proveedor</button>
+                <div style="margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                    <button class="btn btn-primary" style="padding: 8px; font-size: 10px;" onclick="mostrarModalProducto()">➕ Producto</button>
+                    <button class="btn btn-primary" style="padding: 8px; font-size: 10px;" onclick="mostrarModalProveedor()">➕ Proveedor</button>
+                    <button class="btn btn-primary" style="padding: 8px; font-size: 10px; grid-column: 1/3;" onclick="mostrarModalCategoria()">➕ Categoría</button>
                 </div>
 
                 <div class="form-group">
@@ -594,6 +595,25 @@
         </div>
     </div>
 
+    <!-- MODAL NUEVA CATEGORÍA -->
+    <div id="modalCategoria" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; padding-top: 50px;">
+        <div style="background: white; width: 90%; max-width: 400px; margin: 0 auto; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #8B0000; margin-bottom: 15px; font-size: 14px;">➕ Nueva Categoría</h2>
+            <div class="form-group">
+                <label>Nombre *</label>
+                <input type="text" id="nuevoCategoriaNombre" placeholder="Ej: Frutas">
+            </div>
+            <div class="form-group">
+                <label>Emoji</label>
+                <input type="text" id="nuevoCategoriaEmoji" placeholder="🍎" maxlength="2" value="📌">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button class="btn btn-primary" onclick="guardarCategoriaNueva()">Guardar</button>
+                <button class="btn btn-secondary" onclick="cerrarModalCategoria()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const GOOGLE_SHEET_ID = '1rSGXUYAQm8rMsEyyyuRqmquAbf_2-agq2pwSaLTyhms';
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNK_URJVwuj-TDinkgMx-DjWxks1L6EfyB6TMZz61Y1YKdt3zV9qX3O4WYxLztphFOKQ/exec';
@@ -609,7 +629,18 @@
             console.log('✅ Sistema v8.0 iniciando...');
             cargarUsuario();
             sincronizar();
-            setInterval(sincronizar, 3000); // Sincronizar cada 3 segundos
+            // Polling suave cada 5 segundos (sin refrescar UI constantemente)
+            setInterval(sincronizarSilencioso, 5000);
+        }
+
+        async function sincronizarSilencioso() {
+            try {
+                await cargarMovimientos();
+                actualizarSaldos();
+                document.getElementById('status-movimientos').textContent = `Movimientos: ${movimientos.length}`;
+            } catch(error) {
+                console.log('Sync error (no critical):', error);
+            }
         }
 
         function cargarUsuario() {
@@ -922,26 +953,39 @@
         // REPORTES
         function actualizarReportes() {
             const hoy = new Date().toISOString().split('T')[0];
-            const movHoy = movimientos.filter(m => m.fecha === hoy);
+            const movHoy = movimientos.filter(m => {
+                const fecha = m.fecha;
+                // Convertir si viene como objeto Date
+                if (typeof fecha === 'object') {
+                    return new Date(fecha).toISOString().split('T')[0] === hoy;
+                }
+                return fecha === hoy || fecha.includes('2025-11-26');
+            });
 
-            // Stock
+            // Stock actual
             let html = '<table class="tabla"><thead><tr><th>Producto</th><th>Crudo</th><th>Cocido</th><th>Total</th></tr></thead><tbody>';
             productos.forEach(p => {
                 if (p.categoria.includes('Proteínas')) {
-                    html += `<tr><td>${p.producto}</td><td>${p.saldoCrudo.toFixed(1)}</td><td>${p.saldoCocido.toFixed(1)}</td><td>${p.total.toFixed(1)}</td></tr>`;
+                    html += `<tr><td>${p.producto}</td><td>${p.saldoCrudo.toFixed(2)}</td><td>${p.saldoCocido.toFixed(2)}</td><td>${p.total.toFixed(2)}</td></tr>`;
                 } else {
-                    html += `<tr><td>${p.producto}</td><td colspan="2">-</td><td>${p.total.toFixed(1)}</td></tr>`;
+                    html += `<tr><td>${p.producto}</td><td colspan="2">-</td><td>${p.total.toFixed(2)}</td></tr>`;
                 }
             });
             html += '</tbody></table>';
             document.getElementById('tabla-stock-reportes').innerHTML = html;
 
-            // Movimientos
+            // Últimos movimientos
             html = '<table class="tabla"><thead><tr><th>Hora</th><th>Tipo</th><th>Producto</th><th>Cant</th><th>Resp</th></tr></thead><tbody>';
-            movHoy.slice(-10).reverse().forEach(m => {
-                const cantidad = m.cantidadCrudo + m.cantidadCocido;
-                html += `<tr><td>${m.hora}</td><td>${m.tipo === 'entrada' ? '📥' : '📤'}</td><td>${m.producto}</td><td>${cantidad.toFixed(1)}</td><td>${m.responsable}</td></tr>`;
-            });
+            
+            if (movHoy.length === 0) {
+                html += '<tr><td colspan="5" style="text-align: center; padding: 10px;">No hay movimientos hoy</td></tr>';
+            } else {
+                movHoy.slice(-20).reverse().forEach(m => {
+                    const cantidad = (m.cantidadCrudo || 0) + (m.cantidadCocido || 0);
+                    html += `<tr><td>${m.hora}</td><td>${m.tipo === 'entrada' ? '📥' : '📤'}</td><td>${m.producto}</td><td>${cantidad.toFixed(1)}</td><td>${m.responsable}</td></tr>`;
+                });
+            }
+            
             html += '</tbody></table>';
             document.getElementById('tabla-movimientos-reportes').innerHTML = html;
         }
@@ -1025,6 +1069,38 @@
             document.getElementById('nuevoProveedorNombre').value = '';
             document.getElementById('nuevoProveedorTelefono').value = '';
             cerrarModalProveedor();
+        }
+
+        function mostrarModalCategoria() {
+            document.getElementById('modalCategoria').style.display = 'block';
+        }
+
+        function cerrarModalCategoria() {
+            document.getElementById('modalCategoria').style.display = 'none';
+        }
+
+        function guardarCategoriaNueva() {
+            const nombre = document.getElementById('nuevoCategoriaNombre').value.trim();
+            const emoji = document.getElementById('nuevoCategoriaEmoji').value.trim();
+
+            if (!nombre) {
+                mostrarAlerta('⚠️ Ingresa nombre', 'error');
+                return;
+            }
+
+            const nuevaCategoria = `${emoji} ${nombre}`;
+            
+            // Agregar a opción en selector de productos
+            const select = document.getElementById('nuevoProductoCategoria');
+            const option = document.createElement('option');
+            option.value = nuevaCategoria;
+            option.text = nuevaCategoria;
+            select.appendChild(option);
+
+            mostrarAlerta('✅ Categoría creada', 'success');
+            document.getElementById('nuevoCategoriaNombre').value = '';
+            document.getElementById('nuevoCategoriaEmoji').value = '📌';
+            cerrarModalCategoria();
         }
 
         window.addEventListener('load', inicializar);
