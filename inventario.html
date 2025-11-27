@@ -716,12 +716,25 @@
                     method: 'POST',
                     body: JSON.stringify({ action: 'getProductos' })
                 });
-                productos = await response.json();
+                const data = await response.json();
+                
+                if (Array.isArray(data)) {
+                    productos = data;
+                    console.log('✅ Productos cargados:', productos.length);
+                } else if (data.error) {
+                    console.error('❌ Error del servidor:', data.error);
+                    mostrarAlerta('❌ Error cargando productos', 'error');
+                } else {
+                    console.error('❌ Respuesta inesperada:', data);
+                    mostrarAlerta('❌ Formato de respuesta inválido', 'error');
+                }
+                
                 actualizarSelects();
                 actualizarFiltros();
                 filtrarSaldos();
             } catch(error) {
-                console.error('Error cargando productos:', error);
+                console.error('❌ Error cargando productos:', error);
+                mostrarAlerta('❌ No se pudo conectar con Google', 'error');
             }
         }
 
@@ -731,10 +744,20 @@
                     method: 'POST',
                     body: JSON.stringify({ action: 'getMovimientos' })
                 });
-                movimientos = await response.json();
+                const data = await response.json();
+                
+                if (Array.isArray(data)) {
+                    movimientos = data;
+                    console.log('✅ Movimientos cargados:', movimientos.length);
+                } else if (data.error) {
+                    console.error('❌ Error del servidor:', data.error);
+                } else {
+                    console.error('❌ Respuesta inesperada:', data);
+                }
+                
                 actualizarReportes();
             } catch(error) {
-                console.error('Error cargando movimientos:', error);
+                console.error('❌ Error cargando movimientos:', error);
             }
         }
 
@@ -836,9 +859,23 @@
         function actualizarSelects() {
             const selectEntrada = document.getElementById('entrada-producto');
             const selectSalida = document.getElementById('salida-producto');
+            
+            if (!selectEntrada || !selectSalida) {
+                console.error('❌ Selects no encontrados');
+                return;
+            }
+            
+            if (!productos || productos.length === 0) {
+                console.warn('⚠️ No hay productos para cargar');
+                selectEntrada.innerHTML = '<option value="">-- Sin productos --</option>';
+                selectSalida.innerHTML = '<option value="">-- Sin productos --</option>';
+                return;
+            }
+            
             const html = productos.map(p => `<option value="${p.producto}">${p.producto}</option>`).join('');
             selectEntrada.innerHTML = '<option value="">-- Selecciona --</option>' + html;
             selectSalida.innerHTML = '<option value="">-- Selecciona --</option>' + html;
+            console.log('✅ Selects actualizados:', productos.length, 'productos');
         }
 
         function actualizarEstadoEntrada() {
