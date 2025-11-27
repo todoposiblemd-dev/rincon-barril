@@ -1039,12 +1039,12 @@
 
         function actualizarSelectos() {
             const productos = saldos.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
-            const proveedores = window.proveedores.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+            const proveedorOptions = proveedores.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
             const resp = responsables.map(r => `<option value="${r}">${r}</option>`).join('');
 
             document.getElementById('producto-entrada').innerHTML = '<option value="">-- Selecciona --</option>' + productos;
             document.getElementById('producto-salida').innerHTML = '<option value="">-- Selecciona --</option>' + productos;
-            document.getElementById('proveedor-entrada').innerHTML = '<option value="">-- Selecciona --</option>' + proveedores;
+            document.getElementById('proveedor-entrada').innerHTML = '<option value="">-- Selecciona --</option>' + proveedorOptions;
             document.getElementById('responsable-entrada').innerHTML = '<option value="">-- Selecciona --</option>' + resp;
             document.getElementById('responsable-salida').innerHTML = '<option value="">-- Selecciona --</option>' + resp;
         }
