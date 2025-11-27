@@ -324,6 +324,7 @@
                     <span style="font-weight: 600;">👤 </span>
                     <span id="nombre-usuario">Cargando...</span>
                 </div>
+                <button class="btn btn-primary btn-small" onclick="cambiarUsuario()" style="margin: 0; padding: 4px 8px; font-size: 10px;">🔄 Cambiar</button>
                 <div class="user-badge" id="rol-usuario">Rol</div>
             </div>
             <div style="margin-top: 10px; padding: 8px; background: #f0f0f0; border-radius: 6px; font-size: 11px; text-align: center;">
@@ -567,7 +568,14 @@
         function inicializar() {
             console.log('✅ Sistema iniciando...');
             cargarDatos();
-            detectarUsuario();
+            
+            // Si no hay usuario, solicitarlo
+            if (!usuarioActual.nombre) {
+                detectarUsuario();
+            } else {
+                actualizarUIUsuario();
+            }
+            
             actualizarSelectoCategorias();
             actualizarSelectos();
             actualizarSaldos();
@@ -588,11 +596,44 @@
                 rol: rolesMap[rolNum] || 'Bodega'
             };
 
+            localStorage.setItem('usuarioActual', JSON.stringify(usuarioActual));
+            actualizarUIUsuario();
+        }
+
+        function cambiarUsuario() {
+            const usuario = prompt('👤 Nuevo nombre:', usuarioActual.nombre);
+            if (!usuario) return;
+            
+            const rolNum = prompt('🎯 Tu rol?\n1. Bodega\n2. Cocinero\n3. Cajero\n4. Gerente', 
+                usuarioActual.rol === 'Bodega' ? '1' : usuarioActual.rol === 'Cocinero' ? '2' : usuarioActual.rol === 'Cajero' ? '3' : '4');
+            const rolesMap = { '1': 'Bodega', '2': 'Cocinero', '3': 'Cajero', '4': 'Gerente' };
+            
+            usuarioActual = {
+                nombre: usuario,
+                rol: rolesMap[rolNum] || 'Bodega'
+            };
+
+            localStorage.setItem('usuarioActual', JSON.stringify(usuarioActual));
+            actualizarUIUsuario();
+            mostrarAlerta('✅ Usuario actualizado', 'success');
+        }
+
+        function actualizarUIUsuario() {
             document.getElementById('nombre-usuario').textContent = usuarioActual.nombre;
             document.getElementById('rol-usuario').textContent = usuarioActual.rol;
         }
 
         function cargarDatos() {
+            // Cargar usuario guardado
+            const usuarioGuardado = localStorage.getItem('usuarioActual');
+            if (usuarioGuardado) {
+                try {
+                    usuarioActual = JSON.parse(usuarioGuardado);
+                } catch(error) {
+                    console.log('No hay usuario guardado, será solicitado');
+                }
+            }
+
             const datosGuardados = localStorage.getItem('datosMateriasPrimas');
             if (datosGuardados) {
                 try {
