@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Rincón del Barril - Inventario v8.3</title>
+    <title>El Rincón del Barril - Inventario</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #8B0000 0%, #C41E3A 100%); min-height: 100vh; padding: 10px; }
@@ -31,8 +31,8 @@
         .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; }
         .btn-primary { background: #8B0000; color: white; width: 100%; }
         .btn-secondary { background: #f0f0f0; color: #333; width: 100%; border: 1px solid #DDD; }
-        .btn-small { padding: 4px 8px; font-size: 10px; }
-        .producto-card { background: #f9f9f9; border: 1px solid #EEE; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+        .producto-card { background: #f9f9f9; border: 1px solid #EEE; border-radius: 6px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .producto-info { flex: 1; }
         .producto-nombre { font-weight: 600; font-size: 12px; }
         .producto-categoria { font-size: 10px; color: #999; margin-top: 2px; }
         .producto-saldo { font-size: 13px; font-weight: 600; color: #8B0000; text-align: right; }
@@ -44,15 +44,13 @@
         .estado-btn { padding: 6px 12px; border: 1px solid #DDD; background: white; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 11px; }
         .estado-btn.active { background: #8B0000; color: white; border-color: #8B0000; }
         h3 { color: #8B0000; font-size: 12px; margin-bottom: 10px; border-bottom: 2px solid #8B0000; padding-bottom: 8px; }
-        .admin-item { background: #f0f0f0; padding: 8px; margin-bottom: 6px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
-        .btn-delete { background: #FF5252; color: white; padding: 2px 6px; border: none; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: 600; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🍖 El Rincón del Barril</h1>
-            <p>Gestión de Inventario v8.3</p>
+            <p>Gestión de Inventario v9</p>
             <div class="user-section">
                 <div style="flex: 1;"><span class="user-badge" onclick="cambiarUsuario()">👤 <span id="usuario-actual">Bodega</span></span></div>
                 <div style="flex: 1;"><span class="status-badge">✅ Mov: <span id="contador">0</span></span></div>
@@ -65,7 +63,6 @@
             <button class="tab-btn" onclick="cambiarTab('entradas')">📥 Entradas</button>
             <button class="tab-btn" onclick="cambiarTab('salidas')">📤 Salidas</button>
             <button class="tab-btn" onclick="cambiarTab('reportes')">📈 Reportes</button>
-            <button class="tab-btn" onclick="cambiarTab('admin')">⚙️ Admin</button>
         </div>
 
         <div class="content">
@@ -73,7 +70,7 @@
 
             <!-- TAB SALDOS -->
             <div id="saldos" class="tab-content active">
-                <input type="text" id="buscar-saldos" class="search-box" placeholder="🔍 Buscar producto...">
+                <input type="text" id="buscar-saldos" class="search-box" placeholder="🔍 Buscar producto..." oninput="buscarSaldos(this.value)">
                 <h3>Filtrar por Categoría</h3>
                 <div class="filter-buttons" id="filter-buttons"><button class="filter-btn active" onclick="filtrarSaldos('todos')">Todos</button></div>
                 <div id="lista-saldos"></div>
@@ -94,8 +91,8 @@
                     <input type="hidden" id="estado-entrada" value="cocido">
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Cantidad *</label><input type="number" id="cantidad-entrada" placeholder="0.00" step="0.01" required></div>
-                    <div class="form-group"><label>Costo *</label><input type="number" id="costo-entrada" placeholder="0.00" step="0.01" required></div>
+                    <div class="form-group"><label>Cantidad *</label><input type="number" id="cantidad-entrada" placeholder="0.00" step="0.01"></div>
+                    <div class="form-group"><label>Costo *</label><input type="number" id="costo-entrada" placeholder="0.00" step="0.01"></div>
                 </div>
                 <div class="form-row" style="gap: 8px;"><button class="btn btn-primary" onclick="registrarEntrada()">✅ Registrar</button><button class="btn btn-secondary" onclick="limpiarFormEntrada()">🔄 Limpiar</button></div>
                 <h3 style="margin-top: 15px;">Últimas Entradas</h3>
@@ -116,7 +113,7 @@
                     </div>
                     <input type="hidden" id="estado-salida" value="cocido">
                 </div>
-                <div class="form-group"><label>Cantidad *</label><input type="number" id="cantidad-salida" placeholder="0.00" step="0.01" required></div>
+                <div class="form-group"><label>Cantidad *</label><input type="number" id="cantidad-salida" placeholder="0.00" step="0.01"></div>
                 <div class="form-row" style="gap: 8px;"><button class="btn btn-primary" onclick="registrarSalida()">✅ Registrar</button><button class="btn btn-secondary" onclick="limpiarFormSalida()">🔄 Limpiar</button></div>
                 <h3 style="margin-top: 15px;">Últimas Salidas</h3>
                 <div class="scroll-section" id="lista-salidas"></div>
@@ -127,41 +124,18 @@
                 <h3>Movimientos de Hoy</h3>
                 <div class="scroll-section" id="lista-reportes"></div>
             </div>
-
-            <!-- TAB ADMIN -->
-            <div id="admin" class="tab-content">
-                <h3>Administrar Responsables</h3>
-                <div class="form-row"><input type="text" id="nuevo-responsable" placeholder="Nuevo responsable"><button class="btn btn-primary btn-small" onclick="agregarResponsable()">Agregar</button></div>
-                <div id="lista-responsables"></div>
-
-                <h3 style="margin-top: 20px;">Administrar Proveedores</h3>
-                <div class="form-row"><input type="text" id="nuevo-proveedor" placeholder="Nuevo proveedor"><button class="btn btn-primary btn-small" onclick="agregarProveedor()">Agregar</button></div>
-                <div id="lista-proveedores"></div>
-
-                <h3 style="margin-top: 20px;">Administrar Categorías</h3>
-                <div class="form-row"><input type="text" id="nueva-categoria" placeholder="Nueva categoría"><button class="btn btn-primary btn-small" onclick="agregarCategoria()">Agregar</button></div>
-                <div id="lista-categorias"></div>
-
-                <h3 style="margin-top: 20px;">Administrar Productos</h3>
-                <div class="form-group"><label>Nombre *</label><input type="text" id="nuevo-producto-nombre" placeholder="Ej: Papa"></div>
-                <div class="form-group"><label>Categoría *</label><select id="nuevo-producto-categoria"></select></div>
-                <div class="form-group"><label>Stock Mínimo</label><input type="number" id="nuevo-producto-minimo" placeholder="10" step="0.01"></div>
-                <button class="btn btn-primary" onclick="agregarProducto()">✅ Agregar Producto</button>
-                <h3 style="margin-top: 15px;">Productos Existentes</h3>
-                <div class="scroll-section" id="lista-productos"></div>
-            </div>
         </div>
     </div>
 
     <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdHh4WaksLtEA0jg0x9T_GNlKp7JlAwbd5-uZ6SjUT8DAJKtaOuD9RVV-CsUzujkuV-w/exec';
         let responsables = ['Bodega', 'Cocinero', 'Cajero', 'Gerente'];
         let proveedores = ['Atlantic', 'mis tres amores', 'Carnes xyz', 'Distribuidora Local'];
-        let categorias = ['🍖 Proteínas', '🧀 Lácteos', '❄️ Congelados', '🌾 Secos', '🥬 Verduras'];
         let saldos = [
             {id: 1, nombre: 'Costilla de cerdo', categoria: '🍖 Proteínas', saldoCrudo: 3.95, saldoCocido: 0, unidad: 'kg', minimo: 5},
             {id: 2, nombre: 'Pollo', categoria: '🍖 Proteínas', saldoCrudo: 16, saldoCocido: 0, unidad: 'kg', minimo: 7},
-            {id: 3, nombre: 'Queso paisa', categoria: '🧀 Lácteos', saldoCrudo: 0.52, saldoCocido: 0, unidad: 'kg', minimo: 1},
-            {id: 4, nombre: 'Papa', categoria: '❄️ Congelados', saldoCrudo: 12.5, saldoCocido: 0, unidad: 'kg', minimo: 10},
+            {id: 3, nombre: 'Papa', categoria: '❄️ Congelados', saldoCrudo: 12.5, saldoCocido: 0, unidad: 'kg', minimo: 10},
+            {id: 4, nombre: 'Queso cheddar', categoria: '🧀 Lácteos', saldoCrudo: 207, saldoCocido: 0, unidad: 'kg', minimo: 80},
             {id: 5, nombre: 'Chicharrón', categoria: '🍖 Proteínas', saldoCrudo: 7.7, saldoCocido: 0, unidad: 'kg', minimo: 7},
             {id: 6, nombre: 'Lomo de cerdo', categoria: '🍖 Proteínas', saldoCrudo: 9.71, saldoCocido: 0, unidad: 'kg', minimo: 4},
             {id: 7, nombre: 'Punta de anca', categoria: '🍖 Proteínas', saldoCrudo: 3.04, saldoCocido: 0, unidad: 'kg', minimo: 2},
@@ -169,28 +143,17 @@
             {id: 9, nombre: 'Carne molida regular', categoria: '🍖 Proteínas', saldoCrudo: 24.6, saldoCocido: 0, unidad: 'kg', minimo: 4},
             {id: 10, nombre: 'Croquetas de carne', categoria: '🍖 Proteínas', saldoCrudo: 74, saldoCocido: 0, unidad: 'kg', minimo: 70},
             {id: 11, nombre: 'Pecho de res', categoria: '🍖 Proteínas', saldoCrudo: 0, saldoCocido: 0, unidad: 'kg', minimo: 0},
-            {id: 12, nombre: 'Contramuslo de pollo', categoria: '🍖 Proteínas', saldoCrudo: 0, saldoCocido: 0, unidad: 'kg', minimo: 0},
-            {id: 13, nombre: 'Colita de cadera', categoria: '🍖 Proteínas', saldoCrudo: 0, saldoCocido: 0, unidad: 'kg', minimo: 3},
-            {id: 14, nombre: 'Morcilla', categoria: '🍖 Proteínas', saldoCrudo: 1.84, saldoCocido: 0, unidad: 'kg', minimo: 0},
-            {id: 15, nombre: 'Chorizo', categoria: '🍖 Proteínas', saldoCrudo: 1.27, saldoCocido: 0, unidad: 'kg', minimo: 5},
-            {id: 16, nombre: 'Queso cheddar', categoria: '🧀 Lácteos', saldoCrudo: 207, saldoCocido: 0, unidad: 'kg', minimo: 80},
-            {id: 17, nombre: 'Tocineta', categoria: '🍖 Proteínas', saldoCrudo: 7.6, saldoCocido: 0, unidad: 'kg', minimo: 3},
-            {id: 18, nombre: 'Salchichas', categoria: '🍖 Proteínas', saldoCrudo: 19, saldoCocido: 0, unidad: 'kg', minimo: 15},
-            {id: 19, nombre: 'Pan brioche de hamburguesa', categoria: '🌾 Secos', saldoCrudo: 46, saldoCocido: 0, unidad: 'kg', minimo: 30},
-            {id: 20, nombre: 'Pan brioche de perro', categoria: '🌾 Secos', saldoCrudo: 13, saldoCocido: 0, unidad: 'kg', minimo: 10},
-            {id: 21, nombre: 'Papa pastusa', categoria: '🥬 Verduras', saldoCrudo: 14, saldoCocido: 0, unidad: 'kg', minimo: 4},
-            {id: 22, nombre: 'Cebolla cabezona', categoria: '🥬 Verduras', saldoCrudo: 18, saldoCocido: 0, unidad: 'kg', minimo: 10},
-            {id: 23, nombre: 'Tomate', categoria: '🥬 Verduras', saldoCrudo: 12, saldoCocido: 0, unidad: 'kg', minimo: 5},
-            {id: 24, nombre: 'Panela', categoria: '🌾 Secos', saldoCrudo: 10, saldoCocido: 0, unidad: 'kg', minimo: 5},
-            {id: 25, nombre: 'Mayonesa Natucampo', categoria: '🌾 Secos', saldoCrudo: 5, saldoCocido: 0, unidad: 'kg', minimo: 2},
-            {id: 26, nombre: 'Arroz Zulia', categoria: '🌾 Secos', saldoCrudo: 3, saldoCocido: 0, unidad: 'kg', minimo: 2},
-            {id: 27, nombre: 'Frijol Bolón Rojo', categoria: '🌾 Secos', saldoCrudo: 1, saldoCocido: 0, unidad: 'kg', minimo: 1},
-            {id: 28, nombre: 'Aceite Sinai', categoria: '🌾 Secos', saldoCrudo: 2, saldoCocido: 0, unidad: 'kg', minimo: 1},
+            {id: 12, nombre: 'Tocineta', categoria: '🍖 Proteínas', saldoCrudo: 7.6, saldoCocido: 0, unidad: 'kg', minimo: 3},
+            {id: 13, nombre: 'Salchichas', categoria: '🍖 Proteínas', saldoCrudo: 19, saldoCocido: 0, unidad: 'kg', minimo: 15},
+            {id: 14, nombre: 'Pan brioche de hamburguesa', categoria: '🌾 Secos', saldoCrudo: 46, saldoCocido: 0, unidad: 'kg', minimo: 30},
+            {id: 15, nombre: 'Pan brioche de perro', categoria: '🌾 Secos', saldoCrudo: 13, saldoCocido: 0, unidad: 'kg', minimo: 10},
+            {id: 16, nombre: 'Papa pastusa', categoria: '🥬 Verduras', saldoCrudo: 14, saldoCocido: 0, unidad: 'kg', minimo: 4},
+            {id: 17, nombre: 'Cebolla cabezona', categoria: '🥬 Verduras', saldoCrudo: 18, saldoCocido: 0, unidad: 'kg', minimo: 10},
+            {id: 18, nombre: 'Tomate', categoria: '🥬 Verduras', saldoCrudo: 12, saldoCocido: 0, unidad: 'kg', minimo: 5},
         ];
         let movimientos = [];
         let usuarioActual = 'Bodega';
         let filtroActual = 'todos';
-        let proximoId = 5;
 
         function inicializar() {
             cargarDatos();
@@ -200,42 +163,37 @@
             actualizarListaEntradas();
             actualizarListaSalidas();
             actualizarReportes();
-            actualizarAdmin();
-            document.getElementById('buscar-saldos').addEventListener('input', buscarSaldos);
             document.getElementById('usuario-actual').textContent = usuarioActual;
             actualizarContador();
+            mostrarAlerta('✅ Sistema listo', 'success');
         }
 
         function cargarDatos() {
-            const datos = localStorage.getItem('inventario_el_rincon_v8');
+            const datos = localStorage.getItem('inventario_el_rincon_v9');
             if (datos) {
                 const d = JSON.parse(datos);
                 responsables = d.responsables || responsables;
                 proveedores = d.proveedores || proveedores;
-                categorias = d.categorias || categorias;
                 saldos = d.saldos || saldos;
                 movimientos = d.movimientos || [];
                 usuarioActual = d.usuarioActual || 'Bodega';
-                proximoId = d.proximoId || 5;
             }
         }
 
         function guardarDatos() {
-            localStorage.setItem('inventario_el_rincon_v8', JSON.stringify({responsables, proveedores, categorias, saldos, movimientos, usuarioActual, proximoId}));
+            localStorage.setItem('inventario_el_rincon_v9', JSON.stringify({responsables, proveedores, saldos, movimientos, usuarioActual}));
         }
 
         function actualizarSelectos() {
             const resp = responsables.map(r => `<option value="${r}">${r}</option>`).join('');
             const prov = proveedores.map(p => `<option value="${p}">${p}</option>`).join('');
             const prod = saldos.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
-            const cat = categorias.map(c => `<option value="${c}">${c}</option>`).join('');
 
             document.getElementById('responsable-entrada').innerHTML = `<option value="">-- Selecciona --</option>${resp}`;
             document.getElementById('responsable-salida').innerHTML = `<option value="">-- Selecciona --</option>${resp}`;
             document.getElementById('proveedor-entrada').innerHTML = `<option value="">-- Selecciona --</option>${prov}`;
             document.getElementById('producto-entrada').innerHTML = `<option value="">-- Selecciona --</option>${prod}`;
             document.getElementById('producto-salida').innerHTML = `<option value="">-- Selecciona --</option>${prod}`;
-            document.getElementById('nuevo-producto-categoria').innerHTML = cat;
         }
 
         function actualizarFiltros() {
@@ -256,8 +214,6 @@
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tab).classList.add('active');
             event.target.classList.add('active');
-            if (tab === 'reportes') actualizarReportes();
-            if (tab === 'admin') actualizarAdmin();
         }
 
         function cambiarUsuario() {
@@ -278,20 +234,15 @@
             actualizarListaSaldos();
         }
 
-        function buscarSaldos(e) {
-            const termino = e.target.value.toLowerCase();
-            const productos = obtenerProductosParaMostrar();
-            const resultados = productos.filter(p => p.nombre.toLowerCase().includes(termino));
+        function buscarSaldos(termino) {
+            const productos = filtroActual === 'todos' ? saldos : saldos.filter(p => p.categoria === filtroActual);
+            const resultados = productos.filter(p => p.nombre.toLowerCase().includes(termino.toLowerCase()));
             mostrarProductos(resultados);
         }
 
-        function obtenerProductosParaMostrar() {
-            if (filtroActual === 'todos') return saldos;
-            return saldos.filter(p => p.categoria === filtroActual);
-        }
-
         function actualizarListaSaldos() {
-            mostrarProductos(obtenerProductosParaMostrar());
+            const productos = filtroActual === 'todos' ? saldos : saldos.filter(p => p.categoria === filtroActual);
+            mostrarProductos(productos);
         }
 
         function mostrarProductos(productos) {
@@ -302,19 +253,16 @@
             }
             lista.innerHTML = productos.map(p => {
                 const total = p.saldoCrudo + p.saldoCocido;
-                const alerta = total < p.minimo ? ' style="background: #FFEBEE;"' : '';
-                return `<div class="producto-card"${alerta}>
-                    <div style="display: flex; justify-content: space-between;">
-                        <div>
-                            <div class="producto-nombre">${p.nombre}</div>
-                            <div class="producto-categoria">${p.categoria}</div>
-                            ${p.categoria.includes('Proteína') ? 
-                                `<div style="font-size: 10px; color: #666; margin-top: 4px;">🔵 ${p.saldoCrudo.toFixed(2)} | 🔴 ${p.saldoCocido.toFixed(2)} kg</div>` : 
-                                `<div style="font-size: 10px; color: #666; margin-top: 4px;">Total: ${total.toFixed(2)} ${p.unidad}</div>`
-                            }
-                        </div>
-                        <div class="producto-saldo">${total.toFixed(2)}</div>
+                return `<div class="producto-card"${total < p.minimo ? ' style="background: #FFEBEE;"' : ''}>
+                    <div class="producto-info">
+                        <div class="producto-nombre">${p.nombre}</div>
+                        <div class="producto-categoria">${p.categoria}</div>
+                        ${p.categoria.includes('Proteína') ? 
+                            `<div style="font-size: 10px; color: #666; margin-top: 4px;">🔵 ${p.saldoCrudo.toFixed(2)} | 🔴 ${p.saldoCocido.toFixed(2)} kg</div>` : 
+                            `<div style="font-size: 10px; color: #666; margin-top: 4px;">Total: ${total.toFixed(2)}</div>`
+                        }
                     </div>
+                    <div class="producto-saldo">${total.toFixed(2)}</div>
                 </div>`;
             }).join('');
         }
@@ -467,7 +415,7 @@
             const dest = {'cocina': '👨‍🍳', 'barril': '🍖', 'caja': '💰', 'consumo': '🥘', 'merma': '📉', 'danio': '🔥'};
             lista.innerHTML = hoyMov.map(m => {
                 const icono = m.tipo === 'entrada' ? '📥' : '📤';
-                return `<div class="lista-item"><strong>${icono} ${m.hora} - ${m.producto}</strong><br>${m.cantidadCrudo > 0 ? m.cantidadCrudo.toFixed(2) + ' crudo' : ''}${m.cantidadCocido > 0 ? ' / ' + m.cantidadCocido.toFixed(2) + ' cocido' : ''} | ${m.responsable}${m.tipo === 'entrada' ? ` | $${m.costo}` : ''}</div>`;
+                return `<div class="lista-item"><strong>${icono} ${m.hora} - ${m.producto}</strong><br>${m.cantidadCrudo > 0 ? m.cantidadCrudo.toFixed(2) + ' crudo' : ''}${m.cantidadCocido > 0 ? ' / ' + m.cantidadCocido.toFixed(2) + ' cocido' : ''} | ${m.responsable}</div>`;
             }).join('');
         }
 
@@ -483,81 +431,9 @@
             setTimeout(() => { div.innerHTML = ''; }, 3000);
         }
 
-        function agregarResponsable() {
-            const nombre = document.getElementById('nuevo-responsable').value.trim();
-            if (!nombre) { mostrarAlerta('⚠️ Nombre requerido', 'error'); return; }
-            if (responsables.includes(nombre)) { mostrarAlerta('⚠️ Ya existe', 'error'); return; }
-            responsables.push(nombre);
-            guardarDatos();
-            actualizarSelectos();
-            actualizarAdmin();
-            document.getElementById('nuevo-responsable').value = '';
-            mostrarAlerta('✅ Responsable agregado', 'success');
-        }
-
-        function agregarProveedor() {
-            const nombre = document.getElementById('nuevo-proveedor').value.trim();
-            if (!nombre) { mostrarAlerta('⚠️ Nombre requerido', 'error'); return; }
-            if (proveedores.includes(nombre)) { mostrarAlerta('⚠️ Ya existe', 'error'); return; }
-            proveedores.push(nombre);
-            guardarDatos();
-            actualizarSelectos();
-            actualizarAdmin();
-            document.getElementById('nuevo-proveedor').value = '';
-            mostrarAlerta('✅ Proveedor agregado', 'success');
-        }
-
-        function agregarCategoria() {
-            const nombre = document.getElementById('nueva-categoria').value.trim();
-            if (!nombre) { mostrarAlerta('⚠️ Nombre requerido', 'error'); return; }
-            if (categorias.includes(nombre)) { mostrarAlerta('⚠️ Ya existe', 'error'); return; }
-            categorias.push(nombre);
-            guardarDatos();
-            actualizarSelectos();
-            actualizarFiltros();
-            actualizarAdmin();
-            document.getElementById('nueva-categoria').value = '';
-            mostrarAlerta('✅ Categoría agregada', 'success');
-        }
-
-        function agregarProducto() {
-            const nombre = document.getElementById('nuevo-producto-nombre').value.trim();
-            const cat = document.getElementById('nuevo-producto-categoria').value;
-            const min = parseFloat(document.getElementById('nuevo-producto-minimo').value) || 0;
-
-            if (!nombre || !cat) { mostrarAlerta('⚠️ Completa los campos', 'error'); return; }
-            if (saldos.find(p => p.nombre === nombre)) { mostrarAlerta('⚠️ Ya existe', 'error'); return; }
-
-            saldos.push({id: proximoId++, nombre, categoria: cat, saldoCrudo: 0, saldoCocido: 0, unidad: 'kg', minimo: min});
-            guardarDatos();
-            actualizarSelectos();
-            actualizarFiltros();
-            actualizarAdmin();
-            document.getElementById('nuevo-producto-nombre').value = '';
-            document.getElementById('nuevo-producto-minimo').value = '';
-            mostrarAlerta('✅ Producto agregado', 'success');
-        }
-
-        function eliminarResponsable(r) { responsables = responsables.filter(x => x !== r); guardarDatos(); actualizarSelectos(); actualizarAdmin(); mostrarAlerta('✅ Eliminado', 'success'); }
-        function eliminarProveedor(p) { proveedores = proveedores.filter(x => x !== p); guardarDatos(); actualizarSelectos(); actualizarAdmin(); mostrarAlerta('✅ Eliminado', 'success'); }
-        function eliminarCategoria(c) { categorias = categorias.filter(x => x !== c); saldos = saldos.filter(p => p.categoria !== c); guardarDatos(); actualizarSelectos(); actualizarFiltros(); actualizarAdmin(); mostrarAlerta('✅ Eliminado', 'success'); }
-        function eliminarProducto(id) { saldos = saldos.filter(p => p.id !== id); guardarDatos(); actualizarSelectos(); actualizarAdmin(); mostrarAlerta('✅ Eliminado', 'success'); }
-
-        function actualizarAdmin() {
-            document.getElementById('lista-responsables').innerHTML = responsables.map(r => `<div class="admin-item">${r} <button class="btn-delete" onclick="eliminarResponsable('${r}')">❌</button></div>`).join('');
-            document.getElementById('lista-proveedores').innerHTML = proveedores.map(p => `<div class="admin-item">${p} <button class="btn-delete" onclick="eliminarProveedor('${p}')">❌</button></div>`).join('');
-            document.getElementById('lista-categorias').innerHTML = categorias.map(c => `<div class="admin-item">${c} <button class="btn-delete" onclick="eliminarCategoria('${c}')">❌</button></div>`).join('');
-            document.getElementById('lista-productos').innerHTML = saldos.map(p => `<div class="admin-item">${p.nombre} (${(p.saldoCrudo + p.saldoCocido).toFixed(2)}) <button class="btn-delete" onclick="eliminarProducto(${p.id})">❌</button></div>`).join('');
-        }
-
         async function sincronizarGoogleSheets() {
-            mostrarAlerta('⏳ Sincronizando con Google Sheets...', 'loading');
-            
+            mostrarAlerta('⏳ Sincronizando...', 'success');
             try {
-                const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdHh4WaksLtEA0jg0x9T_GNlKp7JlAwbd5-uZ6SjUT8DAJKtaOuD9RVV-CsUzujkuV-w/exec';
-                
-                // PASO 1: Enviar datos
-                console.log('📤 Enviando datos a Google Sheets...');
                 const responseSend = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -567,60 +443,32 @@
                         movimientos: movimientos
                     })
                 });
-
                 const resultadoSend = await responseSend.json();
-                
-                if (!resultadoSend.success) {
-                    throw new Error(resultadoSend.error);
-                }
-                
-                console.log('✅ Datos enviados');
-                
-                // PASO 2: Recargar datos desde Google Sheets
-                console.log('📥 Recargando datos desde Google Sheets...');
-                await cargarDatosDeGoogleSheets();
-                
-                mostrarAlerta(`✅ ¡Sincronizado!\n📊 ${resultadoSend.movimientosSync} movimientos\n📦 ${resultadoSend.productosSync} productos\n✨ Datos actualizados para todos`, 'success');
-                
-                actualizarListaSaldos();
-                actualizarListaEntradas();
-                actualizarListaSalidas();
-                actualizarReportes();
-                actualizarContador();
-                
-            } catch(error) {
-                mostrarAlerta('❌ Error: ' + error.message, 'error');
-                console.error('❌ Error:', error);
-            }
-        }
-
-        async function cargarDatosDeGoogleSheets() {
-            try {
-                const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdHh4WaksLtEA0jg0x9T_GNlKp7JlAwbd5-uZ6SjUT8DAJKtaOuD9RVV-CsUzujkuV-w/exec';
+                if (!resultadoSend.success) throw new Error(resultadoSend.error);
                 
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({action: 'getDatos'})
                 });
-
                 const resultado = await response.json();
-                
                 if (resultado.success) {
                     saldos = resultado.productos;
                     movimientos = resultado.movimientos;
                     guardarDatos();
-                    console.log('✅ Datos recargados desde Google Sheets');
-                    return true;
-                } else {
-                    throw new Error(resultado.error);
                 }
+                
+                mostrarAlerta(`✅ ¡Sincronizado!\n📊 ${resultadoSend.movimientosSync} movimientos\n📦 ${resultadoSend.productosSync} productos`, 'success');
+                actualizarListaSaldos();
+                actualizarListaEntradas();
+                actualizarListaSalidas();
+                actualizarReportes();
             } catch(error) {
-                console.error('⚠️ No se pudo recargar desde Google Sheets:', error);
-                return false;
+                mostrarAlerta('❌ Error: ' + error.message, 'error');
             }
         }
 
         window.addEventListener('load', inicializar);
+    </script>
 </body>
 </html>
