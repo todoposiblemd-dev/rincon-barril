@@ -912,29 +912,48 @@
         function registrarEntrada() {
             try {
                 console.log('🔄 ENTRANDO A FUNCIÓN registrarEntrada');
-                alert('✅ Función se está ejecutando');
                 
-                const producto = document.getElementById('entrada-producto').value;
-                console.log('Producto:', producto);
+                // DEBUG: Ver todos los elementos con id entrada-producto
+                const todos = document.querySelectorAll('[id*="entrada-producto"]');
+                console.log('🔍 Elementos encontrados con "entrada-producto":', todos.length);
+                todos.forEach((el, i) => {
+                    console.log(`  [${i}] ID: ${el.id}, Value: "${el.value}", Tag: ${el.tagName}`);
+                });
                 
+                // Intentar obtener el elemento
+                const selectElement = document.getElementById('entrada-producto');
+                console.log('🎯 Elemento select:', selectElement);
+                console.log('🎯 Elemento existe?:', selectElement !== null);
+                
+                if (selectElement) {
+                    console.log('🎯 Valor actual:', selectElement.value);
+                    console.log('🎯 Opciones disponibles:', selectElement.options.length);
+                    for (let i = 0; i < Math.min(5, selectElement.options.length); i++) {
+                        console.log(`  Opción [${i}]: ${selectElement.options[i].value}`);
+                    }
+                }
+                
+                const producto = selectElement ? selectElement.value : '';
                 const cantidad = document.getElementById('entrada-cantidad').value;
-                console.log('Cantidad:', cantidad);
+                
+                console.log('📝 Valores capturados:');
+                console.log('  Producto:', producto);
+                console.log('  Cantidad:', cantidad);
                 
                 if (!producto) {
-                    alert('⚠️ Selecciona un producto');
+                    alert('⚠️ Selecciona un producto PRIMERO');
                     return;
                 }
                 
                 if (!cantidad || cantidad === '0') {
-                    alert('⚠️ Ingresa cantidad');
+                    alert('⚠️ Ingresa una cantidad válida');
                     return;
                 }
                 
-                alert('✅ Datos válidos: ' + producto + ' x ' + cantidad);
-                enviarEntradaAGoogle(producto, parseFloat(cantidad));
+                alert('✅ Enviando: ' + producto + ' x ' + cantidad);
                 
             } catch(e) {
-                console.error('ERROR:', e);
+                console.error('❌ ERROR EN REGISTRAR:', e);
                 alert('❌ Error: ' + e.message);
             }
         }
