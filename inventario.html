@@ -876,6 +876,10 @@
                 return;
             }
             
+            // GUARDAR VALORES ACTUALES (lo que el usuario ya seleccionó)
+            const valorEntradaAnterior = selectEntrada.value;
+            const valorSalidaAnterior = selectSalida.value;
+            
             if (!productos || productos.length === 0) {
                 console.warn('⚠️ No hay productos para cargar');
                 selectEntrada.innerHTML = '<option value="">-- Sin productos --</option>';
@@ -883,9 +887,23 @@
                 return;
             }
             
+            // Crear opciones
             const html = productos.map(p => `<option value="${p.producto}">${p.producto}</option>`).join('');
+            
+            // ACTUALIZAR SIN PERDER LO QUE EL USUARIO SELECCIONÓ
             selectEntrada.innerHTML = '<option value="">-- Selecciona --</option>' + html;
             selectSalida.innerHTML = '<option value="">-- Selecciona --</option>' + html;
+            
+            // RESTAURAR VALORES SI EL USUARIO YA HABÍA SELECCIONADO ALGO
+            if (valorEntradaAnterior) {
+                selectEntrada.value = valorEntradaAnterior;
+                console.log('✅ Restaurado Entrada:', valorEntradaAnterior);
+            }
+            if (valorSalidaAnterior) {
+                selectSalida.value = valorSalidaAnterior;
+                console.log('✅ Restaurado Salida:', valorSalidaAnterior);
+            }
+            
             console.log('✅ Selects actualizados:', productos.length, 'productos');
         }
 
