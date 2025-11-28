@@ -909,86 +909,73 @@
             event.target.classList.add('active');
         }
 
-        async function registrarEntrada() {
-            console.log('🔄 Registrando entrada...');
-            
-            const producto = document.getElementById('entrada-producto').value;
-            const cantidad = parseFloat(document.getElementById('entrada-cantidad').value);
-            const costo = parseFloat(document.getElementById('entrada-costo').value) || 0;
-            const proveedor = document.getElementById('entrada-proveedor').value;
-            const responsable = document.getElementById('entrada-responsable').value;
-            const estadoInput = document.getElementById('estado-entrada');
-            const estado = estadoInput ? estadoInput.value : '';
-
-            console.log('📝 Datos:', {producto, cantidad, costo, proveedor, responsable, estado});
-
-            if (!producto || producto === '' || isNaN(cantidad) || cantidad === 0) {
-                mostrarAlerta('⚠️ Completa: Producto y Cantidad son obligatorios', 'error');
-                return;
-            }
-
-            if (!responsable || responsable === '') {
-                mostrarAlerta('⚠️ Selecciona un Responsable', 'error');
-                return;
-            }
-
-            const p = productos.find(x => x.producto === producto);
-            const esProteina = p && p.categoria.includes('Proteínas');
-            
-            let cantidadCrudo = 0;
-            let cantidadCocido = 0;
-            
-            if (esProteina) {
-                if (estado === 'crudo') {
-                    cantidadCrudo = cantidad;
-                    cantidadCocido = 0;
-                } else if (estado === 'cocido') {
-                    cantidadCrudo = 0;
-                    cantidadCocido = cantidad;
-                } else {
-                    cantidadCrudo = cantidad;
-                    cantidadCocido = 0;
-                }
-            } else {
-                cantidadCrudo = cantidad;
-                cantidadCocido = 0;
-            }
-
+        function registrarEntrada() {
             try {
-                console.log('📤 Enviando a Google...');
+                console.log('🔄 ENTRANDO A FUNCIÓN registrarEntrada');
+                alert('✅ Función se está ejecutando');
+                
+                const producto = document.getElementById('entrada-producto').value;
+                console.log('Producto:', producto);
+                
+                const cantidad = document.getElementById('entrada-cantidad').value;
+                console.log('Cantidad:', cantidad);
+                
+                if (!producto) {
+                    alert('⚠️ Selecciona un producto');
+                    return;
+                }
+                
+                if (!cantidad || cantidad === '0') {
+                    alert('⚠️ Ingresa cantidad');
+                    return;
+                }
+                
+                alert('✅ Datos válidos: ' + producto + ' x ' + cantidad);
+                enviarEntradaAGoogle(producto, parseFloat(cantidad));
+                
+            } catch(e) {
+                console.error('ERROR:', e);
+                alert('❌ Error: ' + e.message);
+            }
+        }
+        
+        async function enviarEntradaAGoogle(producto, cantidad) {
+            try {
+                console.log('📤 Enviando:', {producto, cantidad});
+                
+                const costo = parseFloat(document.getElementById('entrada-costo').value) || 0;
+                const proveedor = document.getElementById('entrada-proveedor').value;
+                const responsable = document.getElementById('entrada-responsable').value;
+                
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify({
                         action: 'addMovimiento',
                         tipo: 'entrada',
-                        producto,
-                        cantidadCrudo,
-                        cantidadCocido,
+                        producto: producto,
+                        cantidadCrudo: cantidad,
+                        cantidadCocido: 0,
                         destinoOrigen: 'compra',
-                        estado: esProteina ? estado : '',
-                        responsable,
-                        costo,
-                        proveedor
+                        estado: '',
+                        responsable: responsable,
+                        costo: costo,
+                        proveedor: proveedor
                     })
                 });
-
+                
                 const data = await response.json();
-                console.log('✅ Respuesta:', data);
-
-                if (data.success || data.mensaje) {
-                    mostrarAlerta('✅ Entrada registrada correctamente', 'success');
+                console.log('✅ Respuesta Google:', data);
+                
+                if (data.success) {
+                    alert('✅ Entrada registrada');
                     document.getElementById('entrada-producto').value = '';
                     document.getElementById('entrada-cantidad').value = '';
                     document.getElementById('entrada-costo').value = '';
-                    if (estadoInput) estadoInput.value = '';
-                    
-                    await sincronizar();
-                } else {
-                    mostrarAlerta('❌ ' + (data.error || 'Error desconocido'), 'error');
                 }
+                
             } catch(error) {
                 console.error('❌ Error:', error);
-                mostrarAlerta('❌ Error: ' + error.message, 'error');
+                alert('❌ ' + error.message);
             }
         }
 
