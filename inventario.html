@@ -3,53 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Rincón del Barril - Inventario</title>
+    <title>El Rincón del Barril - v10</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #8B0000 0%, #C41E3A 100%); min-height: 100vh; padding: 10px; }
-        .container { max-width: 700px; margin: 0 auto; }
-        .header { background: white; border-radius: 15px 15px 0 0; padding: 15px; text-align: center; border-bottom: 3px solid #8B0000; }
-        .header h1 { color: #8B0000; font-size: 20px; margin-bottom: 5px; }
-        .user-section { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f0f0f0; border-radius: 6px; font-size: 11px; margin-top: 10px; gap: 8px; flex-wrap: wrap; }
-        .user-badge { background: #8B0000; color: white; padding: 4px 10px; border-radius: 15px; font-weight: 600; cursor: pointer; }
-        .status-badge { display: inline-block; background: #4CAF50; color: white; padding: 4px 10px; border-radius: 15px; font-weight: 600; font-size: 10px; }
-        .btn-section { display: flex; gap: 6px; }
-        .sync-btn { background: #2196F3; color: white; padding: 4px 10px; border-radius: 4px; border: none; cursor: pointer; font-size: 10px; font-weight: 600; }
-        .tabs { display: flex; background: white; padding: 0 10px; border-bottom: 1px solid #DDD; overflow-x: auto; flex-wrap: wrap; }
-        .tab-btn { flex: 1; padding: 10px 6px; background: none; border: none; cursor: pointer; font-weight: 600; color: #999; border-bottom: 3px solid transparent; font-size: 9px; min-width: 40px; white-space: nowrap; }
-        .tab-btn.active { color: #8B0000; border-bottom-color: #8B0000; }
-        .content { background: white; padding: 15px; border-radius: 0 0 15px 15px; min-height: 600px; max-height: 80vh; overflow-y: auto; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .search-box { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #DDD; border-radius: 6px; font-size: 13px; }
-        .filter-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
-        .filter-btn { padding: 6px 10px; border: 1px solid #DDD; background: white; border-radius: 15px; cursor: pointer; font-size: 11px; font-weight: 600; color: #666; }
-        .filter-btn.active { background: #8B0000; color: white; border-color: #8B0000; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: #333; }
-        .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #DDD; border-radius: 4px; font-size: 12px; font-family: inherit; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; }
-        .btn-primary { background: #8B0000; color: white; width: 100%; }
-        .btn-secondary { background: #f0f0f0; color: #333; width: 100%; border: 1px solid #DDD; }
-        .btn-small { background: #f44336; color: white; padding: 4px 8px; font-size: 10px; border: none; border-radius: 3px; cursor: pointer; }
-        .producto-card { background: #f9f9f9; border: 1px solid #EEE; border-radius: 6px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; }
-        .producto-info { flex: 1; }
-        .producto-nombre { font-weight: 600; font-size: 12px; }
-        .producto-categoria { font-size: 10px; color: #999; margin-top: 2px; }
-        .producto-saldo { font-size: 13px; font-weight: 600; color: #8B0000; text-align: right; }
-        .alerta { padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 12px; font-weight: 600; }
-        .alerta.success { background: #E8F5E9; color: #2E7D32; }
-        .alerta.error { background: #FFEBEE; color: #C62828; }
-        .alerta.info { background: #E3F2FD; color: #1565C0; }
-        .lista-item { background: #f9f9f9; padding: 8px; margin-bottom: 6px; border-radius: 4px; font-size: 11px; border-left: 3px solid #8B0000; }
-        .scroll-section { max-height: 300px; overflow-y: auto; }
-        .estado-btn { padding: 6px 12px; border: 1px solid #DDD; background: white; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 11px; }
-        .estado-btn.active { background: #8B0000; color: white; border-color: #8B0000; }
-        h3 { color: #8B0000; font-size: 12px; margin-bottom: 10px; border-bottom: 2px solid #8B0000; padding-bottom: 8px; }
-        .admin-item { background: #f9f9f9; padding: 8px; margin-bottom: 6px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
-        .admin-list { background: #f9f9f9; padding: 8px; border-radius: 4px; margin-bottom: 10px; }
-        textarea { width: 100%; padding: 8px; border: 1px solid #DDD; border-radius: 4px; font-size: 12px; font-family: monospace; min-height: 100px; }
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:Segoe UI,sans-serif;background:linear-gradient(135deg,#8B0000,#C41E3A);min-height:100vh;padding:10px}.container{max-width:700px;margin:0 auto}.header{background:#fff;border-radius:15px 15px 0 0;padding:15px;text-align:center;border-bottom:3px solid #8B0000}.header h1{color:#8B0000;font-size:20px;margin-bottom:5px}.user-section{display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f0f0f0;border-radius:6px;font-size:11px;margin-top:10px;gap:8px;flex-wrap:wrap}.user-badge{background:#8B0000;color:#fff;padding:4px 10px;border-radius:15px;font-weight:600;cursor:pointer}.status-badge{background:#4CAF50;color:#fff;padding:4px 10px;border-radius:15px;font-weight:600;font-size:10px}.btn-sync{background:#2196F3;color:#fff;padding:4px 10px;border-radius:4px;border:none;cursor:pointer;font-size:10px;font-weight:600}.tabs{display:flex;background:#fff;padding:0 10px;border-bottom:1px solid #DDD;overflow-x:auto;flex-wrap:wrap}.tab-btn{flex:1;padding:10px 6px;background:none;border:none;cursor:pointer;font-weight:600;color:#999;border-bottom:3px solid transparent;font-size:9px;min-width:35px;white-space:nowrap}.tab-btn.active{color:#8B0000;border-bottom-color:#8B0000}.content{background:#fff;padding:15px;border-radius:0 0 15px 15px;min-height:600px;max-height:80vh;overflow-y:auto}.tab-content{display:none}.tab-content.active{display:block}.search-box{width:100%;padding:10px;margin-bottom:15px;border:1px solid #DDD;border-radius:6px;font-size:13px}.filter-buttons{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:15px}.filter-btn{padding:6px 10px;border:1px solid #DDD;background:#fff;border-radius:15px;cursor:pointer;font-size:11px;font-weight:600;color:#666}.filter-btn.active{background:#8B0000;color:#fff;border-color:#8B0000}.form-group{margin-bottom:12px}.form-group label{display:block;font-size:11px;font-weight:600;margin-bottom:4px;color:#333}.form-group input,.form-group select{width:100%;padding:8px;border:1px solid #DDD;border-radius:4px;font-size:12px;font-family:inherit}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{padding:8px 12px;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px;width:100%}.btn-primary{background:#8B0000;color:#fff}.btn-secondary{background:#f0f0f0;color:#333;border:1px solid #DDD}.btn-small{background:#f44336;color:#fff;padding:4px 8px;font-size:10px;border:none;border-radius:3px;cursor:pointer}.product-card{background:#f9f9f9;border:1px solid #EEE;border-radius:6px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between}.product-info{flex:1}.product-name{font-weight:600;font-size:12px}.product-category{font-size:10px;color:#999;margin-top:2px}.product-stock{font-size:13px;font-weight:600;color:#8B0000;text-align:right}.alert{padding:10px;border-radius:6px;margin-bottom:15px;font-size:12px;font-weight:600}.alert.success{background:#E8F5E9;color:#2E7D32}.alert.error{background:#FFEBEE;color:#C62828}.list-item{background:#f9f9f9;padding:8px;margin-bottom:6px;border-radius:4px;font-size:11px;border-left:3px solid #8B0000}.scroll{max-height:300px;overflow-y:auto}h3{color:#8B0000;font-size:12px;margin-bottom:10px;border-bottom:2px solid #8B0000;padding-bottom:8px}.admin-item{background:#f9f9f9;padding:8px;margin-bottom:6px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;font-size:11px}textarea{width:100%;padding:8px;border:1px solid #DDD;border-radius:4px;font-size:12px;font-family:monospace;min-height:80px}
     </style>
 </head>
 <body>
@@ -58,636 +14,425 @@
             <h1>🍖 El Rincón del Barril</h1>
             <p>Gestión de Inventario v10</p>
             <div class="user-section">
-                <div style="flex: 1;"><span class="user-badge" onclick="cambiarUsuario()">👤 <span id="usuario-actual">Bodega</span></span></div>
-                <div style="flex: 1;"><span class="status-badge">✅ Mov: <span id="contador">0</span></span></div>
-                <div class="btn-section">
-                    <button class="sync-btn" onclick="descargarDatos()" title="Descargar JSON">📥</button>
-                    <button class="sync-btn" onclick="cargarDatos()" title="Cargar JSON">📤</button>
-                </div>
+                <div><span class="user-badge" onclick="cambiarUsuario()">👤 <span id="user">Bodega</span></span></div>
+                <div><span class="status-badge">✅ Mov: <span id="mov">0</span></span></div>
+                <button class="btn-sync" onclick="descargar()">📥</button>
+                <button class="btn-sync" onclick="cargar()">📤</button>
             </div>
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" onclick="cambiarTab('saldos')">📊 Saldos</button>
-            <button class="tab-btn" onclick="cambiarTab('entradas')">📥 Entradas</button>
-            <button class="tab-btn" onclick="cambiarTab('salidas')">📤 Salidas</button>
-            <button class="tab-btn" onclick="cambiarTab('reportes')">📈 Reportes</button>
-            <button class="tab-btn" onclick="cambiarTab('admin')">⚙️ Admin</button>
+            <button class="tab-btn active" onclick="tab('saldos')">📊</button>
+            <button class="tab-btn" onclick="tab('entradas')">📥</button>
+            <button class="tab-btn" onclick="tab('salidas')">📤</button>
+            <button class="tab-btn" onclick="tab('reportes')">📈</button>
+            <button class="tab-btn" onclick="tab('admin')">⚙️</button>
         </div>
 
         <div class="content">
             <div id="alerta"></div>
 
-            <!-- TAB SALDOS -->
+            <!-- SALDOS -->
             <div id="saldos" class="tab-content active">
-                <input type="text" id="buscar-saldos" class="search-box" placeholder="🔍 Buscar producto..." oninput="buscarSaldos(this.value)">
-                <h3>Filtrar por Categoría</h3>
-                <div class="filter-buttons" id="filter-buttons"></div>
+                <input type="text" class="search-box" placeholder="🔍 Buscar..." oninput="buscar(this.value)">
+                <h3>Filtros</h3>
+                <div class="filter-buttons" id="filtros"></div>
                 <div id="lista-saldos"></div>
             </div>
 
-            <!-- TAB ENTRADAS -->
+            <!-- ENTRADAS -->
             <div id="entradas" class="tab-content">
-                <h3>Registrar Entrada (Compra)</h3>
-                <div class="form-group"><label>Responsable *</label><select id="responsable-entrada"></select></div>
-                <div class="form-group"><label>Proveedor *</label><select id="proveedor-entrada"></select></div>
-                <div class="form-group"><label>Producto *</label><select id="producto-entrada" onchange="actualizarEstadoEntrada()"></select></div>
-                <div id="estado-entrada-grupo" style="display: none;">
-                    <label style="font-size: 11px; font-weight: 600; margin-bottom: 8px; display: block;">Estado</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-                        <button type="button" class="estado-btn" onclick="seleccionarEstadoEntrada(this, 'crudo')">Crudo</button>
-                        <button type="button" class="estado-btn active" onclick="seleccionarEstadoEntrada(this, 'cocido')">Cocido</button>
-                    </div>
-                    <input type="hidden" id="estado-entrada" value="cocido">
-                </div>
+                <h3>Registrar Entrada</h3>
+                <div class="form-group"><label>Responsable</label><select id="resp-ent"></select></div>
+                <div class="form-group"><label>Proveedor</label><select id="prov-ent"></select></div>
+                <div class="form-group"><label>Producto</label><select id="prod-ent"></select></div>
                 <div class="form-row">
-                    <div class="form-group"><label>Cantidad *</label><input type="number" id="cantidad-entrada" placeholder="0.00" step="0.01"></div>
-                    <div class="form-group"><label>Costo *</label><input type="number" id="costo-entrada" placeholder="0.00" step="0.01"></div>
+                    <div class="form-group"><label>Cantidad</label><input type="number" id="cant-ent" step="0.01"></div>
+                    <div class="form-group"><label>Costo</label><input type="number" id="cost-ent" step="0.01"></div>
                 </div>
-                <div class="form-row" style="gap: 8px;"><button class="btn btn-primary" onclick="registrarEntrada()">✅ Registrar</button><button class="btn btn-secondary" onclick="limpiarFormEntrada()">🔄 Limpiar</button></div>
-                <h3 style="margin-top: 15px;">Últimas Entradas</h3>
-                <div class="scroll-section" id="lista-entradas"></div>
+                <button class="btn btn-primary" onclick="entrar()">✅ Registrar</button>
+                <h3 style="margin-top:15px">Últimas</h3>
+                <div class="scroll" id="ultimas-ent"></div>
             </div>
 
-            <!-- TAB SALIDAS -->
+            <!-- SALIDAS -->
             <div id="salidas" class="tab-content">
                 <h3>Registrar Salida</h3>
-                <div class="form-group"><label>Responsable *</label><select id="responsable-salida"></select></div>
-                <div class="form-group"><label>Destino *</label><select id="destino-salida"><option value="">-- Selecciona --</option><option value="cocina">👨‍🍳 Cocina</option><option value="caja">💰 Caja</option><option value="barril">🍖 Barril</option><option value="consumo">🥘 Consumo</option><option value="merma">📉 Merma</option><option value="danio">🔥 Daño</option></select></div>
-                <div class="form-group"><label>Producto *</label><select id="producto-salida" onchange="actualizarEstadoSalida()"></select></div>
-                <div id="estado-salida-grupo" style="display: none;">
-                    <label style="font-size: 11px; font-weight: 600; margin-bottom: 8px; display: block;">Estado</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-                        <button type="button" class="estado-btn" onclick="seleccionarEstadoSalida(this, 'crudo')">Crudo</button>
-                        <button type="button" class="estado-btn active" onclick="seleccionarEstadoSalida(this, 'cocido')">Cocido</button>
-                    </div>
-                    <input type="hidden" id="estado-salida" value="cocido">
-                </div>
-                <div class="form-group"><label>Cantidad *</label><input type="number" id="cantidad-salida" placeholder="0.00" step="0.01"></div>
-                <div class="form-row" style="gap: 8px;"><button class="btn btn-primary" onclick="registrarSalida()">✅ Registrar</button><button class="btn btn-secondary" onclick="limpiarFormSalida()">🔄 Limpiar</button></div>
-                <h3 style="margin-top: 15px;">Últimas Salidas</h3>
-                <div class="scroll-section" id="lista-salidas"></div>
+                <div class="form-group"><label>Responsable</label><select id="resp-sal"></select></div>
+                <div class="form-group"><label>Destino</label><select id="dest-sal"><option>-- Selecciona --</option><option>👨‍🍳 Cocina</option><option>💰 Caja</option><option>🍖 Barril</option><option>🥘 Consumo</option><option>📉 Merma</option><option>🔥 Daño</option></select></div>
+                <div class="form-group"><label>Producto</label><select id="prod-sal"></select></div>
+                <div class="form-group"><label>Cantidad</label><input type="number" id="cant-sal" step="0.01"></div>
+                <button class="btn btn-primary" onclick="salir()">✅ Registrar</button>
+                <h3 style="margin-top:15px">Últimas</h3>
+                <div class="scroll" id="ultimas-sal"></div>
             </div>
 
-            <!-- TAB REPORTES -->
+            <!-- REPORTES -->
             <div id="reportes" class="tab-content">
                 <h3>Movimientos de Hoy</h3>
-                <div class="scroll-section" id="lista-reportes"></div>
+                <div class="scroll" id="hoy"></div>
             </div>
 
-            <!-- TAB ADMIN -->
+            <!-- ADMIN -->
             <div id="admin" class="tab-content">
-                <h3>🔒 Administración</h3>
-
-                <h3 style="margin-top: 15px;">Responsables</h3>
-                <div class="form-row" style="margin-bottom: 10px;">
-                    <input type="text" id="nuevo-responsable" placeholder="Nombre">
-                    <button class="btn btn-primary" onclick="agregarResponsable()">✅ Agregar</button>
-                </div>
-                <div class="admin-list" id="lista-responsables"></div>
+                <h3>Responsables</h3>
+                <div class="form-row" style="margin-bottom:10px"><input type="text" id="new-resp" placeholder="Nombre"><button class="btn btn-primary" onclick="addResp()">✅</button></div>
+                <div id="lista-resp"></div>
 
                 <h3>Proveedores</h3>
-                <div class="form-row" style="margin-bottom: 10px;">
-                    <input type="text" id="nuevo-proveedor" placeholder="Nombre">
-                    <button class="btn btn-primary" onclick="agregarProveedor()">✅ Agregar</button>
-                </div>
-                <div class="admin-list" id="lista-proveedores"></div>
+                <div class="form-row" style="margin-bottom:10px"><input type="text" id="new-prov" placeholder="Nombre"><button class="btn btn-primary" onclick="addProv()">✅</button></div>
+                <div id="lista-prov"></div>
 
                 <h3>Categorías</h3>
-                <div class="form-row" style="margin-bottom: 10px;">
-                    <input type="text" id="nueva-categoria" placeholder="Ej: 🍖 Proteínas">
-                    <button class="btn btn-primary" onclick="agregarCategoria()">✅ Agregar</button>
-                </div>
-                <div class="admin-list" id="lista-categorias"></div>
+                <div class="form-row" style="margin-bottom:10px"><input type="text" id="new-cat" placeholder="Ej: 🍖 Proteínas"><button class="btn btn-primary" onclick="addCat()">✅</button></div>
+                <div id="lista-cat"></div>
 
                 <h3>Productos</h3>
-                <div class="form-group"><label>Nombre *</label><input type="text" id="nuevo-producto-nombre" placeholder="Nombre"></div>
-                <div class="form-group"><label>Categoría *</label><select id="nuevo-producto-categoria"></select></div>
-                <div class="form-group"><label>Stock Mínimo</label><input type="number" id="nuevo-producto-minimo" placeholder="0" min="0" step="0.01"></div>
-                <button class="btn btn-primary" onclick="agregarProducto()" style="margin-bottom: 10px;">✅ Agregar Producto</button>
-                <div class="admin-list" id="lista-productos"></div>
+                <div class="form-group"><label>Nombre</label><input type="text" id="new-prod-name"></div>
+                <div class="form-group"><label>Categoría</label><select id="new-prod-cat"></select></div>
+                <div class="form-group"><label>Mínimo</label><input type="number" id="new-prod-min" min="0" step="0.01"></div>
+                <button class="btn btn-primary" onclick="addProd()">✅ Agregar</button>
+                <div id="lista-prod"></div>
 
                 <h3>Datos</h3>
-                <p style="font-size: 11px; color: #666; margin-bottom: 10px;">Descarga tus datos como JSON para respaldarlos o transferirlos a otro dispositivo.</p>
-                <button class="btn btn-secondary" onclick="descargarDatos()" style="margin-bottom: 10px;">📥 Descargar Todos los Datos (JSON)</button>
-                <h3>Cargar Datos Anteriores</h3>
-                <p style="font-size: 11px; color: #666; margin-bottom: 10px;">Pega tu JSON aquí para restaurar datos:</p>
-                <textarea id="json-input" placeholder="Pega tu JSON aquí..."></textarea>
-                <button class="btn btn-primary" onclick="cargarDesdeJSON()" style="margin-top: 10px;">📤 Cargar Datos</button>
+                <button class="btn btn-secondary" onclick="descargar()" style="margin-bottom:10px">📥 Descargar JSON</button>
+                <textarea id="json-txt" placeholder="O pega JSON aquí..."></textarea>
+                <button class="btn btn-primary" style="margin-top:10px" onclick="cargarJSON()">📤 Cargar JSON</button>
             </div>
         </div>
     </div>
 
     <script>
-        let responsables = ['Bodega', 'Cocinero', 'Cajero', 'Gerente'];
-        let proveedores = ['Atlantic', 'mis tres amores', 'Carnes xyz', 'Distribuidora Local'];
-        let categorias = ['🍖 Proteínas', '🧀 Lácteos', '❄️ Congelados', '🌾 Secos', '🥬 Verduras'];
-        let saldos = [
-            {id: 1, nombre: 'Costilla de cerdo', categoria: '🍖 Proteínas', saldoCrudo: 3.95, saldoCocido: 0, unidad: 'kg', minimo: 5},
-            {id: 2, nombre: 'Pollo', categoria: '🍖 Proteínas', saldoCrudo: 16, saldoCocido: 0, unidad: 'kg', minimo: 7},
-            {id: 3, nombre: 'Papa', categoria: '❄️ Congelados', saldoCrudo: 12.5, saldoCocido: 0, unidad: 'kg', minimo: 10},
-            {id: 4, nombre: 'Queso cheddar', categoria: '🧀 Lácteos', saldoCrudo: 207, saldoCocido: 0, unidad: 'kg', minimo: 80},
-            {id: 5, nombre: 'Chicharrón', categoria: '🍖 Proteínas', saldoCrudo: 7.7, saldoCocido: 0, unidad: 'kg', minimo: 7},
-            {id: 6, nombre: 'Lomo de cerdo', categoria: '🍖 Proteínas', saldoCrudo: 9.71, saldoCocido: 0, unidad: 'kg', minimo: 4},
-            {id: 7, nombre: 'Punta de anca', categoria: '🍖 Proteínas', saldoCrudo: 3.04, saldoCocido: 0, unidad: 'kg', minimo: 2},
-            {id: 8, nombre: 'Carne molida CAB', categoria: '🍖 Proteínas', saldoCrudo: 17.47, saldoCocido: 0, unidad: 'kg', minimo: 0},
-            {id: 9, nombre: 'Carne molida regular', categoria: '🍖 Proteínas', saldoCrudo: 24.6, saldoCocido: 0, unidad: 'kg', minimo: 4},
-            {id: 10, nombre: 'Croquetas de carne', categoria: '🍖 Proteínas', saldoCrudo: 74, saldoCocido: 0, unidad: 'kg', minimo: 70},
-            {id: 11, nombre: 'Tocineta', categoria: '🍖 Proteínas', saldoCrudo: 7.6, saldoCocido: 0, unidad: 'kg', minimo: 3},
-            {id: 12, nombre: 'Salchichas', categoria: '🍖 Proteínas', saldoCrudo: 19, saldoCocido: 0, unidad: 'kg', minimo: 15},
-            {id: 13, nombre: 'Pan brioche de hamburguesa', categoria: '🌾 Secos', saldoCrudo: 46, saldoCocido: 0, unidad: 'kg', minimo: 30},
-            {id: 14, nombre: 'Pan brioche de perro', categoria: '🌾 Secos', saldoCrudo: 13, saldoCocido: 0, unidad: 'kg', minimo: 10},
-            {id: 15, nombre: 'Papa pastusa', categoria: '🥬 Verduras', saldoCrudo: 14, saldoCocido: 0, unidad: 'kg', minimo: 4},
-            {id: 16, nombre: 'Cebolla cabezona', categoria: '🥬 Verduras', saldoCrudo: 18, saldoCocido: 0, unidad: 'kg', minimo: 10},
-            {id: 17, nombre: 'Tomate', categoria: '🥬 Verduras', saldoCrudo: 12, saldoCocido: 0, unidad: 'kg', minimo: 5},
+        let resp = ['Bodega', 'Cocinero', 'Cajero', 'Gerente'];
+        let prov = ['Atlantic', 'mis tres amores', 'Carnes xyz', 'Distribuidora Local'];
+        let cat = ['🍖 Proteínas', '🧀 Lácteos', '❄️ Congelados', '🌾 Secos', '🥬 Verduras'];
+        let prod = [
+            {id:1, n:'Costilla de cerdo', c:'🍖 Proteínas', cr:3.95, co:0, u:'kg', min:5},
+            {id:2, n:'Pollo', c:'🍖 Proteínas', cr:16, co:0, u:'kg', min:7},
+            {id:3, n:'Queso paisa', c:'🧀 Lácteos', cr:0.52, co:0, u:'kg', min:1},
+            {id:4, n:'Papa', c:'❄️ Congelados', cr:12.5, co:0, u:'kg', min:10},
+            {id:5, n:'Chicharrón', c:'🍖 Proteínas', cr:7.7, co:0, u:'kg', min:7},
+            {id:6, n:'Lomo de cerdo', c:'🍖 Proteínas', cr:9.71, co:0, u:'kg', min:4},
+            {id:7, n:'Punta de anca', c:'🍖 Proteínas', cr:3.04, co:0, u:'kg', min:2},
+            {id:8, n:'Carne molida CAB', c:'🍖 Proteínas', cr:17.47, co:0, u:'kg', min:0},
+            {id:9, n:'Carne molida regular', c:'🍖 Proteínas', cr:24.6, co:0, u:'kg', min:4},
+            {id:10, n:'Croquetas de carne', c:'🍖 Proteínas', cr:74, co:0, u:'kg', min:70},
+            {id:11, n:'Pecho de res', c:'🍖 Proteínas', cr:0, co:0, u:'kg', min:0},
+            {id:12, n:'Contramuslo de pollo', c:'🍖 Proteínas', cr:0, co:0, u:'kg', min:0},
+            {id:13, n:'Colita de cadera', c:'🍖 Proteínas', cr:0, co:0, u:'kg', min:3},
+            {id:14, n:'Morcilla', c:'🍖 Proteínas', cr:1.84, co:0, u:'kg', min:0},
+            {id:15, n:'Chorizo', c:'🍖 Proteínas', cr:1.27, co:0, u:'kg', min:5},
+            {id:16, n:'Queso cheddar', c:'🧀 Lácteos', cr:207, co:0, u:'kg', min:80},
+            {id:17, n:'Tocineta', c:'🍖 Proteínas', cr:7.6, co:0, u:'kg', min:3},
+            {id:18, n:'Salchichas', c:'🍖 Proteínas', cr:19, co:0, u:'kg', min:15},
+            {id:19, n:'Pan brioche de hamburguesa', c:'🌾 Secos', cr:46, co:0, u:'kg', min:30},
+            {id:20, n:'Pan brioche de perro', c:'🌾 Secos', cr:13, co:0, u:'kg', min:10},
+            {id:21, n:'Papa pastusa', c:'🥬 Verduras', cr:14, co:0, u:'kg', min:4},
+            {id:22, n:'Cebolla cabezona', c:'🥬 Verduras', cr:18, co:0, u:'kg', min:10},
+            {id:23, n:'Tomate', c:'🥬 Verduras', cr:12, co:0, u:'kg', min:5},
+            {id:24, n:'Panela', c:'🌾 Secos', cr:10, co:0, u:'kg', min:5},
+            {id:25, n:'Mayonesa Natucampo', c:'🌾 Secos', cr:5, co:0, u:'kg', min:2},
+            {id:26, n:'Arroz Zulia', c:'🌾 Secos', cr:3, co:0, u:'kg', min:2},
+            {id:27, n:'Frijol Bolón Rojo', c:'🌾 Secos', cr:1, co:0, u:'kg', min:1},
+            {id:28, n:'Aceite Sinai', c:'🌾 Secos', cr:2, co:0, u:'kg', min:1}
         ];
-        let movimientos = [];
-        let usuarioActual = 'Bodega';
-        let filtroActual = 'todos';
-        let proximoId = 18;
+        let mov = [];
+        let user = 'Bodega';
+        let filtro = 'todos';
+        let id = 5;
 
-        function inicializar() {
-            cargarDatosLocal();
-            actualizarSelectos();
-            actualizarFiltros();
-            actualizarListaSaldos();
-            actualizarListaEntradas();
-            actualizarListaSalidas();
-            actualizarReportes();
-            actualizarAdmin();
-            document.getElementById('usuario-actual').textContent = usuarioActual;
-            actualizarContador();
-            mostrarAlerta('✅ Sistema listo - Datos guardados localmente', 'info');
+        function init() {
+            const d = localStorage.getItem('inv');
+            if (d) {
+                const x = JSON.parse(d);
+                resp = x.resp || resp;
+                prov = x.prov || prov;
+                cat = x.cat || cat;
+                prod = x.prod || prod;
+                mov = x.mov || [];
+                user = x.user || 'Bodega';
+                id = x.id || 5;
+            }
+            actualizar();
+            alerta('✅ Listo', 'success');
         }
 
-        function cargarDatosLocal() {
-            const datos = localStorage.getItem('inventario_rincon_v10');
-            if (datos) {
-                const d = JSON.parse(datos);
-                responsables = d.responsables || responsables;
-                proveedores = d.proveedores || proveedores;
-                categorias = d.categorias || categorias;
-                saldos = d.saldos || saldos;
-                movimientos = d.movimientos || [];
-                usuarioActual = d.usuarioActual || 'Bodega';
-                proximoId = d.proximoId || 18;
+        function save() {
+            localStorage.setItem('inv', JSON.stringify({resp, prov, cat, prod, mov, user, id}));
+        }
+
+        function actualizar() {
+            document.getElementById('user').textContent = user;
+            
+            const opts = resp.map(r => `<option>${r}</option>`).join('');
+            const opts2 = prov.map(p => `<option>${p}</option>`).join('');
+            const opts3 = prod.map(p => `<option value="${p.id}">${p.n}</option>`).join('');
+            const opts4 = cat.map(c => `<option>${c}</option>`).join('');
+            
+            ['resp-ent', 'resp-sal'].forEach(e => document.getElementById(e).innerHTML = '<option>--</option>' + opts);
+            document.getElementById('prov-ent').innerHTML = '<option>--</option>' + opts2;
+            ['prod-ent', 'prod-sal'].innerHTML = '<option>--</option>' + opts3;
+            document.getElementById('new-prod-cat').innerHTML = '<option>--</option>' + opts4;
+            
+            document.getElementById('filtros').innerHTML = '<button class="filter-btn active" onclick="filtro2(\'todos\')">Todos</button>' + 
+                [...new Set(prod.map(p => p.c))].sort().map(c => `<button class="filter-btn" onclick="filtro2('${c}')">${c}</button>`).join('');
+            
+            saldos();
+            entradas();
+            salidas();
+            reportes();
+            admin();
+            conteo();
+        }
+
+        function saldos() {
+            const ps = filtro === 'todos' ? prod : prod.filter(p => p.c === filtro);
+            document.getElementById('lista-saldos').innerHTML = ps.length === 0 ? '<p style="color:#999">Sin productos</p>' : 
+                ps.map(p => {
+                    const t = p.cr + p.co;
+                    const bg = t < p.min ? ' style="background:#FFEBEE"' : '';
+                    return `<div class="product-card"${bg}><div class="product-info"><div class="product-name">${p.n}</div><div class="product-category">${p.c}</div><div style="font-size:10px;color:#666;margin-top:4px">${p.c.includes('Proteína') ? `🔵 ${p.cr.toFixed(2)} | 🔴 ${p.co.toFixed(2)}` : `Total: ${t.toFixed(2)}`}</div></div><div class="product-stock">${t.toFixed(2)}</div></div>`;
+                }).join('');
+        }
+
+        function entradas() {
+            const ultimas = mov.filter(m => m.t === 'ent').slice(-10).reverse();
+            document.getElementById('ultimas-ent').innerHTML = ultimas.length === 0 ? '<p style="color:#999">Sin entradas</p>' : 
+                ultimas.map(m => `<div class="list-item"><b>${m.p}</b><br>${m.c1 > 0 ? m.c1.toFixed(2) + ' crudo | ' : ''}${m.c2 > 0 ? m.c2.toFixed(2) + ' cocido | ' : ''}${m.prov} | $${m.costo}</div>`).join('');
+        }
+
+        function salidas() {
+            const ultimas = mov.filter(m => m.t === 'sal').slice(-10).reverse();
+            document.getElementById('ultimas-sal').innerHTML = ultimas.length === 0 ? '<p style="color:#999">Sin salidas</p>' : 
+                ultimas.map(m => `<div class="list-item"><b>${m.p}</b><br>${m.c1 > 0 ? m.c1.toFixed(2) + ' crudo' : ''}${m.c2 > 0 ? ' / ' + m.c2.toFixed(2) + ' cocido' : ''} | ${m.resp}</div>`).join('');
+        }
+
+        function reportes() {
+            const hoy = new Date().toISOString().split('T')[0];
+            const hoyMov = mov.filter(m => m.f === hoy);
+            document.getElementById('hoy').innerHTML = hoyMov.length === 0 ? '<p style="color:#999">Sin movimientos</p>' : 
+                hoyMov.map(m => {
+                    const icon = m.t === 'ent' ? '📥' : '📤';
+                    return `<div class="list-item"><b>${icon} ${m.h} - ${m.p}</b><br>${m.c1 > 0 ? m.c1.toFixed(2) + ' crudo' : ''}${m.c2 > 0 ? ' / ' + m.c2.toFixed(2) + ' cocido' : ''} | ${m.resp}</div>`;
+                }).join('');
+        }
+
+        function admin() {
+            document.getElementById('lista-resp').innerHTML = resp.map(r => `<div class="admin-item"><span>${r}</span><button class="btn-small" onclick="delResp('${r}')">❌</button></div>`).join('');
+            document.getElementById('lista-prov').innerHTML = prov.map(p => `<div class="admin-item"><span>${p}</span><button class="btn-small" onclick="delProv('${p}')">❌</button></div>`).join('');
+            document.getElementById('lista-cat').innerHTML = cat.map(c => `<div class="admin-item"><span>${c}</span><button class="btn-small" onclick="delCat('${c}')">❌</button></div>`).join('');
+            document.getElementById('lista-prod').innerHTML = prod.map(p => `<div class="admin-item"><span>${p.n} (${(p.cr+p.co).toFixed(2)})</span><button class="btn-small" onclick="delProd(${p.id})">❌</button></div>`).join('');
+        }
+
+        function conteo() {
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('mov').textContent = mov.filter(m => m.f === hoy).length;
+        }
+
+        function tab(name) {
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById(name).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function cambiarUsuario() {
+            const idx = prompt(`Selecciona:\n${resp.map((r,i) => (i+1) + '. ' + r).join('\n')}`);
+            if (idx && resp[parseInt(idx)-1]) {
+                user = resp[parseInt(idx)-1];
+                save();
+                document.getElementById('user').textContent = user;
             }
         }
 
-        function guardarDatosLocal() {
-            localStorage.setItem('inventario_rincon_v10', JSON.stringify({
-                responsables, proveedores, categorias, saldos, movimientos, usuarioActual, proximoId
-            }));
+        function buscar(t) {
+            const ps = filtro === 'todos' ? prod : prod.filter(p => p.c === filtro);
+            const res = ps.filter(p => p.n.toLowerCase().includes(t.toLowerCase()));
+            document.getElementById('lista-saldos').innerHTML = res.length === 0 ? '<p style="color:#999">Sin productos</p>' : 
+                res.map(p => {
+                    const total = p.cr + p.co;
+                    return `<div class="product-card"><div class="product-info"><div class="product-name">${p.n}</div></div><div class="product-stock">${total.toFixed(2)}</div></div>`;
+                }).join('');
         }
 
-        function descargarDatos() {
-            const datos = { responsables, proveedores, categorias, saldos, movimientos, usuarioActual, proximoId, fecha: new Date().toISOString() };
-            const json = JSON.stringify(datos, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
+        function filtro2(f) {
+            filtro = f;
+            document.querySelectorAll('.filter-btn').forEach(e => e.classList.remove('active'));
+            event.target.classList.add('active');
+            saldos();
+        }
+
+        function entrar() {
+            const r = document.getElementById('resp-ent').value;
+            const p = document.getElementById('prov-ent').value;
+            const pid = parseInt(document.getElementById('prod-ent').value);
+            const c = parseFloat(document.getElementById('cant-ent').value);
+            const costo = parseFloat(document.getElementById('cost-ent').value);
+
+            if (!r || !p || !pid || isNaN(c) || isNaN(costo)) { alerta('⚠️ Completa campos', 'error'); return; }
+
+            const product = prod.find(x => x.id === pid);
+            product.cr += c;
+
+            mov.push({
+                f: new Date().toISOString().split('T')[0],
+                h: new Date().toTimeString().slice(0,5),
+                t: 'ent',
+                c1: c,
+                c2: 0,
+                p: product.n,
+                resp: r,
+                costo: costo,
+                prov: p
+            });
+
+            save();
+            alerta('✅ Entrada registrada', 'success');
+            document.getElementById('resp-ent').value = '';
+            document.getElementById('prov-ent').value = '';
+            document.getElementById('prod-ent').value = '';
+            document.getElementById('cant-ent').value = '';
+            document.getElementById('cost-ent').value = '';
+            actualizar();
+        }
+
+        function salir() {
+            const r = document.getElementById('resp-sal').value;
+            const d = document.getElementById('dest-sal').value;
+            const pid = parseInt(document.getElementById('prod-sal').value);
+            const c = parseFloat(document.getElementById('cant-sal').value);
+
+            if (!r || !d || !pid || isNaN(c)) { alerta('⚠️ Completa campos', 'error'); return; }
+
+            const product = prod.find(x => x.id === pid);
+            const dis = product.cr + product.co;
+
+            if (c > dis) { alerta(`⚠️ Stock insuficiente: ${dis.toFixed(2)}`, 'error'); return; }
+
+            product.cr -= c;
+
+            mov.push({
+                f: new Date().toISOString().split('T')[0],
+                h: new Date().toTimeString().slice(0,5),
+                t: 'sal',
+                c1: c,
+                c2: 0,
+                p: product.n,
+                resp: r,
+                dest: d,
+                costo: 0,
+                prov: ''
+            });
+
+            save();
+            alerta('✅ Salida registrada', 'success');
+            document.getElementById('resp-sal').value = '';
+            document.getElementById('dest-sal').value = '';
+            document.getElementById('prod-sal').value = '';
+            document.getElementById('cant-sal').value = '';
+            actualizar();
+        }
+
+        function addResp() {
+            const n = document.getElementById('new-resp').value.trim();
+            if (!n || resp.includes(n)) { alerta('❌ Error', 'error'); return; }
+            resp.push(n);
+            save();
+            document.getElementById('new-resp').value = '';
+            actualizar();
+            alerta('✅ Agregado', 'success');
+        }
+
+        function addProv() {
+            const n = document.getElementById('new-prov').value.trim();
+            if (!n || prov.includes(n)) { alerta('❌ Error', 'error'); return; }
+            prov.push(n);
+            save();
+            document.getElementById('new-prov').value = '';
+            actualizar();
+            alerta('✅ Agregado', 'success');
+        }
+
+        function addCat() {
+            const n = document.getElementById('new-cat').value.trim();
+            if (!n || cat.includes(n)) { alerta('❌ Error', 'error'); return; }
+            cat.push(n);
+            save();
+            document.getElementById('new-cat').value = '';
+            actualizar();
+            alerta('✅ Agregado', 'success');
+        }
+
+        function addProd() {
+            const n = document.getElementById('new-prod-name').value.trim();
+            const c = document.getElementById('new-prod-cat').value;
+            const m = parseFloat(document.getElementById('new-prod-min').value) || 0;
+            if (!n || !c) { alerta('⚠️ Completa', 'error'); return; }
+            prod.push({id: id++, n, c, cr: 0, co: 0, u: 'kg', min: m});
+            save();
+            document.getElementById('new-prod-name').value = '';
+            document.getElementById('new-prod-min').value = '';
+            actualizar();
+            alerta('✅ Producto agregado', 'success');
+        }
+
+        function delResp(r) { if (confirm(`¿Eliminar "${r}"?`)) { resp = resp.filter(x => x !== r); save(); actualizar(); } }
+        function delProv(p) { if (confirm(`¿Eliminar "${p}"?`)) { prov = prov.filter(x => x !== p); save(); actualizar(); } }
+        function delCat(c) { if (confirm(`¿Eliminar "${c}"?`)) { cat = cat.filter(x => x !== c); prod = prod.filter(p => p.c !== c); save(); actualizar(); } }
+        function delProd(pid) { if (confirm('¿Eliminar?')) { prod = prod.filter(p => p.id !== pid); save(); actualizar(); } }
+
+        function descargar() {
+            const json = JSON.stringify({resp, prov, cat, prod, mov, user, id}, null, 2);
+            const blob = new Blob([json], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `inventario_rincon_${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `inv_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
-            mostrarAlerta('✅ Datos descargados', 'success');
+            alerta('✅ Descargado', 'success');
         }
 
-        function cargarDatos() {
+        function cargar() {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'application/json';
             input.onchange = (e) => {
                 const file = e.target.files[0];
                 const reader = new FileReader();
-                reader.onload = (event) => {
+                reader.onload = (ev) => {
                     try {
-                        const datos = JSON.parse(event.target.result);
-                        responsables = datos.responsables || responsables;
-                        proveedores = datos.proveedores || proveedores;
-                        categorias = datos.categorias || categorias;
-                        saldos = datos.saldos || saldos;
-                        movimientos = datos.movimientos || [];
-                        usuarioActual = datos.usuarioActual || 'Bodega';
-                        proximoId = datos.proximoId || 18;
-                        guardarDatosLocal();
-                        actualizarSelectos();
-                        actualizarFiltros();
-                        actualizarListaSaldos();
-                        actualizarListaEntradas();
-                        actualizarListaSalidas();
-                        actualizarReportes();
-                        actualizarAdmin();
-                        document.getElementById('usuario-actual').textContent = usuarioActual;
-                        actualizarContador();
-                        mostrarAlerta('✅ Datos cargados correctamente', 'success');
-                    } catch(error) {
-                        mostrarAlerta('❌ Error: archivo JSON inválido', 'error');
-                    }
+                        const x = JSON.parse(ev.target.result);
+                        resp = x.resp; prov = x.prov; cat = x.cat; prod = x.prod; mov = x.mov; user = x.user; id = x.id;
+                        save();
+                        actualizar();
+                        alerta('✅ Cargado', 'success');
+                    } catch { alerta('❌ JSON inválido', 'error'); }
                 };
                 reader.readAsText(file);
             };
             input.click();
         }
 
-        function cargarDesdeJSON() {
-            const json = document.getElementById('json-input').value.trim();
-            if (!json) {
-                mostrarAlerta('⚠️ Pega el JSON primero', 'error');
-                return;
-            }
+        function cargarJSON() {
+            const j = document.getElementById('json-txt').value.trim();
+            if (!j) { alerta('⚠️ Pega JSON', 'error'); return; }
             try {
-                const datos = JSON.parse(json);
-                responsables = datos.responsables || responsables;
-                proveedores = datos.proveedores || proveedores;
-                categorias = datos.categorias || categorias;
-                saldos = datos.saldos || saldos;
-                movimientos = datos.movimientos || [];
-                usuarioActual = datos.usuarioActual || 'Bodega';
-                proximoId = datos.proximoId || 18;
-                guardarDatosLocal();
-                actualizarSelectos();
-                actualizarFiltros();
-                actualizarListaSaldos();
-                actualizarListaEntradas();
-                actualizarListaSalidas();
-                actualizarReportes();
-                actualizarAdmin();
-                document.getElementById('usuario-actual').textContent = usuarioActual;
-                actualizarContador();
-                document.getElementById('json-input').value = '';
-                mostrarAlerta('✅ Datos cargados correctamente', 'success');
-            } catch(error) {
-                mostrarAlerta('❌ Error: JSON inválido', 'error');
-            }
+                const x = JSON.parse(j);
+                resp = x.resp; prov = x.prov; cat = x.cat; prod = x.prod; mov = x.mov; user = x.user; id = x.id;
+                save();
+                document.getElementById('json-txt').value = '';
+                actualizar();
+                alerta('✅ Cargado', 'success');
+            } catch { alerta('❌ JSON inválido', 'error'); }
         }
 
-        function actualizarSelectos() {
-            const resp = responsables.map(r => `<option value="${r}">${r}</option>`).join('');
-            const prov = proveedores.map(p => `<option value="${p}">${p}</option>`).join('');
-            const prod = saldos.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
-            const cat = categorias.map(c => `<option value="${c}">${c}</option>`).join('');
-
-            document.getElementById('responsable-entrada').innerHTML = `<option value="">-- Selecciona --</option>${resp}`;
-            document.getElementById('responsable-salida').innerHTML = `<option value="">-- Selecciona --</option>${resp}`;
-            document.getElementById('proveedor-entrada').innerHTML = `<option value="">-- Selecciona --</option>${prov}`;
-            document.getElementById('producto-entrada').innerHTML = `<option value="">-- Selecciona --</option>${prod}`;
-            document.getElementById('producto-salida').innerHTML = `<option value="">-- Selecciona --</option>${prod}`;
-            document.getElementById('nuevo-producto-categoria').innerHTML = `<option value="">-- Selecciona --</option>${cat}`;
+        function alerta(m, t) {
+            const d = document.getElementById('alerta');
+            d.innerHTML = `<div class="alert ${t}">${m}</div>`;
+            setTimeout(() => d.innerHTML = '', 3000);
         }
 
-        function actualizarFiltros() {
-            const fb = document.getElementById('filter-buttons');
-            fb.innerHTML = '<button class="filter-btn active" onclick="filtrarSaldos(event, \'todos\')">Todos</button>';
-            const cats = [...new Set(saldos.map(p => p.categoria))].sort();
-            cats.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = 'filter-btn';
-                btn.textContent = cat;
-                btn.onclick = (e) => filtrarSaldos(e, cat);
-                fb.appendChild(btn);
-            });
-        }
-
-        function cambiarTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tab).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        function cambiarUsuario() {
-            const opciones = responsables.map((r, i) => `${i + 1}. ${r}`).join('\n');
-            const seleccion = prompt(`Selecciona responsable:\n${opciones}`);
-            const idx = parseInt(seleccion) - 1;
-            if (idx >= 0 && idx < responsables.length) {
-                usuarioActual = responsables[idx];
-                document.getElementById('usuario-actual').textContent = usuarioActual;
-                guardarDatosLocal();
-            }
-        }
-
-        function filtrarSaldos(event, categoria) {
-            filtroActual = categoria;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            actualizarListaSaldos();
-        }
-
-        function buscarSaldos(termino) {
-            const productos = filtroActual === 'todos' ? saldos : saldos.filter(p => p.categoria === filtroActual);
-            const resultados = productos.filter(p => p.nombre.toLowerCase().includes(termino.toLowerCase()));
-            mostrarProductos(resultados);
-        }
-
-        function actualizarListaSaldos() {
-            const productos = filtroActual === 'todos' ? saldos : saldos.filter(p => p.categoria === filtroActual);
-            mostrarProductos(productos);
-        }
-
-        function mostrarProductos(productos) {
-            const lista = document.getElementById('lista-saldos');
-            if (productos.length === 0) {
-                lista.innerHTML = '<p style="color: #999; text-align: center;">Sin productos</p>';
-                return;
-            }
-            lista.innerHTML = productos.map(p => {
-                const total = p.saldoCrudo + p.saldoCocido;
-                const alerta = total < p.minimo ? ' style="background: #FFEBEE;"' : '';
-                return `<div class="producto-card"${alerta}>
-                    <div class="producto-info">
-                        <div class="producto-nombre">${p.nombre}</div>
-                        <div class="producto-categoria">${p.categoria}</div>
-                        ${p.categoria.includes('Proteína') ? 
-                            `<div style="font-size: 10px; color: #666; margin-top: 4px;">🔵 ${p.saldoCrudo.toFixed(2)} | 🔴 ${p.saldoCocido.toFixed(2)} kg</div>` : 
-                            `<div style="font-size: 10px; color: #666; margin-top: 4px;">Total: ${total.toFixed(2)}</div>`
-                        }
-                    </div>
-                    <div class="producto-saldo">${total.toFixed(2)}</div>
-                </div>`;
-            }).join('');
-        }
-
-        function actualizarEstadoEntrada() {
-            const pid = document.getElementById('producto-entrada').value;
-            const p = saldos.find(s => s.id === parseInt(pid));
-            document.getElementById('estado-entrada-grupo').style.display = p?.categoria.includes('Proteína') ? 'block' : 'none';
-        }
-
-        function seleccionarEstadoEntrada(btn, estado) {
-            document.getElementById('estado-entrada').value = estado;
-            document.querySelectorAll('#estado-entrada-grupo .estado-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
-
-        function registrarEntrada() {
-            const resp = document.getElementById('responsable-entrada').value;
-            const prov = document.getElementById('proveedor-entrada').value;
-            const pid = document.getElementById('producto-entrada').value;
-            const cant = parseFloat(document.getElementById('cantidad-entrada').value);
-            const costo = parseFloat(document.getElementById('costo-entrada').value);
-
-            if (!resp || !prov || !pid || isNaN(cant) || isNaN(costo)) {
-                mostrarAlerta('⚠️ Completa todos los campos', 'error');
-                return;
-            }
-
-            const p = saldos.find(s => s.id === parseInt(pid));
-            const estado = p?.categoria.includes('Proteína') ? document.getElementById('estado-entrada').value : '';
-            
-            if (estado === 'crudo') p.saldoCrudo += cant;
-            else if (estado === 'cocido') p.saldoCocido += cant;
-            else p.saldoCrudo += cant;
-
-            movimientos.push({
-                fecha: new Date().toISOString().split('T')[0],
-                hora: new Date().toTimeString().slice(0, 5),
-                tipo: 'entrada',
-                cantidadCrudo: estado === 'crudo' ? cant : 0,
-                cantidadCocido: estado === 'cocido' ? cant : 0,
-                producto: p?.nombre,
-                estado: estado,
-                responsable: resp,
-                costo: costo,
-                proveedor: prov
-            });
-
-            guardarDatosLocal();
-            mostrarAlerta('✅ Entrada registrada', 'success');
-            limpiarFormEntrada();
-            actualizarListaSaldos();
-            actualizarListaEntradas();
-            actualizarReportes();
-            actualizarContador();
-        }
-
-        function actualizarListaEntradas() {
-            const lista = document.getElementById('lista-entradas');
-            const ultimas = movimientos.filter(m => m.tipo === 'entrada').slice(-10).reverse();
-            if (ultimas.length === 0) { lista.innerHTML = '<p style="color: #999;">Sin entradas</p>'; return; }
-            lista.innerHTML = ultimas.map(m => `<div class="lista-item"><strong>${m.producto}</strong><br>${m.cantidadCrudo > 0 ? m.cantidadCrudo.toFixed(2) + ' crudo | ' : ''}${m.cantidadCocido > 0 ? m.cantidadCocido.toFixed(2) + ' cocido | ' : ''}${m.proveedor} | $${m.costo}</div>`).join('');
-        }
-
-        function limpiarFormEntrada() {
-            document.getElementById('responsable-entrada').value = '';
-            document.getElementById('proveedor-entrada').value = '';
-            document.getElementById('producto-entrada').value = '';
-            document.getElementById('cantidad-entrada').value = '';
-            document.getElementById('costo-entrada').value = '';
-        }
-
-        function actualizarEstadoSalida() {
-            const pid = document.getElementById('producto-salida').value;
-            const p = saldos.find(s => s.id === parseInt(pid));
-            document.getElementById('estado-salida-grupo').style.display = p?.categoria.includes('Proteína') ? 'block' : 'none';
-        }
-
-        function seleccionarEstadoSalida(btn, estado) {
-            document.getElementById('estado-salida').value = estado;
-            document.querySelectorAll('#estado-salida-grupo .estado-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
-
-        function registrarSalida() {
-            const resp = document.getElementById('responsable-salida').value;
-            const dest = document.getElementById('destino-salida').value;
-            const pid = document.getElementById('producto-salida').value;
-            const cant = parseFloat(document.getElementById('cantidad-salida').value);
-
-            if (!resp || !dest || !pid || isNaN(cant)) {
-                mostrarAlerta('⚠️ Completa todos los campos', 'error');
-                return;
-            }
-
-            const p = saldos.find(s => s.id === parseInt(pid));
-            const estado = p?.categoria.includes('Proteína') ? document.getElementById('estado-salida').value : '';
-            const disponible = estado === 'crudo' ? p.saldoCrudo : estado === 'cocido' ? p.saldoCocido : p.saldoCrudo + p.saldoCocido;
-
-            if (cant > disponible) {
-                mostrarAlerta(`⚠️ Stock insuficiente: ${disponible.toFixed(2)}`, 'error');
-                return;
-            }
-
-            if (estado === 'crudo') p.saldoCrudo -= cant;
-            else if (estado === 'cocido') p.saldoCocido -= cant;
-            else p.saldoCrudo -= cant;
-
-            movimientos.push({
-                fecha: new Date().toISOString().split('T')[0],
-                hora: new Date().toTimeString().slice(0, 5),
-                tipo: 'salida',
-                cantidadCrudo: estado === 'crudo' ? cant : 0,
-                cantidadCocido: estado === 'cocido' ? cant : 0,
-                producto: p?.nombre,
-                estado: estado,
-                responsable: resp,
-                destinoOrigen: dest,
-                costo: 0,
-                proveedor: ''
-            });
-
-            guardarDatosLocal();
-            mostrarAlerta('✅ Salida registrada', 'success');
-            limpiarFormSalida();
-            actualizarListaSaldos();
-            actualizarListaSalidas();
-            actualizarReportes();
-            actualizarContador();
-        }
-
-        function actualizarListaSalidas() {
-            const lista = document.getElementById('lista-salidas');
-            const ultimas = movimientos.filter(m => m.tipo === 'salida').slice(-10).reverse();
-            if (ultimas.length === 0) { lista.innerHTML = '<p style="color: #999;">Sin salidas</p>'; return; }
-            const dest = {'cocina': '👨‍🍳', 'barril': '🍖', 'caja': '💰', 'consumo': '🥘', 'merma': '📉', 'danio': '🔥'};
-            lista.innerHTML = ultimas.map(m => `<div class="lista-item"><strong>${m.producto}</strong><br>${dest[m.destinoOrigen] || ''} ${m.cantidadCrudo > 0 ? m.cantidadCrudo.toFixed(2) + ' crudo' : ''}${m.cantidadCocido > 0 ? ' / ' + m.cantidadCocido.toFixed(2) + ' cocido' : ''} | ${m.responsable}</div>`).join('');
-        }
-
-        function limpiarFormSalida() {
-            document.getElementById('responsable-salida').value = '';
-            document.getElementById('destino-salida').value = '';
-            document.getElementById('producto-salida').value = '';
-            document.getElementById('cantidad-salida').value = '';
-        }
-
-        function actualizarReportes() {
-            const hoy = new Date().toISOString().split('T')[0];
-            const lista = document.getElementById('lista-reportes');
-            const hoyMov = movimientos.filter(m => m.fecha === hoy);
-            if (hoyMov.length === 0) { lista.innerHTML = '<p style="color: #999;">Sin movimientos hoy</p>'; return; }
-            const dest = {'cocina': '👨‍🍳', 'barril': '🍖', 'caja': '💰', 'consumo': '🥘', 'merma': '📉', 'danio': '🔥'};
-            lista.innerHTML = hoyMov.map(m => {
-                const icono = m.tipo === 'entrada' ? '📥' : '📤';
-                return `<div class="lista-item"><strong>${icono} ${m.hora} - ${m.producto}</strong><br>${m.cantidadCrudo > 0 ? m.cantidadCrudo.toFixed(2) + ' crudo' : ''}${m.cantidadCocido > 0 ? ' / ' + m.cantidadCocido.toFixed(2) + ' cocido' : ''} | ${m.responsable}${m.tipo === 'entrada' ? ' | $' + m.costo : ''}</div>`;
-            }).join('');
-        }
-
-        function actualizarContador() {
-            const hoy = new Date().toISOString().split('T')[0];
-            const cont = movimientos.filter(m => m.fecha === hoy).length;
-            document.getElementById('contador').textContent = cont;
-        }
-
-        function agregarResponsable() {
-            const nombre = document.getElementById('nuevo-responsable').value.trim();
-            if (!nombre) { mostrarAlerta('⚠️ Nombre requerido', 'error'); return; }
-            if (responsables.includes(nombre)) { mostrarAlerta('⚠️ Ya existe', 'error'); return; }
-            responsables.push(nombre);
-            guardarDatosLocal();
-            actualizarSelectos();
-            actualizarAdmin();
-            document.getElementById('nuevo-responsable').value = '';
-            mostrarAlerta('✅ Responsable agregado', 'success');
-        }
-
-        function agregarProveedor() {
-            const nombre = document.getElementById('nuevo-proveedor').value.trim();
-            if (!nombre) { mostrarAlerta('⚠️ Nombre requerido', 'error'); return; }
-            if (proveedores.includes(nombre)) { mostrarAlerta('⚠️ Ya existe', 'error'); return; }
-            proveedores.push(nombre);
-            guardarDatosLocal();
-            actualizarSelectos();
-            actualizarAdmin();
-            document.getElementById('nuevo-proveedor').value = '';
-            mostrarAlerta('✅ Proveedor agregado', 'success');
-        }
-
-        function agregarCategoria() {
-            const nombre = document.getElementById('nueva-categoria').value.trim();
-            if (!nombre) { mostrarAlerta('⚠️ Nombre requerido', 'error'); return; }
-            if (categorias.includes(nombre)) { mostrarAlerta('⚠️ Ya existe', 'error'); return; }
-            categorias.push(nombre);
-            guardarDatosLocal();
-            actualizarSelectos();
-            actualizarFiltros();
-            actualizarAdmin();
-            document.getElementById('nueva-categoria').value = '';
-            mostrarAlerta('✅ Categoría agregada', 'success');
-        }
-
-        function agregarProducto() {
-            const nombre = document.getElementById('nuevo-producto-nombre').value.trim();
-            const cat = document.getElementById('nuevo-producto-categoria').value;
-            const min = parseFloat(document.getElementById('nuevo-producto-minimo').value) || 0;
-
-            if (!nombre || !cat) { mostrarAlerta('⚠️ Completa los campos', 'error'); return; }
-            if (saldos.find(p => p.nombre === nombre)) { mostrarAlerta('⚠️ Ya existe', 'error'); return; }
-
-            saldos.push({
-                id: proximoId++, 
-                nombre, 
-                categoria: cat, 
-                saldoCrudo: 0, 
-                saldoCocido: 0, 
-                unidad: 'kg', 
-                minimo: min
-            });
-            
-            guardarDatosLocal();
-            actualizarSelectos();
-            actualizarFiltros();
-            actualizarAdmin();
-            document.getElementById('nuevo-producto-nombre').value = '';
-            document.getElementById('nuevo-producto-minimo').value = '';
-            mostrarAlerta('✅ Producto agregado', 'success');
-        }
-
-        function eliminarResponsable(r) { 
-            if (confirm(`¿Eliminar "${r}"?`)) {
-                responsables = responsables.filter(x => x !== r); 
-                guardarDatosLocal(); 
-                actualizarSelectos(); 
-                actualizarAdmin(); 
-                mostrarAlerta('✅ Eliminado', 'success'); 
-            }
-        }
-
-        function eliminarProveedor(p) { 
-            if (confirm(`¿Eliminar "${p}"?`)) {
-                proveedores = proveedores.filter(x => x !== p); 
-                guardarDatosLocal(); 
-                actualizarSelectos(); 
-                actualizarAdmin(); 
-                mostrarAlerta('✅ Eliminado', 'success'); 
-            }
-        }
-
-        function eliminarCategoria(c) { 
-            if (confirm(`¿Eliminar "${c}"?`)) {
-                categorias = categorias.filter(x => x !== c); 
-                saldos = saldos.filter(p => p.categoria !== c); 
-                guardarDatosLocal(); 
-                actualizarSelectos(); 
-                actualizarFiltros(); 
-                actualizarAdmin(); 
-                mostrarAlerta('✅ Eliminado', 'success'); 
-            }
-        }
-
-        function eliminarProducto(id) { 
-            const p = saldos.find(x => x.id === id);
-            if (confirm(`¿Eliminar "${p?.nombre}"?`)) {
-                saldos = saldos.filter(x => x.id !== id); 
-                guardarDatosLocal(); 
-                actualizarSelectos(); 
-                actualizarAdmin(); 
-                mostrarAlerta('✅ Eliminado', 'success'); 
-            }
-        }
-
-        function actualizarAdmin() {
-            document.getElementById('lista-responsables').innerHTML = responsables.map(r => `<div class="admin-item"><span>${r}</span><button class="btn-small" onclick="eliminarResponsable('${r}')">❌</button></div>`).join('');
-            document.getElementById('lista-proveedores').innerHTML = proveedores.map(p => `<div class="admin-item"><span>${p}</span><button class="btn-small" onclick="eliminarProveedor('${p}')">❌</button></div>`).join('');
-            document.getElementById('lista-categorias').innerHTML = categorias.map(c => `<div class="admin-item"><span>${c}</span><button class="btn-small" onclick="eliminarCategoria('${c}')">❌</button></div>`).join('');
-            document.getElementById('lista-productos').innerHTML = saldos.map(p => `<div class="admin-item"><span>${p.nombre} (${(p.saldoCrudo + p.saldoCocido).toFixed(2)} kg)</span><button class="btn-small" onclick="eliminarProducto(${p.id})">❌</button></div>`).join('');
-        }
-
-        function mostrarAlerta(msg, tipo) {
-            const div = document.getElementById('alerta');
-            div.innerHTML = `<div class="alerta ${tipo}">${msg}</div>`;
-            setTimeout(() => { div.innerHTML = ''; }, 3000);
-        }
-
-        window.addEventListener('load', inicializar);
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
