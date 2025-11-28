@@ -1102,20 +1102,30 @@
 
         // REPORTES - SOLO MOVIMIENTOS
         function actualizarReportes() {
+            // Obtener fecha de HOY en formato YYYY-MM-DD
+            const hoy = new Date();
+            const fechaHoy = hoy.getFullYear() + '-' + 
+                            String(hoy.getMonth() + 1).padStart(2, '0') + '-' + 
+                            String(hoy.getDate()).padStart(2, '0');
+            
+            console.log('📅 Filtrando movimientos por fecha:', fechaHoy);
+            
             const movimientos_hoy = movimientos.filter(m => {
                 const fecha = m.fecha;
-                // Convertir si viene como objeto Date
                 if (typeof fecha === 'object') {
-                    return new Date(fecha).toISOString().split('T')[0] >= '2025-11-26';
+                    return new Date(fecha).toISOString().split('T')[0] === fechaHoy;
                 }
-                return fecha === '2025-11-26' || fecha.includes('2025-11-26');
+                // Si viene como string
+                return fecha && fecha.toString().includes(fechaHoy);
             });
+
+            console.log('📊 Movimientos encontrados hoy:', movimientos_hoy.length);
 
             // Últimos movimientos
             let html = '<table class="tabla"><thead><tr><th>Hora</th><th>Tipo</th><th>Producto</th><th>Cantidad</th><th>Resp</th><th>Costo</th></tr></thead><tbody>';
             
             if (movimientos_hoy.length === 0) {
-                html += '<tr><td colspan="6" style="text-align: center; padding: 10px;">No hay movimientos</td></tr>';
+                html += '<tr><td colspan="6" style="text-align: center; padding: 10px;">No hay movimientos en ' + fechaHoy + '</td></tr>';
             } else {
                 movimientos_hoy.reverse().forEach(m => {
                     const cantidad = (m.cantidadCrudo || 0) + (m.cantidadCocido || 0);
