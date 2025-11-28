@@ -927,62 +927,21 @@
             event.target.classList.add('active');
         }
 
-        function registrarEntrada() {
+        async function registrarEntrada() {
             try {
-                console.log('🔄 ENTRANDO A FUNCIÓN registrarEntrada');
-                
-                // DEBUG: Ver todos los elementos con id entrada-producto
-                const todos = document.querySelectorAll('[id*="entrada-producto"]');
-                console.log('🔍 Elementos encontrados con "entrada-producto":', todos.length);
-                todos.forEach((el, i) => {
-                    console.log(`  [${i}] ID: ${el.id}, Value: "${el.value}", Tag: ${el.tagName}`);
-                });
-                
-                // Intentar obtener el elemento
                 const selectElement = document.getElementById('entrada-producto');
-                console.log('🎯 Elemento select:', selectElement);
-                console.log('🎯 Elemento existe?:', selectElement !== null);
-                
-                if (selectElement) {
-                    console.log('🎯 Valor actual:', selectElement.value);
-                    console.log('🎯 Opciones disponibles:', selectElement.options.length);
-                    for (let i = 0; i < Math.min(5, selectElement.options.length); i++) {
-                        console.log(`  Opción [${i}]: ${selectElement.options[i].value}`);
-                    }
-                }
-                
                 const producto = selectElement ? selectElement.value : '';
-                const cantidad = document.getElementById('entrada-cantidad').value;
-                
-                console.log('📝 Valores capturados:');
-                console.log('  Producto:', producto);
-                console.log('  Cantidad:', cantidad);
-                
-                if (!producto) {
-                    alert('⚠️ Selecciona un producto PRIMERO');
-                    return;
-                }
-                
-                if (!cantidad || cantidad === '0') {
-                    alert('⚠️ Ingresa una cantidad válida');
-                    return;
-                }
-                
-                alert('✅ Enviando: ' + producto + ' x ' + cantidad);
-                
-            } catch(e) {
-                console.error('❌ ERROR EN REGISTRAR:', e);
-                alert('❌ Error: ' + e.message);
-            }
-        }
-        
-        async function enviarEntradaAGoogle(producto, cantidad) {
-            try {
-                console.log('📤 Enviando:', {producto, cantidad});
-                
+                const cantidad = parseFloat(document.getElementById('entrada-cantidad').value) || 0;
                 const costo = parseFloat(document.getElementById('entrada-costo').value) || 0;
-                const proveedor = document.getElementById('entrada-proveedor').value;
-                const responsable = document.getElementById('entrada-responsable').value;
+                const proveedor = document.getElementById('entrada-proveedor').value || 'sin proveedor';
+                const responsable = document.getElementById('entrada-responsable').value || 'sin responsable';
+                
+                console.log('🔄 Registrando ENTRADA:', {producto, cantidad, costo, proveedor, responsable});
+                
+                if (!producto || cantidad === 0) {
+                    alert('⚠️ Completa: Producto y Cantidad son obligatorios');
+                    return;
+                }
                 
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
@@ -1001,102 +960,68 @@
                 });
                 
                 const data = await response.json();
-                console.log('✅ Respuesta Google:', data);
+                console.log('✅ Respuesta:', data);
                 
-                if (data.success) {
-                    alert('✅ Entrada registrada');
+                if (data.success || data.mensaje) {
+                    alert('✅ Entrada registrada: ' + producto + ' x ' + cantidad);
                     document.getElementById('entrada-producto').value = '';
                     document.getElementById('entrada-cantidad').value = '';
                     document.getElementById('entrada-costo').value = '';
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    await sincronizar();
+                } else {
+                    alert('❌ Error: ' + (data.error || 'desconocido'));
                 }
-                
-            } catch(error) {
-                console.error('❌ Error:', error);
-                alert('❌ ' + error.message);
+            } catch(e) {
+                console.error('❌ ERROR:', e);
+                alert('❌ Error: ' + e.message);
             }
         }
-
+        
         async function registrarSalida() {
-            console.log('🔄 Registrando salida...');
-            
-            const producto = document.getElementById('salida-producto').value;
-            const cantidad = parseFloat(document.getElementById('salida-cantidad').value);
-            const destino = document.getElementById('salida-destino').value;
-            const responsable = document.getElementById('salida-responsable').value;
-            const estadoInput = document.getElementById('estado-salida');
-            const estado = estadoInput ? estadoInput.value : '';
-
-            console.log('📝 Datos:', {producto, cantidad, destino, responsable, estado});
-
-            if (!producto || producto === '' || isNaN(cantidad) || cantidad === 0) {
-                mostrarAlerta('⚠️ Completa: Producto y Cantidad son obligatorios', 'error');
-                return;
-            }
-
-            if (!destino || destino === '') {
-                mostrarAlerta('⚠️ Selecciona un Destino', 'error');
-                return;
-            }
-
-            if (!responsable || responsable === '') {
-                mostrarAlerta('⚠️ Selecciona un Responsable', 'error');
-                return;
-            }
-
-            const p = productos.find(x => x.producto === producto);
-            const esProteina = p && p.categoria.includes('Proteínas');
-            
-            let cantidadCrudo = 0;
-            let cantidadCocido = 0;
-            
-            if (esProteina) {
-                if (estado === 'crudo') {
-                    cantidadCrudo = cantidad;
-                    cantidadCocido = 0;
-                } else if (estado === 'cocido') {
-                    cantidadCrudo = 0;
-                    cantidadCocido = cantidad;
-                } else {
-                    cantidadCrudo = cantidad;
-                    cantidadCocido = 0;
-                }
-            } else {
-                cantidadCrudo = cantidad;
-                cantidadCocido = 0;
-            }
-
             try {
-                console.log('📤 Enviando a Google...');
+                const selectElement = document.getElementById('salida-producto');
+                const producto = selectElement ? selectElement.value : '';
+                const cantidad = parseFloat(document.getElementById('salida-cantidad').value) || 0;
+                const destino = document.getElementById('salida-destino').value || 'cocina';
+                const responsable = document.getElementById('salida-responsable').value || 'sin responsable';
+                
+                console.log('🔄 Registrando SALIDA:', {producto, cantidad, destino, responsable});
+                
+                if (!producto || cantidad === 0) {
+                    alert('⚠️ Completa: Producto y Cantidad son obligatorios');
+                    return;
+                }
+                
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify({
                         action: 'addMovimiento',
                         tipo: 'salida',
-                        producto,
-                        cantidadCrudo,
-                        cantidadCocido,
+                        producto: producto,
+                        cantidadCrudo: cantidad,
+                        cantidadCocido: 0,
                         destinoOrigen: destino,
-                        estado: esProteina ? estado : '',
-                        responsable
+                        estado: '',
+                        responsable: responsable
                     })
                 });
-
+                
                 const data = await response.json();
                 console.log('✅ Respuesta:', data);
-
+                
                 if (data.success || data.mensaje) {
-                    mostrarAlerta('✅ Salida registrada correctamente', 'success');
+                    alert('✅ Salida registrada: ' + producto + ' x ' + cantidad);
                     document.getElementById('salida-producto').value = '';
                     document.getElementById('salida-cantidad').value = '';
-                    if (estadoInput) estadoInput.value = '';
-                    
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                     await sincronizar();
                 } else {
-                    mostrarAlerta('❌ ' + (data.error || 'Error desconocido'), 'error');
+                    alert('❌ Error: ' + (data.error || 'desconocido'));
                 }
-            } catch(error) {
-                console.error('❌ Error:', error);
-                mostrarAlerta('❌ Error: ' + error.message, 'error');
+            } catch(e) {
+                console.error('❌ ERROR:', e);
+                alert('❌ Error: ' + e.message);
             }
         }
 
