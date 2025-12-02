@@ -186,7 +186,6 @@
         let prodEntId = -1;
         let prodSalId = -1;
         let prodEditId = -1;
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbypzlwCrBv8bcnuHx6ynp35q7ToctRytu382EaPrRhIUBZt17HTEeubasR1b7Mk1hPTZA/exec';
 
         const PRODUCTOS = [{id:1, n:'Costilla de cerdo', c:'🍖 Proteínas', cant:3.95, u:'kg', min:5},{id:2, n:'Pollo', c:'🍖 Proteínas', cant:16, u:'kg', min:7},{id:3, n:'Queso paisa', c:'🧀 Lácteos', cant:0.52, u:'kg', min:1},{id:4, n:'Papa', c:'❄️ Congelados', cant:12.5, u:'kg', min:10},{id:5, n:'chicharron', c:'🍖 Proteínas', cant:7.7, u:'kg', min:7},{id:6, n:'lomo de cerdo', c:'🍖 Proteínas', cant:9.71, u:'kg', min:4},{id:7, n:'punta de anca', c:'🍖 Proteínas', cant:3.04, u:'kg', min:2},{id:8, n:'carne molida CAB', c:'🍖 Proteínas', cant:17.47, u:'kg', min:0},{id:9, n:'carne molida regular', c:'🍖 Proteínas', cant:24.6, u:'kg', min:4},{id:10, n:'croquetas de carne', c:'🍖 Proteínas', cant:74, u:'kg', min:70},{id:11, n:'pecho de res', c:'🍖 Proteínas', cant:0, u:'kg', min:0},{id:12, n:'contramuslo de pollo', c:'🍖 Proteínas', cant:0, u:'kg', min:0},{id:13, n:'colita de cadera', c:'🍖 Proteínas', cant:0, u:'kg', min:3},{id:14, n:'morcilla', c:'🍖 Proteínas', cant:1.84, u:'kg', min:0},{id:15, n:'chorizo', c:'🍖 Proteínas', cant:1.27, u:'kg', min:5},{id:16, n:'queso cheddar', c:'🧀 Lácteos', cant:207, u:'kg', min:80},{id:17, n:'tocineta', c:'🍖 Proteínas', cant:7.6, u:'kg', min:3},{id:18, n:'salchichas', c:'🍖 Proteínas', cant:19, u:'kg', min:15},{id:19, n:'pan brioche de hamburguesa', c:'🌾 Secos', cant:46, u:'kg', min:30},{id:20, n:'pan brioche de perro', c:'🌾 Secos', cant:13, u:'kg', min:10},{id:21, n:'papa pastusa', c:'🥬 Verduras', cant:14, u:'kg', min:4},{id:22, n:'cebolla cabezona', c:'🥬 Verduras', cant:20.1, u:'kg', min:3},{id:23, n:'tomate', c:'🥬 Verduras', cant:14, u:'kg', min:3},{id:24, n:'ajo pelado en bolsa', c:'🥬 Verduras', cant:0, u:'kg', min:0},{id:25, n:'pimenton rojo', c:'🥬 Verduras', cant:0, u:'kg', min:0},{id:26, n:'cebolla morada', c:'🥬 Verduras', cant:0, u:'kg', min:0},{id:27, n:'limon tahiti', c:'🥬 Verduras', cant:8, u:'kg', min:3},{id:28, n:'arroz zulia', c:'🌾 Secos', cant:3, u:'kg', min:2},{id:29, n:'frijol bolon rojo', c:'🌾 Secos', cant:2.6, u:'kg', min:1.5},{id:30, n:'panela', c:'🥬 Verduras', cant:12, u:'kg', min:2},{id:31, n:'mayonesa natucampo', c:'🧀 Lácteos', cant:8, u:'kg', min:1},{id:32, n:'cebolla roja', c:'🥬 Verduras', cant:0, u:'kg', min:0},{id:33, n:'ajo badia', c:'🧂 Condimentos/Salsas', cant:0.53, u:'kg', min:0.3},{id:34, n:'pimienta molida badia', c:'🧂 Condimentos/Salsas', cant:0.35, u:'kg', min:0.3},{id:35, n:'paprika', c:'🧂 Condimentos/Salsas', cant:1.4, u:'kg', min:0.3},{id:36, n:'agua p600', c:'🥤 Gaseosas', cant:15, u:'und', min:12},{id:37, n:'huevos', c:'🧀 Lácteos', cant:21, u:'kg', min:12},{id:38, n:'coca cola 1.5', c:'🥤 Gaseosas', cant:9, u:'und', min:12},{id:39, n:'coca cola p400', c:'🥤 Gaseosas', cant:11, u:'und', min:12},{id:40, n:'coca cola zero 1.5', c:'🥤 Gaseosas', cant:1, u:'und', min:6},{id:41, n:'coca cola zero p400', c:'🥤 Gaseosas', cant:10, u:'und', min:6},{id:42, n:'coca cola zero p250', c:'🥤 Gaseosas', cant:7, u:'und', min:12},{id:43, n:'quatro 1.5', c:'🥤 Gaseosas', cant:2, u:'und', min:6},{id:44, n:'quatro p400', c:'🥤 Gaseosas', cant:8, u:'und', min:6},{id:45, n:'quatro p250', c:'🥤 Gaseosas', cant:0, u:'und', min:12},{id:46, n:'sprite 1.5', c:'🥤 Gaseosas', cant:5, u:'und', min:6},{id:47, n:'sprite p400', c:'🥤 Gaseosas', cant:6, u:'und', min:6},{id:48, n:'kola roman 1.5', c:'🥤 Gaseosas', cant:8, u:'und', min:6},{id:49, n:'kola roman p400', c:'🥤 Gaseosas', cant:4, u:'und', min:6},{id:50, n:'soda frutos rojos', c:'🥤 Gaseosas', cant:16, u:'und', min:6},{id:51, n:'soda frutos amarillos', c:'🥤 Gaseosas', cant:13, u:'und', min:6},{id:52, n:'cerveza', c:'🍺 Cervezas', cant:0, u:'und', min:12},{id:53, n:'crema de coco', c:'🧋 Bebidas', cant:0, u:'kg', min:1},{id:54, n:'cerezas', c:'🧋 Bebidas', cant:0, u:'kg', min:1},{id:55, n:'soda p400', c:'🥤 Gaseosas', cant:12, u:'und', min:6},{id:56, n:'Caja de hamburguesa', c:'📌 Empaques', cant:0, u:'kg', min:100},{id:57, n:'caja para 1/2kg picada', c:'📌 Empaques', cant:0, u:'kg', min:30},{id:58, n:'caja para 1kg picada', c:'📌 Empaques', cant:45, u:'kg', min:30},{id:59, n:'icopor P1', c:'📌 Empaques', cant:11, u:'kg', min:20},{id:60, n:'icopor C1', c:'📌 Empaques', cant:16, u:'kg', min:20},{id:61, n:'contenedor 16 OZ', c:'📌 Empaques', cant:75, u:'kg', min:20},{id:62, n:'contenedor 24 OZ', c:'📌 Empaques', cant:59, u:'kg', min:20},{id:63, n:'potes 4 OZ ensalada', c:'📌 Empaques', cant:275, u:'kg', min:70},{id:64, n:'potes 1 OZ salsas', c:'📌 Empaques', cant:302, u:'kg', min:150},{id:65, n:'servilletas', c:'📌 Empaques', cant:21, u:'kg', min:10},{id:66, n:'vasos desechables 12 OZ', c:'📌 Empaques', cant:100, u:'kg', min:50},{id:67, n:'vasos 12 OZ con tapa para llevar', c:'📌 Empaques', cant:2, u:'kg', min:25},{id:68, n:'bolsas 2kg', c:'📌 Empaques', cant:2, u:'kg', min:1},{id:69, n:'bolsas de 10 kg', c:'📌 Empaques', cant:2, u:'kg', min:1},{id:70, n:'bolsas de 20 kg', c:'📌 Empaques', cant:1, u:'kg', min:1},{id:71, n:'salsa de tomate heinz', c:'🧂 Condimentos/Salsas', cant:3, u:'kg', min:1},{id:72, n:'salsa mostaza', c:'🧂 Condimentos/Salsas', cant:1, u:'kg', min:1},{id:73, n:'aceite sinai', c:'🌻 Aceites', cant:2, u:'kg', min:1},{id:74, n:'Limón', c:'🥬 Verduras', cant:5, u:'kg', min:2}];
 
@@ -621,28 +620,47 @@
             }
             try {
                 const x = JSON.parse(j);
-                const idExist = new Set(mov.map(m => m.id));
-                const nuevos = (x.mov || []).filter(m => !idExist.has(m.id));
-                if (nuevos.length > 0) {
-                    nuevos.forEach(nm => {
-                        const p = prod.find(xp => xp.n === nm.p);
-                        if (p) {
-                            if (nm.t === 'ent') p.cant += nm.cant;
-                            else p.cant -= nm.cant;
-                            if (p.cant < 0) p.cant = 0;
-                        }
-                        mov.push(nm);
-                    });
+                
+                // Verificar si es la carga inicial (celular vacío)
+                const esCargarInicial = prod.length === 74 && mov.length === 13;
+                
+                if (esCargarInicial || prod.length === 74) {
+                    // Si es carga inicial, reemplazar TODO
+                    prod = x.prod || prod;
+                    mov = x.mov || mov;
+                    resp = x.resp || resp;
+                    prov = x.prov || prov;
+                    cat = x.cat || cat;
                     save();
                     document.getElementById('json-txt').value = '';
                     cerrarModal();
                     actualizar();
-                    alerta(`✅ ${nuevos.length} movimientos cargados`, 'success');
+                    alerta(`✅ ¡¡Datos sincronizados!!\n📦 Productos: ${prod.length}\n📋 Movimientos: ${mov.length}`, 'success');
                 } else {
-                    alerta('⚠️ Sin movimientos nuevos', 'error');
+                    // Si ya hay datos, solo agregar movimientos nuevos
+                    const idExist = new Set(mov.map(m => m.id));
+                    const nuevos = (x.mov || []).filter(m => !idExist.has(m.id));
+                    if (nuevos.length > 0) {
+                        nuevos.forEach(nm => {
+                            const p = prod.find(xp => xp.n === nm.p);
+                            if (p) {
+                                if (nm.t === 'ent') p.cant += nm.cant;
+                                else p.cant -= nm.cant;
+                                if (p.cant < 0) p.cant = 0;
+                            }
+                            mov.push(nm);
+                        });
+                        save();
+                        document.getElementById('json-txt').value = '';
+                        cerrarModal();
+                        actualizar();
+                        alerta(`✅ ${nuevos.length} movimientos agregados`, 'success');
+                    } else {
+                        alerta('⚠️ Sin movimientos nuevos\n(O ya están cargados)', 'error');
+                    }
                 }
             } catch(e) {
-                alerta('❌ JSON inválido', 'error');
+                alerta('❌ JSON inválido\n' + e.message, 'error');
             }
         }
 
@@ -669,13 +687,11 @@
             alerta('⏳ Generando archivo...', 'success');
 
             try {
-                // ===== GENERAR DATOS PARA PRODUCTOS =====
                 let productosTab = 'Producto\tCategoría\tSaldo Crudo\tSaldo Cocido\tTotal\tUnidad\tMínimo\n';
                 prod.forEach(p => {
                     productosTab += `${p.n}\t${p.c}\t${p.cant}\t0\t${p.cant}\t${p.u}\t${p.min}\n`;
                 });
 
-                // ===== GENERAR DATOS PARA MOVIMIENTOS =====
                 let movimientosTab = 'Fecha\tHora\tTipo\tCantidad Crudo\tCantidad Cocido\tDestino/Origen\tProducto\tEstado\tResponsable\tCosto\tProveedor\n';
                 mov.forEach(m => {
                     const cantCrudo = m.estado === 'cocido' ? 0 : m.cant;
@@ -683,15 +699,12 @@
                     movimientosTab += `${m.f}\t${m.h}\t${m.t}\t${cantCrudo}\t${cantCocido}\t${m.dest || m.prov || 'compra'}\t${m.p}\t${m.estado || ''}\t${m.resp}\t${m.costo || 0}\t${m.prov || ''}\n`;
                 });
 
-                // ===== CREAR ARCHIVO DESCARGABLE =====
-                // Opción 1: Descargar como TSV (abre en Excel perfectamente)
                 const contenidoProductos = new Blob([productosTab], {type: 'text/tab-separated-values;charset=utf-8'});
                 const linkProductos = document.createElement('a');
                 linkProductos.href = URL.createObjectURL(contenidoProductos);
                 linkProductos.download = `El_Rincon_Productos_${new Date().toISOString().split('T')[0]}.tsv`;
                 linkProductos.click();
 
-                // Pequeña pausa antes de descargar el segundo archivo
                 setTimeout(() => {
                     const contenidoMovimientos = new Blob([movimientosTab], {type: 'text/tab-separated-values;charset=utf-8'});
                     const linkMovimientos = document.createElement('a');
@@ -712,7 +725,6 @@
             actualizar();
             alerta('✅ Sistema listo', 'success');
             
-            // Arreglo para móvil: Agregar event listeners a botones de rol
             setTimeout(() => {
                 const botones = document.querySelectorAll('button.rol-btn');
                 botones.forEach(btn => {
