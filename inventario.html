@@ -3,41 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Rincón del Barril - v10</title>
+    <title>El Rincón del Barril - Inventario</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}body{font-family:Segoe UI,sans-serif;background:linear-gradient(135deg,#8B0000,#C41E3A);min-height:100vh;padding:10px}.container{max-width:700px;margin:0 auto}.header{background:#fff;border-radius:15px 15px 0 0;padding:15px;text-align:center;border-bottom:3px solid #8B0000}.header h1{color:#8B0000;font-size:20px;margin-bottom:5px}.user-section{display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f0f0f0;border-radius:6px;font-size:11px;margin-top:10px;gap:8px;flex-wrap:wrap}.user-badge{background:#8B0000;color:#fff;padding:4px 10px;border-radius:15px;font-weight:600;cursor:pointer}.status-badge{background:#4CAF50;color:#fff;padding:4px 10px;border-radius:15px;font-weight:600;font-size:10px}.btn-sync{background:#2196F3;color:#fff;padding:4px 10px;border-radius:4px;border:none;cursor:pointer;font-size:10px;font-weight:600}.tabs{display:flex;background:#fff;padding:0 10px;border-bottom:1px solid #DDD;overflow-x:auto;flex-wrap:wrap}.tab-btn{flex:1;padding:10px 6px;background:none;border:none;cursor:pointer;font-weight:600;color:#999;border-bottom:3px solid transparent;font-size:9px;min-width:35px;white-space:nowrap}.tab-btn.active{color:#8B0000;border-bottom-color:#8B0000}.content{background:#fff;padding:15px;border-radius:0 0 15px 15px;min-height:600px;max-height:80vh;overflow-y:auto}.tab-content{display:none}.tab-content.active{display:block}.search-box{width:100%;padding:10px;margin-bottom:15px;border:1px solid #DDD;border-radius:6px;font-size:13px}.filter-buttons{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:15px}.filter-btn{padding:6px 10px;border:1px solid #DDD;background:#fff;border-radius:15px;cursor:pointer;font-size:11px;font-weight:600;color:#666}.filter-btn.active{background:#8B0000;color:#fff;border-color:#8B0000}.form-group{margin-bottom:12px}.form-group label{display:block;font-size:11px;font-weight:600;margin-bottom:4px;color:#333}.form-group input,.form-group select{width:100%;padding:8px;border:1px solid #DDD;border-radius:4px;font-size:12px;font-family:inherit}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{padding:8px 12px;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px;width:100%}.btn-primary{background:#8B0000;color:#fff}.btn-secondary{background:#f0f0f0;color:#333;border:1px solid #DDD}.btn-small{background:#f44336;color:#fff;padding:4px 8px;font-size:10px;border:none;border-radius:3px;cursor:pointer}.product-card{background:#f9f9f9;border:1px solid #EEE;border-radius:6px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between}.product-info{flex:1}.product-name{font-weight:600;font-size:12px}.product-category{font-size:10px;color:#999;margin-top:2px}.product-stock{font-size:13px;font-weight:600;color:#8B0000;text-align:right}.alert{padding:10px;border-radius:6px;margin-bottom:15px;font-size:12px;font-weight:600}.alert.success{background:#E8F5E9;color:#2E7D32}.alert.error{background:#FFEBEE;color:#C62828}.list-item{background:#f9f9f9;padding:8px;margin-bottom:6px;border-radius:4px;font-size:11px;border-left:3px solid #8B0000}.scroll{max-height:300px;overflow-y:auto}h3{color:#8B0000;font-size:12px;margin-bottom:10px;border-bottom:2px solid #8B0000;padding-bottom:8px}.admin-item{background:#f9f9f9;padding:8px;margin-bottom:6px;border-radius:4px;display:flex;justify-content:space-between;align-items:center;font-size:11px}textarea{width:100%;padding:8px;border:1px solid #DDD;border-radius:4px;font-size:12px;font-family:monospace;min-height:80px}
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:Segoe UI,sans-serif;background:linear-gradient(135deg,#8B0000,#C41E3A);min-height:100vh;padding:10px}.container{max-width:900px;margin:0 auto}.header{background:#fff;border-radius:15px 15px 0 0;padding:15px;text-align:center;border-bottom:3px solid #8B0000}.header h1{color:#8B0000;font-size:20px;margin-bottom:5px}.header p{color:#666;font-size:12px}.user-section{display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f0f0f0;border-radius:6px;font-size:11px;margin-top:10px;gap:8px;flex-wrap:wrap}.user-badge{background:#8B0000;color:#fff;padding:6px 12px;border-radius:15px;font-weight:600;cursor:pointer}.role-badge{display:inline-block;padding:4px 10px;border-radius:10px;font-weight:600;font-size:10px;margin-left:8px;color:#fff}.role-bodega{background:#FF9800}.role-cocinero{background:#9C27B0}.role-caja{background:#2196F3}.role-dueno{background:#F44336}.status-badge{background:#4CAF50;color:#fff;padding:6px 12px;border-radius:15px;font-size:10px}.btn-sync{background:#2196F3;color:#fff;padding:6px 12px;border-radius:4px;border:none;cursor:pointer;font-size:10px;font-weight:600}.tabs{display:flex;background:#fff;border-bottom:2px solid #8B0000;overflow-x:auto;flex-wrap:wrap}.tab-btn{flex:1;padding:12px;background:none;border:none;cursor:pointer;font-weight:600;color:#999;border-bottom:3px solid transparent;font-size:12px;min-width:70px;white-space:nowrap;transition:all 0.3s}.tab-btn:hover{background:#f5f5f5;color:#8B0000}.tab-btn.active{color:#8B0000;border-bottom-color:#8B0000}.content{background:#fff;padding:15px;border-radius:0 0 15px 15px;min-height:400px;max-height:80vh;overflow-y:auto}.tab-content{display:none}.tab-content.active{display:block}.search-box{width:100%;padding:10px;margin-bottom:15px;border:1px solid #DDD;border-radius:6px;font-size:13px}.filter-buttons{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:15px}.filter-btn{padding:6px 12px;border:1px solid #DDD;background:#fff;border-radius:15px;cursor:pointer;font-size:11px;font-weight:600;color:#666}.filter-btn.active{background:#8B0000;color:#fff}.form-group{margin-bottom:12px;position:relative}.form-group label{display:block;font-size:11px;font-weight:600;margin-bottom:4px;color:#333}.form-group input,.form-group select{width:100%;padding:8px;border:1px solid #DDD;border-radius:4px;font-size:12px}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{padding:10px 12px;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px;width:100%;transition:all 0.2s}.btn-primary{background:#8B0000;color:#fff}.btn-primary:hover{background:#6B0000}.btn-secondary{background:#f0f0f0;color:#333;border:1px solid #DDD}.product-card{background:#f9f9f9;border:1px solid #EEE;border-radius:6px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between}.product-info{flex:1}.product-name{font-weight:600;font-size:12px}.product-category{font-size:10px;color:#999;margin-top:2px}.product-stock{font-size:13px;font-weight:600;color:#8B0000;text-align:right}.alert{padding:10px;border-radius:6px;margin-bottom:15px;font-size:12px;font-weight:600}.alert.success{background:#E8F5E9;color:#2E7D32}.alert.error{background:#FFEBEE;color:#C62828}.list-item{background:#f9f9f9;padding:10px;margin-bottom:8px;border-radius:4px;font-size:11px;border-left:3px solid #8B0000;display:flex;justify-content:space-between}.scroll{max-height:400px;overflow-y:auto}h3{color:#8B0000;font-size:12px;margin-bottom:10px;border-bottom:2px solid #8B0000;padding-bottom:8px}.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;overflow-y:auto}.modal-content{background:#fff;padding:20px;border-radius:10px;max-width:90%;width:500px;max-height:80vh;overflow-y:auto;margin:20px auto}.modal-header{font-size:14px;font-weight:600;color:#8B0000;margin-bottom:15px;border-bottom:2px solid #8B0000;padding-bottom:10px}.modal.active{display:flex}.btn-grupo{display:flex;gap:6px}.btn-grupo button{flex:1}.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #DDD;max-height:200px;overflow-y:auto;z-index:200;display:none;box-shadow:0 2px 8px rgba(0,0,0,0.15)}.autocomplete-item{padding:10px;border-bottom:1px solid #EEE;cursor:pointer;font-size:11px}.autocomplete-item:hover{background:#f0f0f0}.admin-section{background:#f5f5f5;border:1px solid #DDD;border-radius:6px;padding:12px;margin-bottom:15px}.admin-section h4{color:#333;font-size:11px;font-weight:600;margin-bottom:8px}.product-item-admin{padding:8px;border-bottom:1px solid #EEE;font-size:11px;display:flex;justify-content:space-between;align-items:center}.btn-edit{background:#2196F3;color:#fff;padding:4px 8px;font-size:10px;border:none;cursor:pointer;border-radius:2px}.btn-xs{padding:3px 6px;font-size:9px;background:#f44336;color:#fff;border:none;cursor:pointer;border-radius:2px}.rol-selector{text-align:center;margin-top:40px}.rol-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;max-width:500px;margin:0 auto}.rol-btn{padding:30px 15px;border:none;border-radius:10px;cursor:pointer;color:#fff;font-weight:600;font-size:15px;transition:0.2s;width:100%;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 8px rgba(0,0,0,0.2);touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}.rol-btn:active{transform:scale(0.97)}.rol-btn:hover{transform:scale(1.02)}.rol-btn-bodega{background:#FF9800}.rol-btn-cocinero{background:#9C27B0}.rol-btn-caja{background:#2196F3}.rol-btn-dueno{background:#F44336}.rol-btn div:first-child{font-size:45px;margin-bottom:10px}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🍖 El Rincón del Barril</h1>
-            <p>Gestión de Inventario v10</p>
+            <p>Gestión de Inventario v11.5 - Multi-Usuario</p>
             <div class="user-section">
-                <div><span class="user-badge" onclick="cambiarUsuario()">👤 <span id="user">Bodega</span></span></div>
-                <div><span class="status-badge">✅ Mov: <span id="mov">0</span></span></div>
-                <button class="btn-sync" onclick="descargar()">📥</button>
-                <button class="btn-sync" onclick="cargar()">📤</button>
+                <div><span class="user-badge" onclick="cambiarRol()">👤 <span id="rol-actual">Selecciona Rol</span> <span class="role-badge" id="badge-rol"></span></span></div>
+                <div><span class="status-badge">✅ Mov Hoy: <span id="mov">0</span> | Prod: <span id="prod-count">0</span></span></div>
+                <button class="btn-sync" onclick="descargarJSON()">📥 Descargar</button>
+                <button class="btn-sync" onclick="abrirModalCargar()">📤 Cargar</button>
             </div>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" onclick="tab('saldos')">📊</button>
-            <button class="tab-btn" onclick="tab('entradas')">📥</button>
-            <button class="tab-btn" onclick="tab('salidas')">📤</button>
-            <button class="tab-btn" onclick="tab('reportes')">📈</button>
-            <button class="tab-btn" onclick="tab('admin')">⚙️</button>
-        </div>
+        <div class="tabs" id="tabs-container"></div>
 
         <div class="content">
             <div id="alerta"></div>
 
+            <!-- SIN ROL -->
+            <div id="sin-rol" class="tab-content active">
+                <div class="rol-selector">
+                    <h2 style="color:#8B0000;margin-bottom:30px">Selecciona tu Rol</h2>
+                    <div class="rol-grid">
+                        <button class="rol-btn rol-btn-bodega" onclick="selRol('bodega')"><div>📦</div><div>BODEGA</div></button>
+                        <button class="rol-btn rol-btn-cocinero" onclick="selRol('cocinero')"><div>👨‍🍳</div><div>COCINERO</div></button>
+                        <button class="rol-btn rol-btn-caja" onclick="selRol('caja')"><div>💰</div><div>CAJA</div></button>
+                        <button class="rol-btn rol-btn-dueno" onclick="selRol('dueno')"><div>📊</div><div>DUEÑO</div></button>
+                    </div>
+                </div>
+            </div>
+
             <!-- SALDOS -->
-            <div id="saldos" class="tab-content active">
-                <input type="text" class="search-box" placeholder="🔍 Buscar..." oninput="buscar(this.value)">
+            <div id="saldos" class="tab-content">
+                <input type="text" class="search-box" placeholder="🔍 Buscar producto..." oninput="buscar(this.value)">
                 <h3>Filtros</h3>
                 <div class="filter-buttons" id="filtros"></div>
-                <div id="lista-saldos"></div>
+                <div id="lista-saldos" class="scroll"></div>
             </div>
 
             <!-- ENTRADAS -->
@@ -45,13 +52,15 @@
                 <h3>Registrar Entrada</h3>
                 <div class="form-group"><label>Responsable</label><select id="resp-ent"></select></div>
                 <div class="form-group"><label>Proveedor</label><select id="prov-ent"></select></div>
-                <div class="form-group"><label>Producto</label><select id="prod-ent"></select></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Cantidad</label><input type="number" id="cant-ent" step="0.01"></div>
-                    <div class="form-group"><label>Costo</label><input type="number" id="cost-ent" step="0.01"></div>
+                <div class="form-group">
+                    <label>Producto</label>
+                    <input type="text" id="prod-ent-search" placeholder="Escribe para buscar..." oninput="filtrarProdEnt()">
+                    <div id="lista-prod-ent" class="autocomplete-list"></div>
                 </div>
+                <div id="cant-ent-container"></div>
+                <div class="form-group"><label>Costo Total</label><input type="number" id="cost-ent" step="0.01" placeholder="0.00"></div>
                 <button class="btn btn-primary" onclick="entrar()">✅ Registrar</button>
-                <h3 style="margin-top:15px">Últimas</h3>
+                <h3 style="margin-top:20px">Últimas Entradas</h3>
                 <div class="scroll" id="ultimas-ent"></div>
             </div>
 
@@ -59,174 +68,179 @@
             <div id="salidas" class="tab-content">
                 <h3>Registrar Salida</h3>
                 <div class="form-group"><label>Responsable</label><select id="resp-sal"></select></div>
-                <div class="form-group"><label>Destino</label><select id="dest-sal"><option>-- Selecciona --</option><option>👨‍🍳 Cocina</option><option>💰 Caja</option><option>🍖 Barril</option><option>🥘 Consumo</option><option>📉 Merma</option><option>🔥 Daño</option></select></div>
-                <div class="form-group"><label>Producto</label><select id="prod-sal"></select></div>
-                <div class="form-group"><label>Cantidad</label><input type="number" id="cant-sal" step="0.01"></div>
+                <div class="form-group"><label>Destino</label><select id="dest-sal"><option>--</option><option>👨‍🍳 Cocina</option><option>💰 Caja</option><option>🍖 Barril</option><option>🥘 Consumo</option><option>📉 Merma</option><option>🔥 Daño</option></select></div>
+                <div class="form-group">
+                    <label>Producto</label>
+                    <input type="text" id="prod-sal-search" placeholder="Escribe para buscar..." oninput="filtrarProdSal()">
+                    <div id="lista-prod-sal" class="autocomplete-list"></div>
+                </div>
+                <div id="cant-sal-container"></div>
                 <button class="btn btn-primary" onclick="salir()">✅ Registrar</button>
-                <h3 style="margin-top:15px">Últimas</h3>
+                <h3 style="margin-top:20px">Últimas Salidas</h3>
                 <div class="scroll" id="ultimas-sal"></div>
             </div>
 
-            <!-- REPORTES -->
-            <div id="reportes" class="tab-content">
-                <h3>Movimientos de Hoy</h3>
-                <div class="scroll" id="hoy"></div>
+            <!-- HISTORIAL -->
+            <div id="historial" class="tab-content">
+                <h3>Todos los Movimientos</h3>
+                <div class="filter-buttons" style="margin-bottom:15px">
+                    <button class="filter-btn active" onclick="filtroMov('todos')">Todos</button>
+                    <button class="filter-btn" onclick="filtroMov('ent')">Entradas</button>
+                    <button class="filter-btn" onclick="filtroMov('sal')">Salidas</button>
+                </div>
+                <div class="scroll" id="lista-historial"></div>
             </div>
 
             <!-- ADMIN -->
             <div id="admin" class="tab-content">
-                <h3>Responsables</h3>
-                <div class="form-row" style="margin-bottom:10px"><input type="text" id="new-resp" placeholder="Nombre"><button class="btn btn-primary" onclick="addResp()">✅</button></div>
-                <div id="lista-resp"></div>
+                <div class="admin-section">
+                    <h4>➕ Agregar Producto</h4>
+                    <div class="form-group"><label>Nombre</label><input type="text" id="new-prod-name" placeholder="Ej: Leche"></div>
+                    <div class="form-group"><label>Categoría</label><select id="new-prod-cat" onchange="actualizarFormAdmin()"></select></div>
+                    <div id="new-prod-cantidad-container"></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Unidad</label><input type="text" id="new-prod-unit" placeholder="kg" value="kg"></div>
+                        <div class="form-group"><label>Mínimo</label><input type="number" id="new-prod-min" step="0.01" placeholder="5"></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addProducto()">✅ Agregar</button>
+                </div>
 
-                <h3>Proveedores</h3>
-                <div class="form-row" style="margin-bottom:10px"><input type="text" id="new-prov" placeholder="Nombre"><button class="btn btn-primary" onclick="addProv()">✅</button></div>
-                <div id="lista-prov"></div>
+                <div class="admin-section">
+                    <h4>🏷️ Agregar Categoría</h4>
+                    <div class="form-row">
+                        <div class="form-group"><label>Emoji</label><input type="text" id="new-cat-emoji" placeholder="🍖" maxlength="2"></div>
+                        <div class="form-group"><label>Nombre</label><input type="text" id="new-cat-name" placeholder="Proteínas"></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addCategoria()">✅ Agregar</button>
+                </div>
 
-                <h3>Categorías</h3>
-                <div class="form-row" style="margin-bottom:10px"><input type="text" id="new-cat" placeholder="Ej: 🍖 Proteínas"><button class="btn btn-primary" onclick="addCat()">✅</button></div>
-                <div id="lista-cat"></div>
+                <div class="admin-section">
+                    <h4>👤 Agregar Responsable</h4>
+                    <input type="text" id="new-resp" placeholder="Nombre" style="width:100%;padding:8px;border:1px solid #DDD;border-radius:4px;margin-bottom:8px">
+                    <button class="btn btn-primary" onclick="addResp()">✅ Agregar</button>
+                </div>
 
-                <h3>Productos</h3>
-                <div class="form-group"><label>Nombre</label><input type="text" id="new-prod-name"></div>
-                <div class="form-group"><label>Categoría</label><select id="new-prod-cat"></select></div>
-                <div class="form-group"><label>Mínimo</label><input type="number" id="new-prod-min" min="0" step="0.01"></div>
-                <button class="btn btn-primary" onclick="addProd()">✅ Agregar</button>
-                <div id="lista-prod"></div>
+                <div class="admin-section">
+                    <h4>🏪 Proveedores</h4>
+                    <div style="display:flex;gap:6px;margin-bottom:8px">
+                        <input type="text" id="new-prov" placeholder="Nombre proveedor" style="flex:1;padding:8px;border:1px solid #DDD;border-radius:4px">
+                        <button class="btn btn-primary" onclick="addProv()" style="flex:0;min-width:100px">✅ Agregar</button>
+                    </div>
+                    <div id="lista-prov" style="max-height:150px;overflow-y:auto"></div>
+                </div>
 
-                <h3>Datos</h3>
-                <button class="btn btn-secondary" onclick="descargar()" style="margin-bottom:10px">📥 Descargar JSON</button>
-                <textarea id="json-txt" placeholder="O pega JSON aquí..."></textarea>
-                <button class="btn btn-primary" style="margin-top:10px" onclick="cargarJSON()">📤 Cargar JSON</button>
+                <div class="admin-section">
+                    <h4>📊 Sincronizar con Google Sheets</h4>
+                    <button class="btn btn-primary" onclick="sincronizarGoogleSheets()" style="background:#4CAF50">📤 Enviar a Google Sheets</button>
+                </div>
+
+                <div class="admin-section">
+                    <h4>📝 Productos (<span id="prod-total">0</span>)</h4>
+                    <input type="text" class="search-box" placeholder="🔍 Buscar..." oninput="buscarAdmin(this.value)" style="margin-bottom:8px">
+                    <div class="product-item-admin" style="max-height:250px;overflow-y:auto" id="lista-prod-admin"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR PRODUCTO -->
+    <div id="modal-editar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">✏️ Editar Producto</div>
+            <div class="form-group"><label>Nombre</label><input type="text" id="edit-prod-name"></div>
+            <div class="form-group"><label>Categoría</label><select id="edit-prod-cat"></select></div>
+            <div class="form-group"><label>Cantidad</label><input type="number" id="edit-prod-cant" step="0.01"></div>
+            <div class="form-row">
+                <div class="form-group"><label>Unidad</label><input type="text" id="edit-prod-unit"></div>
+                <div class="form-group"><label>Mínimo</label><input type="number" id="edit-prod-min" step="0.01"></div>
+            </div>
+            <div class="btn-grupo" style="margin-top:15px">
+                <button class="btn btn-primary" onclick="guardarEdicion()">✅ Guardar</button>
+                <button class="btn btn-secondary" onclick="cerrarModalEdit()">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CARGAR -->
+    <div id="modal-cargar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">📤 Cargar desde JSON</div>
+            <textarea id="json-txt" placeholder="Pega el JSON aquí..." style="width:100%;padding:10px;border:1px solid #DDD;border-radius:4px;min-height:150px;font-family:monospace;font-size:11px"></textarea>
+            <div class="btn-grupo" style="margin-top:10px">
+                <button class="btn btn-primary" onclick="cargarJSON()">✅ Cargar</button>
+                <button class="btn btn-secondary" onclick="cerrarModal()">❌ Cancelar</button>
             </div>
         </div>
     </div>
 
     <script>
-        let resp = ['Bodega', 'Cocinero', 'Cajero', 'Gerente'];
-        let prov = ['Atlantic', 'mis tres amores', 'Carnes xyz', 'Distribuidora Local'];
-        let cat = ['🍖 Proteínas', '🧀 Lácteos', '❄️ Congelados', '🌾 Secos', '🥬 Verduras'];
-        let prod = [
-            {id:1, n:'Costilla de cerdo', c:'🍖 Proteínas', cr:3.95, co:0, u:'kg', min:5},
-            {id:2, n:'Pollo', c:'🍖 Proteínas', cr:16, co:0, u:'kg', min:7},
-            {id:3, n:'Queso paisa', c:'🧀 Lácteos', cr:0.52, co:0, u:'kg', min:1},
-            {id:4, n:'Papa', c:'❄️ Congelados', cr:12.5, co:0, u:'kg', min:10},
-            {id:5, n:'Chicharrón', c:'🍖 Proteínas', cr:7.7, co:0, u:'kg', min:7},
-            {id:6, n:'Lomo de cerdo', c:'🍖 Proteínas', cr:9.71, co:0, u:'kg', min:4},
-            {id:7, n:'Punta de anca', c:'🍖 Proteínas', cr:3.04, co:0, u:'kg', min:2},
-            {id:8, n:'Carne molida CAB', c:'🍖 Proteínas', cr:17.47, co:0, u:'kg', min:0},
-            {id:9, n:'Carne molida regular', c:'🍖 Proteínas', cr:24.6, co:0, u:'kg', min:4},
-            {id:10, n:'Croquetas de carne', c:'🍖 Proteínas', cr:74, co:0, u:'kg', min:70},
-            {id:11, n:'Pecho de res', c:'🍖 Proteínas', cr:0, co:0, u:'kg', min:0},
-            {id:12, n:'Contramuslo de pollo', c:'🍖 Proteínas', cr:0, co:0, u:'kg', min:0},
-            {id:13, n:'Colita de cadera', c:'🍖 Proteínas', cr:0, co:0, u:'kg', min:3},
-            {id:14, n:'Morcilla', c:'🍖 Proteínas', cr:1.84, co:0, u:'kg', min:0},
-            {id:15, n:'Chorizo', c:'🍖 Proteínas', cr:1.27, co:0, u:'kg', min:5},
-            {id:16, n:'Queso cheddar', c:'🧀 Lácteos', cr:207, co:0, u:'kg', min:80},
-            {id:17, n:'Tocineta', c:'🍖 Proteínas', cr:7.6, co:0, u:'kg', min:3},
-            {id:18, n:'Salchichas', c:'🍖 Proteínas', cr:19, co:0, u:'kg', min:15},
-            {id:19, n:'Pan brioche de hamburguesa', c:'🌾 Secos', cr:46, co:0, u:'kg', min:30},
-            {id:20, n:'Pan brioche de perro', c:'🌾 Secos', cr:13, co:0, u:'kg', min:10},
-            {id:21, n:'Papa pastusa', c:'🥬 Verduras', cr:14, co:0, u:'kg', min:4},
-            {id:22, n:'Cebolla cabezona', c:'🥬 Verduras', cr:18, co:0, u:'kg', min:10},
-            {id:23, n:'Tomate', c:'🥬 Verduras', cr:12, co:0, u:'kg', min:5},
-            {id:24, n:'Panela', c:'🌾 Secos', cr:10, co:0, u:'kg', min:5},
-            {id:25, n:'Mayonesa Natucampo', c:'🌾 Secos', cr:5, co:0, u:'kg', min:2},
-            {id:26, n:'Arroz Zulia', c:'🌾 Secos', cr:3, co:0, u:'kg', min:2},
-            {id:27, n:'Frijol Bolón Rojo', c:'🌾 Secos', cr:1, co:0, u:'kg', min:1},
-            {id:28, n:'Aceite Sinai', c:'🌾 Secos', cr:2, co:0, u:'kg', min:1}
-        ];
+        let rol = null;
+        let resp = ['Bodega', 'Cocinero', 'Caja', 'Gerente'];
+        let prov = ['Atlantic', 'mis tres amigos', 'Carnes xyz', 'Local'];
+        let prod = [];
+        let cat = ['🍖 Proteínas', '🧀 Lácteos', '❄️ Congelados', '🌾 Secos', '🥬 Verduras', '📌 Empaques', '🥤 Gaseosas', '🍺 Cervezas', '🧋 Bebidas', '🧂 Condimentos/Salsas', '🌻 Aceites'];
         let mov = [];
-        let user = 'Bodega';
         let filtro = 'todos';
-        let id = 5;
+        let filtroMov2 = 'todos';
+        let filtroAdminProd = '';
+        let prodEntId = -1;
+        let prodSalId = -1;
+        let prodEditId = -1;
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbypzlwCrBv8bcnuHx6ynp35q7ToctRytu382EaPrRhIUBZt17HTEeubasR1b7Mk1hPTZA/exec';
+
+        const PRODUCTOS = [{id:1, n:'Costilla de cerdo', c:'🍖 Proteínas', cant:3.95, u:'kg', min:5},{id:2, n:'Pollo', c:'🍖 Proteínas', cant:16, u:'kg', min:7},{id:3, n:'Queso paisa', c:'🧀 Lácteos', cant:0.52, u:'kg', min:1},{id:4, n:'Papa', c:'❄️ Congelados', cant:12.5, u:'kg', min:10},{id:5, n:'chicharron', c:'🍖 Proteínas', cant:7.7, u:'kg', min:7},{id:6, n:'lomo de cerdo', c:'🍖 Proteínas', cant:9.71, u:'kg', min:4},{id:7, n:'punta de anca', c:'🍖 Proteínas', cant:3.04, u:'kg', min:2},{id:8, n:'carne molida CAB', c:'🍖 Proteínas', cant:17.47, u:'kg', min:0},{id:9, n:'carne molida regular', c:'🍖 Proteínas', cant:24.6, u:'kg', min:4},{id:10, n:'croquetas de carne', c:'🍖 Proteínas', cant:74, u:'kg', min:70},{id:11, n:'pecho de res', c:'🍖 Proteínas', cant:0, u:'kg', min:0},{id:12, n:'contramuslo de pollo', c:'🍖 Proteínas', cant:0, u:'kg', min:0},{id:13, n:'colita de cadera', c:'🍖 Proteínas', cant:0, u:'kg', min:3},{id:14, n:'morcilla', c:'🍖 Proteínas', cant:1.84, u:'kg', min:0},{id:15, n:'chorizo', c:'🍖 Proteínas', cant:1.27, u:'kg', min:5},{id:16, n:'queso cheddar', c:'🧀 Lácteos', cant:207, u:'kg', min:80},{id:17, n:'tocineta', c:'🍖 Proteínas', cant:7.6, u:'kg', min:3},{id:18, n:'salchichas', c:'🍖 Proteínas', cant:19, u:'kg', min:15},{id:19, n:'pan brioche de hamburguesa', c:'🌾 Secos', cant:46, u:'kg', min:30},{id:20, n:'pan brioche de perro', c:'🌾 Secos', cant:13, u:'kg', min:10},{id:21, n:'papa pastusa', c:'🥬 Verduras', cant:14, u:'kg', min:4},{id:22, n:'cebolla cabezona', c:'🥬 Verduras', cant:20.1, u:'kg', min:3},{id:23, n:'tomate', c:'🥬 Verduras', cant:14, u:'kg', min:3},{id:24, n:'ajo pelado en bolsa', c:'🥬 Verduras', cant:0, u:'kg', min:0},{id:25, n:'pimenton rojo', c:'🥬 Verduras', cant:0, u:'kg', min:0},{id:26, n:'cebolla morada', c:'🥬 Verduras', cant:0, u:'kg', min:0},{id:27, n:'limon tahiti', c:'🥬 Verduras', cant:8, u:'kg', min:3},{id:28, n:'arroz zulia', c:'🌾 Secos', cant:3, u:'kg', min:2},{id:29, n:'frijol bolon rojo', c:'🌾 Secos', cant:2.6, u:'kg', min:1.5},{id:30, n:'panela', c:'🥬 Verduras', cant:12, u:'kg', min:2},{id:31, n:'mayonesa natucampo', c:'🧀 Lácteos', cant:8, u:'kg', min:1},{id:32, n:'cebolla roja', c:'🥬 Verduras', cant:0, u:'kg', min:0},{id:33, n:'ajo badia', c:'🧂 Condimentos/Salsas', cant:0.53, u:'kg', min:0.3},{id:34, n:'pimienta molida badia', c:'🧂 Condimentos/Salsas', cant:0.35, u:'kg', min:0.3},{id:35, n:'paprika', c:'🧂 Condimentos/Salsas', cant:1.4, u:'kg', min:0.3},{id:36, n:'agua p600', c:'🥤 Gaseosas', cant:15, u:'und', min:12},{id:37, n:'huevos', c:'🧀 Lácteos', cant:21, u:'kg', min:12},{id:38, n:'coca cola 1.5', c:'🥤 Gaseosas', cant:9, u:'und', min:12},{id:39, n:'coca cola p400', c:'🥤 Gaseosas', cant:11, u:'und', min:12},{id:40, n:'coca cola zero 1.5', c:'🥤 Gaseosas', cant:1, u:'und', min:6},{id:41, n:'coca cola zero p400', c:'🥤 Gaseosas', cant:10, u:'und', min:6},{id:42, n:'coca cola zero p250', c:'🥤 Gaseosas', cant:7, u:'und', min:12},{id:43, n:'quatro 1.5', c:'🥤 Gaseosas', cant:2, u:'und', min:6},{id:44, n:'quatro p400', c:'🥤 Gaseosas', cant:8, u:'und', min:6},{id:45, n:'quatro p250', c:'🥤 Gaseosas', cant:0, u:'und', min:12},{id:46, n:'sprite 1.5', c:'🥤 Gaseosas', cant:5, u:'und', min:6},{id:47, n:'sprite p400', c:'🥤 Gaseosas', cant:6, u:'und', min:6},{id:48, n:'kola roman 1.5', c:'🥤 Gaseosas', cant:8, u:'und', min:6},{id:49, n:'kola roman p400', c:'🥤 Gaseosas', cant:4, u:'und', min:6},{id:50, n:'soda frutos rojos', c:'🥤 Gaseosas', cant:16, u:'und', min:6},{id:51, n:'soda frutos amarillos', c:'🥤 Gaseosas', cant:13, u:'und', min:6},{id:52, n:'cerveza', c:'🍺 Cervezas', cant:0, u:'und', min:12},{id:53, n:'crema de coco', c:'🧋 Bebidas', cant:0, u:'kg', min:1},{id:54, n:'cerezas', c:'🧋 Bebidas', cant:0, u:'kg', min:1},{id:55, n:'soda p400', c:'🥤 Gaseosas', cant:12, u:'und', min:6},{id:56, n:'Caja de hamburguesa', c:'📌 Empaques', cant:0, u:'kg', min:100},{id:57, n:'caja para 1/2kg picada', c:'📌 Empaques', cant:0, u:'kg', min:30},{id:58, n:'caja para 1kg picada', c:'📌 Empaques', cant:45, u:'kg', min:30},{id:59, n:'icopor P1', c:'📌 Empaques', cant:11, u:'kg', min:20},{id:60, n:'icopor C1', c:'📌 Empaques', cant:16, u:'kg', min:20},{id:61, n:'contenedor 16 OZ', c:'📌 Empaques', cant:75, u:'kg', min:20},{id:62, n:'contenedor 24 OZ', c:'📌 Empaques', cant:59, u:'kg', min:20},{id:63, n:'potes 4 OZ ensalada', c:'📌 Empaques', cant:275, u:'kg', min:70},{id:64, n:'potes 1 OZ salsas', c:'📌 Empaques', cant:302, u:'kg', min:150},{id:65, n:'servilletas', c:'📌 Empaques', cant:21, u:'kg', min:10},{id:66, n:'vasos desechables 12 OZ', c:'📌 Empaques', cant:100, u:'kg', min:50},{id:67, n:'vasos 12 OZ con tapa para llevar', c:'📌 Empaques', cant:2, u:'kg', min:25},{id:68, n:'bolsas 2kg', c:'📌 Empaques', cant:2, u:'kg', min:1},{id:69, n:'bolsas de 10 kg', c:'📌 Empaques', cant:2, u:'kg', min:1},{id:70, n:'bolsas de 20 kg', c:'📌 Empaques', cant:1, u:'kg', min:1},{id:71, n:'salsa de tomate heinz', c:'🧂 Condimentos/Salsas', cant:3, u:'kg', min:1},{id:72, n:'salsa mostaza', c:'🧂 Condimentos/Salsas', cant:1, u:'kg', min:1},{id:73, n:'aceite sinai', c:'🌻 Aceites', cant:2, u:'kg', min:1},{id:74, n:'Limón', c:'🥬 Verduras', cant:5, u:'kg', min:2}];
+
+        const MOVIMIENTOS = [{id:'mov_001', f:'2025-11-26', h:'18:11', t:'ent', cant:15.3, p:'carne molida regular', resp:'Bodega', prov:'Atlantic', costo:299115},{id:'mov_002', f:'2025-11-26', h:'18:12', t:'ent', cant:17.47, p:'carne molida CAB', resp:'Bodega', prov:'Atlantic', costo:719764},{id:'mov_003', f:'2025-11-26', h:'18:12', t:'ent', cant:7.7, p:'chicharron', resp:'Bodega', prov:'Atlantic', costo:189420},{id:'mov_004', f:'2025-11-26', h:'18:15', t:'ent', cant:160, p:'queso cheddar', resp:'Bodega', prov:'Atlantic', costo:145280},{id:'mov_005', f:'2025-11-26', h:'18:15', t:'ent', cant:4.82, p:'lomo de cerdo', resp:'Bodega', prov:'Atlantic', costo:90134},{id:'mov_006', f:'2025-11-26', h:'18:16', t:'ent', cant:10, p:'panela', resp:'Bodega', prov:'mis tres amigos', costo:33000},{id:'mov_007', f:'2025-11-26', h:'18:17', t:'ent', cant:5, p:'mayonesa natucampo', resp:'Bodega', prov:'mis tres amigos', costo:245000},{id:'mov_008', f:'2025-11-26', h:'18:17', t:'ent', cant:3, p:'arroz zulia', resp:'Bodega', prov:'mis tres amigos', costo:15000},{id:'mov_009', f:'2025-11-26', h:'18:17', t:'ent', cant:1, p:'frijol bolon rojo', resp:'Bodega', prov:'mis tres amigos', costo:14000},{id:'mov_010', f:'2025-11-26', h:'18:19', t:'ent', cant:2, p:'aceite sinai', resp:'Bodega', prov:'Atlantic', costo:323600},{id:'mov_011', f:'2025-11-26', h:'18:20', t:'ent', cant:14, p:'papa pastusa', resp:'Bodega', prov:'mis tres amigos', costo:28000},{id:'mov_012', f:'2025-11-26', h:'18:22', t:'ent', cant:18, p:'cebolla cabezona', resp:'Bodega', prov:'mis tres amigos', costo:50400},{id:'mov_013', f:'2025-11-26', h:'22:22', t:'ent', cant:12, p:'tomate', resp:'Bodega', prov:'mis tres amigos', costo:33600}];
 
         function init() {
             const d = localStorage.getItem('inv');
             if (d) {
-                const x = JSON.parse(d);
-                resp = x.resp || resp;
-                prov = x.prov || prov;
-                cat = x.cat || cat;
-                prod = x.prod || prod;
-                mov = x.mov || [];
-                user = x.user || 'Bodega';
-                id = x.id || 5;
+                try {
+                    const x = JSON.parse(d);
+                    prod = x.prod || JSON.parse(JSON.stringify(PRODUCTOS));
+                    mov = x.mov || JSON.parse(JSON.stringify(MOVIMIENTOS));
+                    resp = x.resp || resp;
+                    prov = x.prov || prov;
+                    cat = x.cat || cat;
+                } catch(e) {
+                    prod = JSON.parse(JSON.stringify(PRODUCTOS));
+                    mov = JSON.parse(JSON.stringify(MOVIMIENTOS));
+                }
+            } else {
+                prod = JSON.parse(JSON.stringify(PRODUCTOS));
+                mov = JSON.parse(JSON.stringify(MOVIMIENTOS));
             }
-            actualizar();
-            alerta('✅ Listo', 'success');
         }
 
         function save() {
-            localStorage.setItem('inv', JSON.stringify({resp, prov, cat, prod, mov, user, id}));
+            localStorage.setItem('inv', JSON.stringify({resp, prov, prod, cat, mov}));
         }
 
-        function actualizar() {
-            document.getElementById('user').textContent = user;
-            
-            const opts = resp.map(r => `<option>${r}</option>`).join('');
-            const opts2 = prov.map(p => `<option>${p}</option>`).join('');
-            const opts3 = prod.map(p => `<option value="${p.id}">${p.n}</option>`).join('');
-            const opts4 = cat.map(c => `<option>${c}</option>`).join('');
-            
-            ['resp-ent', 'resp-sal'].forEach(e => document.getElementById(e).innerHTML = '<option>--</option>' + opts);
-            document.getElementById('prov-ent').innerHTML = '<option>--</option>' + opts2;
-            ['prod-ent', 'prod-sal'].innerHTML = '<option>--</option>' + opts3;
-            document.getElementById('new-prod-cat').innerHTML = '<option>--</option>' + opts4;
-            
-            document.getElementById('filtros').innerHTML = '<button class="filter-btn active" onclick="filtro2(\'todos\')">Todos</button>' + 
-                [...new Set(prod.map(p => p.c))].sort().map(c => `<button class="filter-btn" onclick="filtro2('${c}')">${c}</button>`).join('');
-            
-            saldos();
-            entradas();
-            salidas();
-            reportes();
-            admin();
-            conteo();
+        function cambiarRol() {
+            rol = null;
+            document.getElementById('sin-rol').classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
         }
 
-        function saldos() {
-            const ps = filtro === 'todos' ? prod : prod.filter(p => p.c === filtro);
-            document.getElementById('lista-saldos').innerHTML = ps.length === 0 ? '<p style="color:#999">Sin productos</p>' : 
-                ps.map(p => {
-                    const t = p.cr + p.co;
-                    const bg = t < p.min ? ' style="background:#FFEBEE"' : '';
-                    return `<div class="product-card"${bg}><div class="product-info"><div class="product-name">${p.n}</div><div class="product-category">${p.c}</div><div style="font-size:10px;color:#666;margin-top:4px">${p.c.includes('Proteína') ? `🔵 ${p.cr.toFixed(2)} | 🔴 ${p.co.toFixed(2)}` : `Total: ${t.toFixed(2)}`}</div></div><div class="product-stock">${t.toFixed(2)}</div></div>`;
-                }).join('');
+        function selRol(r) {
+            if (!r) return;
+            rol = r;
+            const nombres = {bodega: 'BODEGA', cocinero: 'COCINERO', caja: 'CAJA', dueno: 'DUEÑO'};
+            const clases = {bodega: 'role-bodega', cocinero: 'role-cocinero', caja: 'role-caja', dueno: 'role-dueno'};
+            document.getElementById('rol-actual').textContent = nombres[r];
+            document.getElementById('badge-rol').className = 'role-badge ' + clases[r];
+            document.getElementById('badge-rol').textContent = nombres[r];
+            document.getElementById('sin-rol').classList.remove('active');
+            document.getElementById('saldos').classList.add('active');
+            actualizarTabs();
+            actualizar();
+            save();
         }
 
-        function entradas() {
-            const ultimas = mov.filter(m => m.t === 'ent').slice(-10).reverse();
-            document.getElementById('ultimas-ent').innerHTML = ultimas.length === 0 ? '<p style="color:#999">Sin entradas</p>' : 
-                ultimas.map(m => `<div class="list-item"><b>${m.p}</b><br>${m.c1 > 0 ? m.c1.toFixed(2) + ' crudo | ' : ''}${m.c2 > 0 ? m.c2.toFixed(2) + ' cocido | ' : ''}${m.prov} | $${m.costo}</div>`).join('');
-        }
-
-        function salidas() {
-            const ultimas = mov.filter(m => m.t === 'sal').slice(-10).reverse();
-            document.getElementById('ultimas-sal').innerHTML = ultimas.length === 0 ? '<p style="color:#999">Sin salidas</p>' : 
-                ultimas.map(m => `<div class="list-item"><b>${m.p}</b><br>${m.c1 > 0 ? m.c1.toFixed(2) + ' crudo' : ''}${m.c2 > 0 ? ' / ' + m.c2.toFixed(2) + ' cocido' : ''} | ${m.resp}</div>`).join('');
-        }
-
-        function reportes() {
-            const hoy = new Date().toISOString().split('T')[0];
-            const hoyMov = mov.filter(m => m.f === hoy);
-            document.getElementById('hoy').innerHTML = hoyMov.length === 0 ? '<p style="color:#999">Sin movimientos</p>' : 
-                hoyMov.map(m => {
-                    const icon = m.t === 'ent' ? '📥' : '📤';
-                    return `<div class="list-item"><b>${icon} ${m.h} - ${m.p}</b><br>${m.c1 > 0 ? m.c1.toFixed(2) + ' crudo' : ''}${m.c2 > 0 ? ' / ' + m.c2.toFixed(2) + ' cocido' : ''} | ${m.resp}</div>`;
-                }).join('');
-        }
-
-        function admin() {
-            document.getElementById('lista-resp').innerHTML = resp.map(r => `<div class="admin-item"><span>${r}</span><button class="btn-small" onclick="delResp('${r}')">❌</button></div>`).join('');
-            document.getElementById('lista-prov').innerHTML = prov.map(p => `<div class="admin-item"><span>${p}</span><button class="btn-small" onclick="delProv('${p}')">❌</button></div>`).join('');
-            document.getElementById('lista-cat').innerHTML = cat.map(c => `<div class="admin-item"><span>${c}</span><button class="btn-small" onclick="delCat('${c}')">❌</button></div>`).join('');
-            document.getElementById('lista-prod').innerHTML = prod.map(p => `<div class="admin-item"><span>${p.n} (${(p.cr+p.co).toFixed(2)})</span><button class="btn-small" onclick="delProd(${p.id})">❌</button></div>`).join('');
-        }
-
-        function conteo() {
-            const hoy = new Date().toISOString().split('T')[0];
-            document.getElementById('mov').textContent = mov.filter(m => m.f === hoy).length;
+        function actualizarTabs() {
+            let html = '<button class="tab-btn active" onclick="tab(\'saldos\')">📊 Saldos</button><button class="tab-btn" onclick="tab(\'entradas\')">📥 Entradas</button><button class="tab-btn" onclick="tab(\'salidas\')">📤 Salidas</button><button class="tab-btn" onclick="tab(\'historial\')">📋 Historial</button>';
+            if (rol === 'dueno') html += '<button class="tab-btn" onclick="tab(\'admin\')">⚙️ Admin</button>';
+            document.getElementById('tabs-container').innerHTML = html;
         }
 
         function tab(name) {
@@ -236,23 +250,36 @@
             event.target.classList.add('active');
         }
 
-        function cambiarUsuario() {
-            const idx = prompt(`Selecciona:\n${resp.map((r,i) => (i+1) + '. ' + r).join('\n')}`);
-            if (idx && resp[parseInt(idx)-1]) {
-                user = resp[parseInt(idx)-1];
-                save();
-                document.getElementById('user').textContent = user;
-            }
+        function actualizar() {
+            document.getElementById('prod-count').textContent = prod.length;
+            document.getElementById('prod-total').textContent = prod.length;
+            const opts = resp.map(r => `<option>${r}</option>`).join('');
+            const opts2 = prov.map(p => `<option>${p}</option>`).join('');
+            const optsCat = cat.map(c => `<option>${c}</option>`).join('');
+            ['resp-ent', 'resp-sal'].forEach(e => document.getElementById(e).innerHTML = '<option>--</option>' + opts);
+            document.getElementById('prov-ent').innerHTML = '<option>--</option>' + opts2;
+            document.getElementById('new-prod-cat').innerHTML = '<option>--</option>' + optsCat;
+            document.getElementById('filtros').innerHTML = '<button class="filter-btn active" onclick="filtro2(\'todos\')">Todos</button>' + [...new Set(prod.map(p => p.c))].sort().map(c => `<button class="filter-btn" onclick="filtro2('${c}')">${c}</button>`).join('');
+            listaProductosAdmin();
+            listaProveedores();
+            saldos();
+            entradas();
+            salidas();
+            historial();
+            conteo();
+        }
+
+        function saldos() {
+            const ps = filtro === 'todos' ? prod : prod.filter(p => p.c === filtro);
+            document.getElementById('lista-saldos').innerHTML = ps.map(p => {
+                const bg = p.cant < p.min ? 'background:#FFEBEE' : '';
+                return `<div class="product-card" style="${bg}"><div class="product-info"><div class="product-name">${p.n}</div><div class="product-category">${p.c}</div><div style="font-size:10px;color:#666;margin-top:4px">Stock: ${p.cant.toFixed(2)} ${p.u} (Mín: ${p.min})</div></div><div class="product-stock">${p.cant.toFixed(2)}</div></div>`;
+            }).join('');
         }
 
         function buscar(t) {
-            const ps = filtro === 'todos' ? prod : prod.filter(p => p.c === filtro);
-            const res = ps.filter(p => p.n.toLowerCase().includes(t.toLowerCase()));
-            document.getElementById('lista-saldos').innerHTML = res.length === 0 ? '<p style="color:#999">Sin productos</p>' : 
-                res.map(p => {
-                    const total = p.cr + p.co;
-                    return `<div class="product-card"><div class="product-info"><div class="product-name">${p.n}</div></div><div class="product-stock">${total.toFixed(2)}</div></div>`;
-                }).join('');
+            const res = prod.filter(p => p.n.toLowerCase().includes(t.toLowerCase()));
+            document.getElementById('lista-saldos').innerHTML = res.map(p => `<div class="product-card"><div class="product-info"><div class="product-name">${p.n}</div></div><div class="product-stock">${p.cant.toFixed(2)}</div></div>`).join('');
         }
 
         function filtro2(f) {
@@ -262,177 +289,453 @@
             saldos();
         }
 
+        function filtrarProdEnt() {
+            const t = document.getElementById('prod-ent-search').value.toLowerCase();
+            const lista = document.getElementById('lista-prod-ent');
+            if (t === '') {
+                lista.style.display = 'none';
+                return;
+            }
+            const filtrados = prod.filter(p => p.n.toLowerCase().includes(t));
+            lista.innerHTML = filtrados.length === 0 ? '<div class="autocomplete-item">Sin resultados</div>' : filtrados.map(p => `<div class="autocomplete-item" onclick="selProdEnt(${p.id})">${p.n}</div>`).join('');
+            lista.style.display = 'block';
+        }
+
+        function esCarne(categoria) {
+            return categoria && categoria.includes('Proteína');
+        }
+
+        function selProdEnt(id) {
+            const p = prod.find(x => x.id === id);
+            document.getElementById('prod-ent-search').value = p.n;
+            document.getElementById('lista-prod-ent').style.display = 'none';
+            prodEntId = id;
+            const c = document.getElementById('cant-ent-container');
+            let html = `<div class="form-group"><label>Cantidad</label><input type="number" id="cant-ent" step="0.01" placeholder="0.00"></div>`;
+            if (esCarne(p.c)) {
+                html += `<div class="form-group"><label>Estado</label><select id="est-ent"><option value="crudo">Crudo</option><option value="cocido">Cocido</option></select></div>`;
+            }
+            c.innerHTML = html;
+        }
+
         function entrar() {
             const r = document.getElementById('resp-ent').value;
             const p = document.getElementById('prov-ent').value;
-            const pid = parseInt(document.getElementById('prod-ent').value);
-            const c = parseFloat(document.getElementById('cant-ent').value);
-            const costo = parseFloat(document.getElementById('cost-ent').value);
-
-            if (!r || !p || !pid || isNaN(c) || isNaN(costo)) { alerta('⚠️ Completa campos', 'error'); return; }
-
-            const product = prod.find(x => x.id === pid);
-            product.cr += c;
-
-            mov.push({
-                f: new Date().toISOString().split('T')[0],
-                h: new Date().toTimeString().slice(0,5),
-                t: 'ent',
-                c1: c,
-                c2: 0,
-                p: product.n,
-                resp: r,
-                costo: costo,
-                prov: p
-            });
-
+            const cant = parseFloat(document.getElementById('cant-ent').value) || 0;
+            const costo = parseFloat(document.getElementById('cost-ent').value) || 0;
+            if (!r || r === '--' || !p || p === '--' || prodEntId < 0 || cant <= 0) {
+                alerta('⚠️ Completa todos', 'error');
+                return;
+            }
+            const producto = prod.find(x => x.id === prodEntId);
+            const est = document.getElementById('est-ent') ? document.getElementById('est-ent').value : '';
+            producto.cant += cant;
+            mov.push({id: `mov_${Date.now()}`, f: '2025-11-28', h: new Date().toTimeString().slice(0,5), t: 'ent', cant, p: producto.n, resp: r, prov: p, costo, estado: est});
             save();
-            alerta('✅ Entrada registrada', 'success');
             document.getElementById('resp-ent').value = '';
             document.getElementById('prov-ent').value = '';
-            document.getElementById('prod-ent').value = '';
-            document.getElementById('cant-ent').value = '';
+            document.getElementById('prod-ent-search').value = '';
             document.getElementById('cost-ent').value = '';
+            document.getElementById('cant-ent-container').innerHTML = '';
+            prodEntId = -1;
             actualizar();
+            alerta('✅ Entrada registrada', 'success');
+        }
+
+        function entradas() {
+            const ultimas = mov.filter(m => m.t === 'ent').slice(-10).reverse();
+            document.getElementById('ultimas-ent').innerHTML = ultimas.length === 0 ? '<p>Sin entradas</p>' : ultimas.map(m => `<div class="list-item"><div><b>${m.p}</b><br><span style="font-size:10px;color:#666">${m.cant.toFixed(2)} | ${m.prov}</span></div></div>`).join('');
+        }
+
+        function filtrarProdSal() {
+            const t = document.getElementById('prod-sal-search').value.toLowerCase();
+            const lista = document.getElementById('lista-prod-sal');
+            if (t === '') {
+                lista.style.display = 'none';
+                return;
+            }
+            const filtrados = prod.filter(p => p.n.toLowerCase().includes(t));
+            lista.innerHTML = filtrados.length === 0 ? '<div class="autocomplete-item">Sin resultados</div>' : filtrados.map(p => `<div class="autocomplete-item" onclick="selProdSal(${p.id})">${p.n}</div>`).join('');
+            lista.style.display = 'block';
+        }
+
+        function selProdSal(id) {
+            const p = prod.find(x => x.id === id);
+            document.getElementById('prod-sal-search').value = p.n;
+            document.getElementById('lista-prod-sal').style.display = 'none';
+            prodSalId = id;
+            const c = document.getElementById('cant-sal-container');
+            let html = `<div class="form-group"><label>Cantidad</label><input type="number" id="cant-sal" step="0.01" placeholder="0.00"></div>`;
+            if (esCarne(p.c)) {
+                html += `<div class="form-group"><label>Estado</label><select id="est-sal"><option value="crudo">Crudo</option><option value="cocido">Cocido</option></select></div>`;
+            }
+            c.innerHTML = html;
         }
 
         function salir() {
             const r = document.getElementById('resp-sal').value;
             const d = document.getElementById('dest-sal').value;
-            const pid = parseInt(document.getElementById('prod-sal').value);
-            const c = parseFloat(document.getElementById('cant-sal').value);
-
-            if (!r || !d || !pid || isNaN(c)) { alerta('⚠️ Completa campos', 'error'); return; }
-
-            const product = prod.find(x => x.id === pid);
-            const dis = product.cr + product.co;
-
-            if (c > dis) { alerta(`⚠️ Stock insuficiente: ${dis.toFixed(2)}`, 'error'); return; }
-
-            product.cr -= c;
-
-            mov.push({
-                f: new Date().toISOString().split('T')[0],
-                h: new Date().toTimeString().slice(0,5),
-                t: 'sal',
-                c1: c,
-                c2: 0,
-                p: product.n,
-                resp: r,
-                dest: d,
-                costo: 0,
-                prov: ''
-            });
-
+            const cant = parseFloat(document.getElementById('cant-sal').value) || 0;
+            if (!r || r === '--' || !d || d === '--' || prodSalId < 0 || cant <= 0) {
+                alerta('⚠️ Completa todos', 'error');
+                return;
+            }
+            const producto = prod.find(x => x.id === prodSalId);
+            const est = document.getElementById('est-sal') ? document.getElementById('est-sal').value : '';
+            if (cant > producto.cant) {
+                alerta(`⚠️ Stock: ${producto.cant.toFixed(2)}`, 'error');
+                return;
+            }
+            producto.cant -= cant;
+            mov.push({id: `mov_${Date.now()}`, f: '2025-11-28', h: new Date().toTimeString().slice(0,5), t: 'sal', cant, p: producto.n, resp: r, dest: d, estado: est});
             save();
-            alerta('✅ Salida registrada', 'success');
             document.getElementById('resp-sal').value = '';
             document.getElementById('dest-sal').value = '';
-            document.getElementById('prod-sal').value = '';
-            document.getElementById('cant-sal').value = '';
+            document.getElementById('prod-sal-search').value = '';
+            document.getElementById('cant-sal-container').innerHTML = '';
+            prodSalId = -1;
             actualizar();
+            alerta('✅ Salida registrada', 'success');
         }
 
-        function addResp() {
-            const n = document.getElementById('new-resp').value.trim();
-            if (!n || resp.includes(n)) { alerta('❌ Error', 'error'); return; }
-            resp.push(n);
-            save();
-            document.getElementById('new-resp').value = '';
-            actualizar();
-            alerta('✅ Agregado', 'success');
+        function salidas() {
+            const ultimas = mov.filter(m => m.t === 'sal').slice(-10).reverse();
+            document.getElementById('ultimas-sal').innerHTML = ultimas.length === 0 ? '<p>Sin salidas</p>' : ultimas.map(m => `<div class="list-item"><div><b>${m.p}</b><br><span style="font-size:10px;color:#666">${m.cant.toFixed(2)} | ${m.dest}</span></div></div>`).join('');
+        }
+
+        function historial() {
+            const filtrado = filtroMov2 === 'todos' ? mov : mov.filter(m => m.t === filtroMov2);
+            const ordenado = [...filtrado].reverse();
+            document.getElementById('lista-historial').innerHTML = ordenado.length === 0 ? '<p>Sin movimientos</p>' : ordenado.map(m => {
+                const icon = m.t === 'ent' ? '📥' : '📤';
+                const estado = m.estado ? ` (${m.estado})` : '';
+                return `<div class="list-item"><div><b>${icon} ${m.p}${estado}</b><br><span style="font-size:10px;color:#666">${m.cant.toFixed(2)} | ${m.f} ${m.h}</span></div></div>`;
+            }).join('');
+        }
+
+        function filtroMov(f) {
+            filtroMov2 = f;
+            document.querySelectorAll('.filter-buttons .filter-btn').forEach(e => e.classList.remove('active'));
+            event.target.classList.add('active');
+            historial();
+        }
+
+        function listaProductosAdmin() {
+            const lista = filtroAdminProd === '' ? prod : prod.filter(p => p.n.toLowerCase().includes(filtroAdminProd.toLowerCase()));
+            document.getElementById('lista-prod-admin').innerHTML = lista.map(p => {
+                let info = `${p.cant.toFixed(2)} ${p.u}`;
+                return `<div class="product-item-admin">
+                    <div><b>${p.n}</b><br><span style="font-size:9px;color:#666">${p.c} | ${info}</span></div>
+                    <div style="display:flex;gap:4px">
+                        <button class="btn-edit" onclick="editarProducto(${p.id})">✏️ Editar</button>
+                        <button class="btn-xs" onclick="eliminarProducto(${p.id})">❌ Eliminar</button>
+                    </div>
+                </div>`;
+            }).join('') || '<p style="padding:10px;color:#999">Sin productos</p>';
+        }
+
+        function buscarAdmin(t) {
+            filtroAdminProd = t;
+            listaProductosAdmin();
+        }
+
+        function editarProducto(id) {
+            const p = prod.find(x => x.id === id);
+            if (!p) {
+                alerta('❌ Producto no encontrado', 'error');
+                return;
+            }
+            prodEditId = id;
+            document.getElementById('edit-prod-name').value = p.n;
+            document.getElementById('edit-prod-cant').value = p.cant;
+            document.getElementById('edit-prod-unit').value = p.u;
+            document.getElementById('edit-prod-min').value = p.min;
+            
+            const optsCat = cat.map(c => `<option ${c === p.c ? 'selected' : ''}>${c}</option>`).join('');
+            document.getElementById('edit-prod-cat').innerHTML = '<option>--</option>' + optsCat;
+            
+            document.getElementById('modal-editar').classList.add('active');
+        }
+
+        function guardarEdicion() {
+            const n = document.getElementById('edit-prod-name').value.trim();
+            const c = document.getElementById('edit-prod-cat').value;
+            const cant = parseFloat(document.getElementById('edit-prod-cant').value) || 0;
+            const u = document.getElementById('edit-prod-unit').value.trim() || 'kg';
+            const min = parseFloat(document.getElementById('edit-prod-min').value) || 0;
+            
+            if (!n || !c || c === '--') {
+                alerta('⚠️ Completa todos los campos', 'error');
+                return;
+            }
+            
+            const p = prod.find(x => x.id === prodEditId);
+            if (p) {
+                p.n = n;
+                p.c = c;
+                p.cant = cant;
+                p.u = u;
+                p.min = min;
+                save();
+                cerrarModalEdit();
+                actualizar();
+                alerta('✅ Producto actualizado', 'success');
+            }
+        }
+
+        function cerrarModalEdit() {
+            document.getElementById('modal-editar').classList.remove('active');
+            prodEditId = -1;
         }
 
         function addProv() {
             const n = document.getElementById('new-prov').value.trim();
-            if (!n || prov.includes(n)) { alerta('❌ Error', 'error'); return; }
+            if (!n) {
+                alerta('⚠️ Escribe el nombre', 'error');
+                return;
+            }
+            if (prov.includes(n)) {
+                alerta('❌ Proveedor duplicado', 'error');
+                return;
+            }
             prov.push(n);
             save();
             document.getElementById('new-prov').value = '';
-            actualizar();
-            alerta('✅ Agregado', 'success');
+            listaProveedores();
+            alerta('✅ Proveedor agregado', 'success');
         }
 
-        function addCat() {
-            const n = document.getElementById('new-cat').value.trim();
-            if (!n || cat.includes(n)) { alerta('❌ Error', 'error'); return; }
-            cat.push(n);
-            save();
-            document.getElementById('new-cat').value = '';
-            actualizar();
-            alerta('✅ Agregado', 'success');
+        function delProv(i) {
+            if (confirm('¿Eliminar?')) {
+                prov.splice(i, 1);
+                save();
+                listaProveedores();
+                actualizar();
+            }
         }
 
-        function addProd() {
+        function listaProveedores() {
+            document.getElementById('lista-prov').innerHTML = prov.length === 0 ? '<p style="color:#999;font-size:10px">Sin proveedores</p>' : 
+                prov.map((p, i) => `<div class="list-item"><span>${p}</span><button class="btn-xs" onclick="delProv(${i})">❌</button></div>`).join('');
+        }
+
+        function eliminarProducto(id) {
+            const p = prod.find(x => x.id === id);
+            const movAsociados = mov.filter(m => m.p === p.n).length;
+            let msg = `¿Eliminar "${p.n}"?`;
+            if (movAsociados > 0) msg += `\n\n⚠️ ${movAsociados} movimiento(s)`;
+            if (confirm(msg)) {
+                mov = mov.filter(m => m.p !== p.n);
+                prod = prod.filter(x => x.id !== id);
+                save();
+                actualizar();
+                alerta('✅ Eliminado', 'success');
+            }
+        }
+
+        function addProducto() {
             const n = document.getElementById('new-prod-name').value.trim();
             const c = document.getElementById('new-prod-cat').value;
-            const m = parseFloat(document.getElementById('new-prod-min').value) || 0;
-            if (!n || !c) { alerta('⚠️ Completa', 'error'); return; }
-            prod.push({id: id++, n, c, cr: 0, co: 0, u: 'kg', min: m});
+            const cant = parseFloat(document.getElementById('new-prod-cant').value) || 0;
+            const unit = document.getElementById('new-prod-unit').value.trim() || 'kg';
+            const min = parseFloat(document.getElementById('new-prod-min').value) || 0;
+            if (!n || !c || c === '--') {
+                alerta('⚠️ Completa todos', 'error');
+                return;
+            }
+            if (prod.find(p => p.n.toLowerCase() === n.toLowerCase())) {
+                alerta('❌ Duplicado', 'error');
+                return;
+            }
+            const id = Math.max(...prod.map(p => p.id), 0) + 1;
+            prod.push({id, n, c, cant, u: unit, min});
             save();
             document.getElementById('new-prod-name').value = '';
+            document.getElementById('new-prod-cat').value = '';
+            document.getElementById('new-prod-cant').value = '';
+            document.getElementById('new-prod-unit').value = 'kg';
             document.getElementById('new-prod-min').value = '';
             actualizar();
-            alerta('✅ Producto agregado', 'success');
+            alerta('✅ Agregado', 'success');
         }
 
-        function delResp(r) { if (confirm(`¿Eliminar "${r}"?`)) { resp = resp.filter(x => x !== r); save(); actualizar(); } }
-        function delProv(p) { if (confirm(`¿Eliminar "${p}"?`)) { prov = prov.filter(x => x !== p); save(); actualizar(); } }
-        function delCat(c) { if (confirm(`¿Eliminar "${c}"?`)) { cat = cat.filter(x => x !== c); prod = prod.filter(p => p.c !== c); save(); actualizar(); } }
-        function delProd(pid) { if (confirm('¿Eliminar?')) { prod = prod.filter(p => p.id !== pid); save(); actualizar(); } }
+        function actualizarFormAdmin() {
+            const cat = document.getElementById('new-prod-cat').value;
+            const container = document.getElementById('new-prod-cantidad-container');
+            container.innerHTML = `<div class="form-group"><label>Cantidad Inicial</label><input type="number" id="new-prod-cant" step="0.01" placeholder="0.00"></div>`;
+        }
 
-        function descargar() {
-            const json = JSON.stringify({resp, prov, cat, prod, mov, user, id}, null, 2);
+        function addCategoria() {
+            const emoji = document.getElementById('new-cat-emoji').value.trim();
+            const name = document.getElementById('new-cat-name').value.trim();
+            if (!emoji || !name) {
+                alerta('⚠️ Completa campos', 'error');
+                return;
+            }
+            const newCat = emoji + ' ' + name;
+            if (cat.includes(newCat)) {
+                alerta('❌ Duplicada', 'error');
+                return;
+            }
+            cat.push(newCat);
+            save();
+            document.getElementById('new-cat-emoji').value = '';
+            document.getElementById('new-cat-name').value = '';
+            actualizar();
+            alerta('✅ Categoría agregada', 'success');
+        }
+
+        function addResp() {
+            const n = document.getElementById('new-resp').value.trim();
+            if (!n || resp.includes(n)) {
+                alerta('❌ Duplicado o vacío', 'error');
+                return;
+            }
+            resp.push(n);
+            save();
+            document.getElementById('new-resp').value = '';
+            actualizar();
+            alerta('✅ Responsable agregado', 'success');
+        }
+
+        function descargarJSON() {
+            const json = JSON.stringify({resp, prov, prod, cat, mov}, null, 2);
             const blob = new Blob([json], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `inv_${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `inventario_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             alerta('✅ Descargado', 'success');
         }
 
-        function cargar() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'application/json';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    try {
-                        const x = JSON.parse(ev.target.result);
-                        resp = x.resp; prov = x.prov; cat = x.cat; prod = x.prod; mov = x.mov; user = x.user; id = x.id;
-                        save();
-                        actualizar();
-                        alerta('✅ Cargado', 'success');
-                    } catch { alerta('❌ JSON inválido', 'error'); }
-                };
-                reader.readAsText(file);
-            };
-            input.click();
+        function abrirModalCargar() {
+            document.getElementById('modal-cargar').classList.add('active');
         }
 
         function cargarJSON() {
             const j = document.getElementById('json-txt').value.trim();
-            if (!j) { alerta('⚠️ Pega JSON', 'error'); return; }
+            if (!j) {
+                alerta('⚠️ Pega JSON', 'error');
+                return;
+            }
             try {
                 const x = JSON.parse(j);
-                resp = x.resp; prov = x.prov; cat = x.cat; prod = x.prod; mov = x.mov; user = x.user; id = x.id;
-                save();
-                document.getElementById('json-txt').value = '';
-                actualizar();
-                alerta('✅ Cargado', 'success');
-            } catch { alerta('❌ JSON inválido', 'error'); }
+                const idExist = new Set(mov.map(m => m.id));
+                const nuevos = (x.mov || []).filter(m => !idExist.has(m.id));
+                if (nuevos.length > 0) {
+                    nuevos.forEach(nm => {
+                        const p = prod.find(xp => xp.n === nm.p);
+                        if (p) {
+                            if (nm.t === 'ent') p.cant += nm.cant;
+                            else p.cant -= nm.cant;
+                            if (p.cant < 0) p.cant = 0;
+                        }
+                        mov.push(nm);
+                    });
+                    save();
+                    document.getElementById('json-txt').value = '';
+                    cerrarModal();
+                    actualizar();
+                    alerta(`✅ ${nuevos.length} movimientos cargados`, 'success');
+                } else {
+                    alerta('⚠️ Sin movimientos nuevos', 'error');
+                }
+            } catch(e) {
+                alerta('❌ JSON inválido', 'error');
+            }
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-cargar').classList.remove('active');
+        }
+
+        function conteo() {
+            document.getElementById('mov').textContent = mov.filter(m => m.f === '2025-11-28').length;
         }
 
         function alerta(m, t) {
             const d = document.getElementById('alerta');
             d.innerHTML = `<div class="alert ${t}">${m}</div>`;
-            setTimeout(() => d.innerHTML = '', 3000);
+            setTimeout(() => d.innerHTML = '', 4000);
         }
 
-        window.addEventListener('load', init);
+        function sincronizarGoogleSheets() {
+            if (rol !== 'dueno') {
+                alerta('❌ Solo el Dueño puede sincronizar', 'error');
+                return;
+            }
+
+            alerta('⏳ Generando archivo...', 'success');
+
+            try {
+                // ===== GENERAR DATOS PARA PRODUCTOS =====
+                let productosTab = 'Producto\tCategoría\tSaldo Crudo\tSaldo Cocido\tTotal\tUnidad\tMínimo\n';
+                prod.forEach(p => {
+                    productosTab += `${p.n}\t${p.c}\t${p.cant}\t0\t${p.cant}\t${p.u}\t${p.min}\n`;
+                });
+
+                // ===== GENERAR DATOS PARA MOVIMIENTOS =====
+                let movimientosTab = 'Fecha\tHora\tTipo\tCantidad Crudo\tCantidad Cocido\tDestino/Origen\tProducto\tEstado\tResponsable\tCosto\tProveedor\n';
+                mov.forEach(m => {
+                    const cantCrudo = m.estado === 'cocido' ? 0 : m.cant;
+                    const cantCocido = m.estado === 'cocido' ? m.cant : 0;
+                    movimientosTab += `${m.f}\t${m.h}\t${m.t}\t${cantCrudo}\t${cantCocido}\t${m.dest || m.prov || 'compra'}\t${m.p}\t${m.estado || ''}\t${m.resp}\t${m.costo || 0}\t${m.prov || ''}\n`;
+                });
+
+                // ===== CREAR ARCHIVO DESCARGABLE =====
+                // Opción 1: Descargar como TSV (abre en Excel perfectamente)
+                const contenidoProductos = new Blob([productosTab], {type: 'text/tab-separated-values;charset=utf-8'});
+                const linkProductos = document.createElement('a');
+                linkProductos.href = URL.createObjectURL(contenidoProductos);
+                linkProductos.download = `El_Rincon_Productos_${new Date().toISOString().split('T')[0]}.tsv`;
+                linkProductos.click();
+
+                // Pequeña pausa antes de descargar el segundo archivo
+                setTimeout(() => {
+                    const contenidoMovimientos = new Blob([movimientosTab], {type: 'text/tab-separated-values;charset=utf-8'});
+                    const linkMovimientos = document.createElement('a');
+                    linkMovimientos.href = URL.createObjectURL(contenidoMovimientos);
+                    linkMovimientos.download = `El_Rincon_Movimientos_${new Date().toISOString().split('T')[0]}.tsv`;
+                    linkMovimientos.click();
+                }, 500);
+
+                alerta(`✅ ¡¡ARCHIVOS DESCARGADOS!!\n\n📁 Archivo 1: Productos (${prod.length})\n📁 Archivo 2: Movimientos (${mov.length})\n\n📌 INSTRUCCIONES PARA EL DUEÑO:\n1. Abre "El_Rincon_Productos_...tsv" en Excel\n2. Selecciona TODO (Ctrl+A)\n3. Copia (Ctrl+C)\n4. Google Sheets → Pestaña "Productos" → Celda C2\n5. Pega especial → Valores\n6. Repite para Movimientos`, 'success');
+            } catch(error) {
+                alerta(`❌ Error: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        window.addEventListener('load', () => {
+            init();
+            actualizar();
+            alerta('✅ Sistema listo', 'success');
+            
+            // Arreglo para móvil: Agregar event listeners a botones de rol
+            setTimeout(() => {
+                const botones = document.querySelectorAll('button.rol-btn');
+                botones.forEach(btn => {
+                    btn.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const attrs = this.getAttribute('onclick');
+                        const match = attrs.match(/'([^']+)'/);
+                        if (match && match[1]) {
+                            selRol(match[1]);
+                        }
+                        return false;
+                    };
+                });
+            }, 50);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.id.includes('prod-') && !e.target.id.includes('lista-')) {
+                document.getElementById('lista-prod-ent').style.display = 'none';
+                document.getElementById('lista-prod-sal').style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
