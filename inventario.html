@@ -539,15 +539,30 @@
             }
             const producto = prod.find(x => x.id === prodSalId);
             const est = document.getElementById('est-sal') ? document.getElementById('est-sal').value : '';
+            
             let stockDisponible = producto.cant;
+            
+            // Si es carne Y tiene crudo/cocido inicializados, usar esos
             if (esCarne(producto.c)) {
-                stockDisponible = (producto.cant_crudo || 0) + (producto.cant_cocido || 0);
+                const crudo = producto.cant_crudo || 0;
+                const cocido = producto.cant_cocido || 0;
+                const totalCrudoCocido = crudo + cocido;
+                
+                // Si tiene dato de crudo/cocido, usar eso. Si no, usar cant normal
+                if (totalCrudoCocido > 0) {
+                    stockDisponible = totalCrudoCocido;
+                } else {
+                    stockDisponible = producto.cant;
+                }
             }
+            
             if (cant > stockDisponible) {
-                alerta(`⚠️ Stock: ${stockDisponible.toFixed(2)}`, 'error');
+                alerta(`⚠️ Stock disponible: ${stockDisponible.toFixed(2)}`, 'error');
                 return;
             }
-            if (esCarne(producto.c) && est) {
+            
+            if (esCarne(producto.c) && est && ((producto.cant_crudo || 0) > 0 || (producto.cant_cocido || 0) > 0)) {
+                // Si está separado por crudo/cocido, restar de ese campo
                 if (est === 'crudo') {
                     producto.cant_crudo = (producto.cant_crudo || 0) - cant;
                     if (producto.cant_crudo < 0) producto.cant_crudo = 0;
@@ -556,8 +571,10 @@
                     if (producto.cant_cocido < 0) producto.cant_cocido = 0;
                 }
             } else {
+                // Si no está separado, restar del campo cant normal
                 producto.cant -= cant;
             }
+            
             mov.push({id: `mov_${Date.now()}`, f: new Date().toISOString().split('T')[0], h: new Date().toTimeString().slice(0,5), t: 'sal', cant, p: producto.n, resp: r, dest: d, estado: est});
             save();
             document.getElementById('resp-sal').value = '';
