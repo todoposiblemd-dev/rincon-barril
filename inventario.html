@@ -451,7 +451,7 @@
             
             mov.push({
                 id: `mov_${Date.now()}`, 
-                f: '2025-11-28', 
+                f: new Date().toISOString().split('T')[0],
                 h: new Date().toTimeString().slice(0,5), 
                 t: 'ent', 
                 cant, 
@@ -558,7 +558,7 @@
             } else {
                 producto.cant -= cant;
             }
-            mov.push({id: `mov_${Date.now()}`, f: '2025-11-28', h: new Date().toTimeString().slice(0,5), t: 'sal', cant, p: producto.n, resp: r, dest: d, estado: est});
+            mov.push({id: `mov_${Date.now()}`, f: new Date().toISOString().split('T')[0], h: new Date().toTimeString().slice(0,5), t: 'sal', cant, p: producto.n, resp: r, dest: d, estado: est});
             save();
             document.getElementById('resp-sal').value = '';
             document.getElementById('dest-sal').value = '';
@@ -844,7 +844,8 @@
         }
 
         function conteo() {
-            document.getElementById('mov').textContent = mov.filter(m => m.f === '2025-11-28').length;
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('mov').textContent = mov.filter(m => m.f === hoy).length;
         }
 
         function alerta(m, t) {
