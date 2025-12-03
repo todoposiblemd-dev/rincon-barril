@@ -96,6 +96,12 @@
 
             <!-- ADMIN -->
             <div id="admin" class="tab-content">
+                <div class="admin-section" style="background:#fff3cd;border-color:#ffc107;">
+                    <h4 style="color:#856404;">⚠️ ALERTAS DE LÍMITES SUPERADOS</h4>
+                    <p style="font-size:11px;color:#666;margin-bottom:12px">Compras que superaron el límite permitido:</p>
+                    <div id="lista-alertas-limites" style="max-height:200px;overflow-y:auto;"></div>
+                </div>
+
                 <div class="admin-section">
                     <h4>➕ Agregar Producto</h4>
                     <div class="form-group"><label>Nombre</label><input type="text" id="new-prod-name" placeholder="Ej: Leche"></div>
@@ -313,6 +319,7 @@
             salidas();
             historial();
             conteo();
+            mostrarAlertasLimites();
         }
 
         function saldos() {
@@ -855,6 +862,44 @@
             } catch(error) {
                 alerta(`❌ Error: ${error.message}`, 'error');
                 console.error(error);
+            }
+        }
+
+        function mostrarAlertasLimites() {
+            const alertas = mov.filter(m => m.supera_limite === 'SÍ' && m.t === 'ent').reverse();
+            const div = document.getElementById('lista-alertas-limites');
+            
+            if (!div) return;
+            
+            if (alertas.length === 0) {
+                div.innerHTML = '<p style="color:#666;font-size:11px;text-align:center;padding:10px">✅ Sin alertas</p>';
+                return;
+            }
+            
+            div.innerHTML = alertas.map(m => {
+                const nombreRol = {bodega: '📦 BODEGA', cocinero: '👨‍🍳 COCINERO', caja: '💰 CAJA', bar: '🍺 BAR', dueno: '📊 DUEÑO'}[m.resp] || m.resp;
+                const diferencia = m.costo - (m.rol_limite || 999999999);
+                return `<div class="list-item" style="background:#ffebee;border-left-color:#d32f2f;margin-bottom:8px">
+                    <div style="flex:1">
+                        <b style="color:#d32f2f">${m.p}</b><br>
+                        <span style="font-size:10px;color:#666">
+                            ${nombreRol} | $${m.costo.toLocaleString('es-CO')} | ${m.fecha_completa || m.f + ' ' + m.h}
+                        </span><br>
+                        <span style="font-size:9px;color:#d32f2f">
+                            ⚠️ Superó por: $${diferencia.toLocaleString('es-CO')} (Límite: $${(m.rol_limite || 0).toLocaleString('es-CO')})
+                        </span>
+                    </div>
+                    <button class="btn-xs" onclick="eliminarMovimiento('${m.id}')">🗑️ Eliminar</button>
+                </div>`;
+            }).join('');
+        }
+
+        function eliminarMovimiento(movId) {
+            if (confirm('¿Eliminar este movimiento?')) {
+                mov = mov.filter(m => m.id !== movId);
+                save();
+                actualizar();
+                alerta('✅ Movimiento eliminado', 'success');
             }
         }
 
