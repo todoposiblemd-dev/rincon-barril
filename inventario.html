@@ -232,7 +232,7 @@
         let prodEntId = -1;
         let prodSalId = -1;
         let prodEditId = -1;
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbypzlwCrBv8bcnuHx6ynp35q7ToctRytu382EaPrRhIUBZt17HTEeubasR1b7Mk1hPTZA/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4NzAL9uKOl2JIldyeWyz6QKG1GF7pnkkm13lQis68FplialEHIybBJRNVEEKRlciySw/exec';
         
         let limites = {
             'bodega': 300000,
@@ -376,15 +376,32 @@
 
         function selProdEnt(id) {
             const p = prod.find(x => x.id === id);
+            if (!p) {
+                alerta('❌ Producto no encontrado', 'error');
+                return;
+            }
             document.getElementById('prod-ent-search').value = p.n;
             document.getElementById('lista-prod-ent').style.display = 'none';
             prodEntId = id;
             const c = document.getElementById('cant-ent-container');
-            let html = `<div class="form-group"><label>Cantidad</label><input type="number" id="cant-ent" step="0.01" placeholder="0.00"></div>`;
+            
+            let html = `<div class="form-group">
+                <label>Cantidad</label>
+                <input type="number" id="cant-ent" step="0.01" placeholder="0.00" oninput="calcularCostoUnitario()">
+            </div>`;
+            
             if (esCarne(p.c)) {
-                html += `<div class="form-group"><label>Estado</label><select id="est-ent"><option value="crudo">Crudo</option><option value="cocido">Cocido</option></select></div>`;
+                html += `<div class="form-group">
+                    <label>Estado</label>
+                    <select id="est-ent" oninput="calcularCostoUnitario()">
+                        <option value="crudo">🔴 Crudo</option>
+                        <option value="cocido">🟠 Cocido</option>
+                    </select>
+                </div>`;
             }
+            
             c.innerHTML = html;
+            console.log('Producto seleccionado:', p.n, 'Es carne:', esCarne(p.c));
         }
 
         function calcularCostoUnitario() {
@@ -484,15 +501,32 @@
 
         function selProdSal(id) {
             const p = prod.find(x => x.id === id);
+            if (!p) {
+                alerta('❌ Producto no encontrado', 'error');
+                return;
+            }
             document.getElementById('prod-sal-search').value = p.n;
             document.getElementById('lista-prod-sal').style.display = 'none';
             prodSalId = id;
             const c = document.getElementById('cant-sal-container');
-            let html = `<div class="form-group"><label>Cantidad</label><input type="number" id="cant-sal" step="0.01" placeholder="0.00"></div>`;
+            
+            let html = `<div class="form-group">
+                <label>Cantidad</label>
+                <input type="number" id="cant-sal" step="0.01" placeholder="0.00">
+            </div>`;
+            
             if (esCarne(p.c)) {
-                html += `<div class="form-group"><label>Estado</label><select id="est-sal"><option value="crudo">Crudo</option><option value="cocido">Cocido</option></select></div>`;
+                html += `<div class="form-group">
+                    <label>Estado</label>
+                    <select id="est-sal">
+                        <option value="crudo">🔴 Crudo</option>
+                        <option value="cocido">🟠 Cocido</option>
+                    </select>
+                </div>`;
             }
+            
             c.innerHTML = html;
+            console.log('Producto seleccionado (Salida):', p.n, 'Es carne:', esCarne(p.c));
         }
 
         function salir() {
