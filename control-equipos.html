@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Equipos - El Rincón del Barril</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #8B0000 0%, #C41E3A 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8B0000 0%, #C41E3A 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 { font-size: 28px; margin-bottom: 5px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            min-width: 100px;
+        }
+
+        .tab-button:hover { background: #e8e8e8; }
+        .tab-button.active {
+            background: white;
+            color: #8B0000;
+            border-bottom: 3px solid #8B0000;
+        }
+
+        .content {
+            padding: 25px;
+            max-height: 850px;
+            overflow-y: auto;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #8B0000;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: #8B0000;
+            color: white;
+            font-weight: 600;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tbody tr:hover { background: #f9f9f9; }
+
+        input, select, textarea {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        input[type="number"] {
+            width: 100%;
+        }
+
+        button {
+            background: linear-gradient(135deg, #8B0000 0%, #C41E3A 100%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: transform 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover { transform: translateY(-2px); }
+
+        .btn-small {
+            width: auto;
+            padding: 8px 14px;
+            font-size: 12px;
+            margin-top: 0;
+            margin-right: 5px;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            width: auto;
+            padding: 6px 10px;
+            margin: 0;
+            font-size: 12px;
+        }
+
+        .btn-success {
+            background: #28a745;
+            width: auto;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .estado-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        .estado-funcionando {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .estado-mantenimiento {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .estado-critico {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .critical-box {
+            background: #ffe7e7;
+            border-left: 4px solid #ff3333;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        /* MODO CONTEO RÁPIDO */
+        .conteo-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .conteo-nombre {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .conteo-anterior {
+            font-size: 12px;
+            color: #999;
+            background: #f5f5f5;
+            padding: 6px;
+            border-radius: 4px;
+        }
+
+        .conteo-input {
+            border: 2px solid #8B0000;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .conteo-diferencia {
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .diff-zero {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .diff-positive {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .diff-negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .conteo-area-header {
+            background: #f0f0f0;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 14px;
+            border-left: 4px solid #8B0000;
+        }
+
+        .contador-procreso {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .historial-conteo {
+            background: #f9f9f9;
+            border-left: 3px solid #8B0000;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .json-display {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 300px;
+            overflow-y: auto;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 768px) {
+            .form-row { grid-template-columns: 1fr; }
+            .form-row-3 { grid-template-columns: 1fr; }
+            .conteo-item { grid-template-columns: 1fr; }
+            .tab-button { min-width: 80px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Control de Equipos - El Rincón del Barril</h1>
+            <p>Sistema Multi-dispositivo con Conteos Simultáneos | v2.0</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="cambiarTab('conteorapido')">⚡ Conteo Rápido</button>
+            <button class="tab-button" onclick="cambiarTab('inventario')">📦 Inventario</button>
+            <button class="tab-button" onclick="cambiarTab('comparacion')">🔍 Comparación</button>
+            <button class="tab-button" onclick="cambiarTab('historial')">📜 Historial</button>
+            <button class="tab-button" onclick="cambiarTab('sincronia')">☁️ Sincronización</button>
+            <button class="tab-button" onclick="cambiarTab('admin')">⚙️ Admin</button>
+        </div>
+
+        <div class="content">
+
+            <!-- CONTEO RÁPIDO -->
+            <div id="conteorapido" class="tab-content active">
+                <div class="section-title">⚡ Modo Conteo Rápido</div>
+                <div id="mensajeConteo" class="message"></div>
+
+                <div class="info-box">
+                    <strong>💡 Cómo usar:</strong> Ingresa la cantidad en cada equipo. El sistema calcula automáticamente la diferencia con el conteo anterior.
+                </div>
+
+                <div class="form-group">
+                    <label for="filtroAreaConteo">Filtrar por Área:</label>
+                    <select id="filtroAreaConteo" onchange="mostrarConteoRapido()">
+                        <option value="">-- Todas las áreas --</option>
+                        <option value="EQUIPOS">EQUIPOS</option>
+                        <option value="BARRA">BARRA</option>
+                        <option value="COCINA">COCINA</option>
+                        <option value="SERVICIO">SERVICIO</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="numeroConteo">Número de Conteo:</label>
+                        <input type="number" id="numeroConteo" placeholder="1, 2, 3, 4..." min="1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="responsableConteo">Responsable del Conteo:</label>
+                        <select id="responsableConteo">
+                            <option value="">-- Seleccionar --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="contador-procreso">
+                    <span id="conteoProgreso">Equipos procesados: 0 / 0</span>
+                </div>
+
+                <div id="listadoConteoRapido" style="margin-top: 20px;"></div>
+
+                <button onclick="guardarConteoRapido()" style="margin-top: 20px; background: #28a745;">💾 Guardar Conteo Completo</button>
+            </div>
+
+            <!-- INVENTARIO -->
+            <div id="inventario" class="tab-content">
+                <div class="section-title">📦 Inventario General</div>
+                <div id="mensajeInventario" class="message"></div>
+
+                <input type="text" id="buscarEquipo" placeholder="🔍 Buscar equipo..." onkeyup="filtrarTabla('cuerpoTabla')" style="width: 100%; margin-bottom: 15px; padding: 10px;">
+
+                <div class="form-group">
+                    <label for="filtroAreaInventario">Filtrar por Área:</label>
+                    <select id="filtroAreaInventario" onchange="actualizarTablaInventario()">
+                        <option value="">Todas las áreas</option>
+                        <option value="EQUIPOS">EQUIPOS</option>
+                        <option value="BARRA">BARRA</option>
+                        <option value="COCINA">COCINA</option>
+                        <option value="SERVICIO">SERVICIO</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Equipo</th>
+                                <th>Área</th>
+                                <th>Último Conteo</th>
+                                <th>Mínimo</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpoTabla"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- COMPARACIÓN -->
+            <div id="comparacion" class="tab-content">
+                <div class="section-title">🔍 Comparación de Conteos</div>
+                <div id="mensajeComparacion" class="message"></div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="conteo1Comparacion">Conteo 1:</label>
+                        <select id="conteo1Comparacion" onchange="actualizarComparacion()">
+                            <option value="1">Conteo 1 (Original)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="conteo2Comparacion">Conteo 2:</label>
+                        <select id="conteo2Comparacion" onchange="actualizarComparacion()">
+                            <option value="2">Conteo 2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Equipo</th>
+                                <th>Conteo 1</th>
+                                <th>Conteo 2</th>
+                                <th>Diferencia</th>
+                                <th>% Variación</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaComparacion"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- HISTORIAL -->
+            <div id="historial" class="tab-content">
+                <div class="section-title">📜 Historial de Conteos</div>
+                <div id="mensajeHistorial" class="message"></div>
+
+                <div id="listaHistorial"></div>
+            </div>
+
+            <!-- SINCRONIZACIÓN JSON -->
+            <div id="sincronia" class="tab-content">
+                <div class="section-title">☁️ Sincronización JSON</div>
+                <div id="mensajeSincro" class="message"></div>
+
+                <div class="info-box">
+                    <strong>📱 Múltiples dispositivos:</strong> Exporta JSON desde cada dispositivo → El dueño importa todos en uno → Descarga JSON final para Google Sheets
+                </div>
+
+                <h3 style="color: #333; margin: 20px 0 15px 0;">1️⃣ Exportar Datos (Para compartir)</h3>
+                <p style="font-size: 13px; color: #666; margin-bottom: 10px;">Copia este JSON y envíalo al dueño por WhatsApp</p>
+                <div class="form-group">
+                    <textarea id="jsonExport" readonly style="height: 200px; font-family: monospace; font-size: 11px;"></textarea>
+                    <button onclick="copiarAlPortapapeles('jsonExport')" class="btn-small">📋 Copiar al Portapapeles</button>
+                </div>
+
+                <h3 style="color: #333; margin: 20px 0 15px 0;">2️⃣ Importar Datos (Sincronizar múltiples dispositivos)</h3>
+                <p style="font-size: 13px; color: #666; margin-bottom: 10px;">Pega el JSON de otros dispositivos aquí</p>
+                <div class="form-group">
+                    <textarea id="jsonImport" placeholder="Pega el JSON aquí..." style="height: 200px; font-family: monospace; font-size: 11px;"></textarea>
+                    <button onclick="importarJSON()">📥 Importar y Sincronizar</button>
+                </div>
+
+                <h3 style="color: #333; margin: 20px 0 15px 0;">3️⃣ Descargar para Google Sheets</h3>
+                <p style="font-size: 13px; color: #666; margin-bottom: 10px;">Descarga JSON final para actualizar Google Sheets</p>
+                <button onclick="descargarJSON()" class="btn-small" style="width: 100%; background: #28a745;">📊 Descargar JSON Final</button>
+
+                <h3 style="color: #333; margin: 20px 0 15px 0;">4️⃣ Vista Previa de Datos</h3>
+                <div id="previewJSON" class="json-display">Aquí aparecerá la vista previa...</div>
+            </div>
+
+            <!-- ADMINISTRACIÓN -->
+            <div id="admin" class="tab-content">
+                <div class="section-title">⚙️ Administración</div>
+                <div id="mensajeAdmin" class="message"></div>
+
+                <h3 style="color: #333; margin-bottom: 15px;">👥 Gestionar Responsables</h3>
+                <div class="form-group">
+                    <input type="text" id="nuevoResponsable" placeholder="Nombre del responsable...">
+                    <button onclick="agregarResponsable()" class="btn-small">➕ Agregar</button>
+                </div>
+                <div id="listaResponsables"></div>
+
+                <h3 style="color: #333; margin: 30px 0 15px 0; border-top: 2px solid #ddd; padding-top: 20px;">📦 Agregar Equipo</h3>
+                <div class="form-row-3">
+                    <input type="text" id="nombreEquipo" placeholder="Nombre">
+                    <select id="areaEquipo">
+                        <option value="">-- Área --</option>
+                        <option value="EQUIPOS">EQUIPOS</option>
+                        <option value="BARRA">BARRA</option>
+                        <option value="COCINA">COCINA</option>
+                        <option value="SERVICIO">SERVICIO</option>
+                    </select>
+                    <input type="number" id="minimoEquipo" placeholder="Mínimo" value="0" min="0">
+                </div>
+                <button onclick="agregarEquipo()" style="margin-top: 10px;">➕ Agregar Equipo</button>
+
+                <h3 style="color: #333; margin: 30px 0 15px 0; border-top: 2px solid #ddd; padding-top: 20px;">🔄 Restaurar Datos</h3>
+                <div class="critical-box">
+                    <strong>⚠️ Cuidado:</strong> Estas acciones no se pueden deshacer
+                </div>
+                <button onclick="resetearTodo()" style="background: #dc3545;">🗑️ Limpiar Todo (Excepto Historial)</button>
+                <button onclick="exportarTodoHistorial()" style="background: #6c757d; margin-top: 10px;">📥 Exportar Historial Completo</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const GOOGLE_SHEET_ID = '188DMKLi297XTqJSFi3N6SdMvRnxgfaF45CqUoSzlaIk';
+
+        let equipos = [
+            { Nombre: 'barriles', Área: 'EQUIPOS', Mínimo: 1, conteos: {1: 2} },
+            { Nombre: 'asadores', Área: 'EQUIPOS', Mínimo: 2, conteos: {1: 3} },
+            { Nombre: 'freidora', Área: 'EQUIPOS', Mínimo: 1, conteos: {1: 2} },
+            { Nombre: 'mesa metalica pequeña', Área: 'EQUIPOS', Mínimo: 0, conteos: {1: 1} },
+            { Nombre: 'estantes', Área: 'EQUIPOS', Mínimo: 0, conteos: {1: 3} },
+            { Nombre: 'formador de hamburguesas', Área: 'EQUIPOS', Mínimo: 0, conteos: {1: 1} },
+            { Nombre: 'picadora', Área: 'EQUIPOS', Mínimo: 0, conteos: {1: 1} },
+            { Nombre: 'Licuadora', Área: 'EQUIPOS', Mínimo: 1, conteos: {1: 2} },
+            { Nombre: 'vascula digital pequeña', Área: 'EQUIPOS', Mínimo: 0, conteos: {1: 1} },
+            { Nombre: 'vascula digital grande', Área: 'EQUIPOS', Mínimo: 1, conteos: {1: 2} },
+            { Nombre: 'vascula 150kg', Área: 'EQUIPOS', Mínimo: 0, conteos: {1: 1} },
+            { Nombre: 'Mesas plásticas', Área: 'EQUIPOS', Mínimo: 5, conteos: {1: 10} },
+            { Nombre: 'Mesa negra plástica', Área: 'EQUIPOS', Mínimo: 0, conteos: {1: 1} },
+            { Nombre: 'Mesa negra metal', Área: 'EQUIPOS', Mínimo: 0, conteos: {1: 2} },
+            { Nombre: 'Mesa pequeña', Área: 'EQUIPOS', Mínimo: 0, conteos: {1: 1} },
+            { Nombre: 'Sillas beis y rojas', Área: 'EQUIPOS', Mínimo: 10, conteos: {1: 36} },
+            { Nombre: 'Sillas negras', Área: 'EQUIPOS', Mínimo: 2, conteos: {1: 4} },
+            { Nombre: 'Medidor de onzas', Área: 'BARRA', Mínimo: 1, conteos: {1: 1} },
+            { Nombre: 'Vasos de vidrio', Área: 'BARRA', Mínimo: 10, conteos: {1: 38} },
+            { Nombre: 'Copas larga', Área: 'BARRA', Mínimo: 2, conteos: {1: 10} },
+            { Nombre: 'Copas redondas', Área: 'BARRA', Mínimo: 2, conteos: {1: 8} },
+            { Nombre: 'Exprimidor', Área: 'BARRA', Mínimo: 1, conteos: {1: 2} },
+            { Nombre: 'Cuchara coctelera', Área: 'BARRA', Mínimo: 1, conteos: {1: 1} },
+            { Nombre: 'Martillo de hielo', Área: 'BARRA', Mínimo: 1, conteos: {1: 1} },
+            { Nombre: 'Batidor', Área: 'BARRA', Mínimo: 1, conteos: {1: 1} },
+            { Nombre: 'Jarras', Área: 'BARRA', Mínimo: 2, conteos: {1: 5} },
+            { Nombre: 'Pala para hielo', Área: 'BARRA', Mínimo: 1, conteos: {1: 1} },
+            { Nombre: 'Termo grande agua', Área: 'BARRA', Mínimo: 1, conteos: {1: 1} },
+            { Nombre: 'Termo mediano hielo', Área: 'BARRA', Mínimo: 1, conteos: {1: 1} },
+            { Nombre: 'Pote azul agua', Área: 'BARRA', Mínimo: 1, conteos: {1: 1} },
+            { Nombre: 'Pote transparente', Área: 'BARRA', Mínimo: 1, conteos: {1: 1} },
+            { Nombre: 'Jarra grande', Área: 'BARRA', Mínimo: 1, conteos: {1: 1} },
+            { Nombre: 'Cucharas', Área: 'COCINA', Mínimo: 15, conteos: {1: 31} },
+            { Nombre: 'Tenedores', Área: 'COCINA', Mínimo: 15, conteos: {1: 29} },
+            { Nombre: 'Cuchillos', Área: 'COCINA', Mínimo: 15, conteos: {1: 37} },
+            { Nombre: 'colador de aluminio', Área: 'COCINA', Mínimo: 1, conteos: {1: 2} },
+            { Nombre: 'Bandeja', Área: 'COCINA', Mínimo: 1, conteos: {1: 2} },
+            { Nombre: 'Bandejas metalicas', Área: 'COCINA', Mínimo: 4, conteos: {1: 14} },
+            { Nombre: 'Platos planos', Área: 'COCINA', Mínimo: 8, conteos: {1: 16} },
+            { Nombre: 'Platos hondos grandes', Área: 'COCINA', Mínimo: 4, conteos: {1: 8} },
+            { Nombre: 'Platos de mute', Área: 'COCINA', Mínimo: 10, conteos: {1: 23} },
+            { Nombre: 'Plato negro plastico', Área: 'COCINA', Mínimo: 5, conteos: {1: 11} },
+            { Nombre: 'Plato negro de barro', Área: 'COCINA', Mínimo: 2, conteos: {1: 4} },
+            { Nombre: 'Salseros de aluminio', Área: 'COCINA', Mínimo: 30, conteos: {1: 77} },
+            { Nombre: 'Canasta grande', Área: 'COCINA', Mínimo: 1, conteos: {1: 3} },
+            { Nombre: 'Canasta pequeña', Área: 'COCINA', Mínimo: 4, conteos: {1: 8} },
+            { Nombre: 'Tablas', Área: 'COCINA', Mínimo: 10, conteos: {1: 18} },
+            { Nombre: 'Cucharas pequeñas', Área: 'COCINA', Mínimo: 10, conteos: {1: 18} },
+            { Nombre: 'Tarro salsa tomate', Área: 'SERVICIO', Mínimo: 5, conteos: {1: 12} },
+            { Nombre: 'Tarro salsa mostaza', Área: 'SERVICIO', Mínimo: 5, conteos: {1: 12} },
+            { Nombre: 'Servilleteros', Área: 'SERVICIO', Mínimo: 6, conteos: {1: 17} },
+            { Nombre: 'Cubiertero negro', Área: 'SERVICIO', Mínimo: 6, conteos: {1: 13} },
+            { Nombre: 'Cubiertero grande', Área: 'SERVICIO', Mínimo: 1, conteos: {1: 1} },
+            { Nombre: 'Saleros', Área: 'SERVICIO', Mínimo: 6, conteos: {1: 12} },
+            { Nombre: 'Palillos', Área: 'SERVICIO', Mínimo: 5, conteos: {1: 10} },
+            { Nombre: 'Picantes', Área: 'SERVICIO', Mínimo: 5, conteos: {1: 11} }
+        ];
+
+        let responsables = ['Oscar', 'Pedro', 'Juan', 'Carlos'];
+        let historialConteos = [];
+
+        // ========== FUNCIONES GENERALES ==========
+        function cambiarTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'conteorapido') mostrarConteoRapido();
+            if (tabName === 'inventario') actualizarTablaInventario();
+            if (tabName === 'comparacion') cargarSelectsComparacion();
+            if (tabName === 'historial') mostrarHistorial();
+            if (tabName === 'sincronia') actualizarJSONExport();
+        }
+
+        function mostrarMensaje(tab, texto, tipo) {
+            const div = document.getElementById(`mensaje${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+            if (div) {
+                div.textContent = texto;
+                div.className = `message ${tipo}`;
+                setTimeout(() => div.className = 'message', 4000);
+            }
+        }
+
+        function guardarEnLocal() {
+            localStorage.setItem('controlEquiposData', JSON.stringify({
+                equipos: equipos,
+                responsables: responsables,
+                historialConteos: historialConteos
+            }));
+        }
+
+        function cargarDelLocal() {
+            const data = localStorage.getItem('controlEquiposData');
+            if (data) {
+                const parsed = JSON.parse(data);
+                equipos = parsed.equipos;
+                responsables = parsed.responsables;
+                historialConteos = parsed.historialConteos || [];
+            }
+        }
+
+        // ========== CONTEO RÁPIDO ==========
+        function mostrarConteoRapido() {
+            const area = document.getElementById('filtroAreaConteo').value;
+            const numeroConteo = document.getElementById('numeroConteo').value;
+            let equiposFiltrados = area ? equipos.filter(e => e.Área === area) : equipos;
+
+            let html = '';
+            equiposFiltrados.forEach((eq, idx) => {
+                const anterior = eq.conteos[numeroConteo - 1] || 0;
+                const actual = eq.conteos[numeroConteo] || anterior;
+                const diff = actual - anterior;
+                let classDiff = 'diff-zero';
+                if (diff > 0) classDiff = 'diff-positive';
+                if (diff < 0) classDiff = 'diff-negative';
+
+                html += `
+                    <div class="conteo-item">
+                        <div>
+                            <div class="conteo-nombre">${eq.Nombre}</div>
+                            <div class="conteo-anterior">Anterior: ${anterior}</div>
+                        </div>
+                        <input type="number" class="conteo-input" id="conteo_${idx}" value="${actual}" onchange="calcularDiferencia(${idx}, ${numeroConteo}, ${anterior})">
+                        <div id="diff_${idx}" class="conteo-diferencia ${classDiff}">${diff > 0 ? '+' : ''}${diff}</div>
+                        <button class="btn-small" onclick="reportarDiferencia('${eq.Nombre}', ${idx})">📝 Reportar</button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('listadoConteoRapido').innerHTML = html;
+            document.getElementById('conteoProgreso').textContent = `Equipos procesados: 0 / ${equiposFiltrados.length}`;
+        }
+
+        function calcularDiferencia(idx, numeroConteo, anterior) {
+            const valor = parseInt(document.getElementById(`conteo_${idx}`).value) || anterior;
+            const diff = valor - anterior;
+            const elemento = document.getElementById(`diff_${idx}`);
+            
+            elemento.textContent = (diff > 0 ? '+' : '') + diff;
+            elemento.className = 'conteo-diferencia ';
+            if (diff > 0) elemento.className += 'diff-positive';
+            else if (diff < 0) elemento.className += 'diff-negative';
+            else elemento.className += 'diff-zero';
+        }
+
+        function guardarConteoRapido() {
+            const numeroConteo = parseInt(document.getElementById('numeroConteo').value);
+            const responsable = document.getElementById('responsableConteo').value;
+            const areaSeleccionada = document.getElementById('filtroAreaConteo').value;
+
+            if (!responsable) {
+                mostrarMensaje('conteorapido', '⚠️ Selecciona el responsable del conteo', 'error');
+                return;
+            }
+
+            if (numeroConteo < 1 || isNaN(numeroConteo)) {
+                mostrarMensaje('conteorapido', '⚠️ Número de conteo debe ser 1 o mayor', 'error');
+                return;
+            }
+
+            // Guardar datos de conteo
+            equipos.forEach((eq, idx) => {
+                const input = document.getElementById(`conteo_${idx}`);
+                if (input) {
+                    const valor = parseInt(input.value) || eq.conteos[numeroConteo - 1] || 0;
+                    eq.conteos[numeroConteo] = valor;
+                }
+            });
+
+            // Registrar en historial con más detalles
+            const areaFilter = document.getElementById('filtroAreaConteo').value;
+            historialConteos.push({
+                numeroConteo: numeroConteo,
+                fecha: new Date().toISOString().split('T')[0],
+                hora: new Date().toLocaleTimeString('es-CO'),
+                responsable: responsable,
+                area: areaFilter || 'Todas',
+                equiposProcesados: areaFilter 
+                    ? equipos.filter(e => e.Área === areaFilter).length 
+                    : equipos.length,
+                timestamp: new Date().toISOString()
+            });
+
+            guardarEnLocal();
+            mostrarMensaje('conteorapido', '✅ Conteo guardado correctamente', 'success');
+            
+            setTimeout(() => {
+                document.getElementById('numeroConteo').value = (numeroConteo + 1).toString();
+                document.getElementById('filtroAreaConteo').value = '';
+                document.getElementById('responsableConteo').value = '';
+                mostrarConteoRapido();
+            }, 1500);
+        }
+
+        function reportarDiferencia(nombre, idx) {
+            const valor = parseInt(document.getElementById(`conteo_${idx}`).value);
+            alert(`📝 Reportar ${nombre}: ${valor}\n\nIr a pestaña "Comparación" para ver detalles`);
+        }
+
+        // ========== INVENTARIO ==========
+        function actualizarTablaInventario() {
+            const area = document.getElementById('filtroAreaInventario').value;
+            let equiposFiltrados = area ? equipos.filter(e => e.Área === area) : equipos;
+
+            const tbody = document.getElementById('cuerpoTabla');
+            tbody.innerHTML = equiposFiltrados.map((eq, idx) => {
+                const numeroConteoMax = Math.max(...Object.keys(eq.conteos).map(Number));
+                const stock = eq.conteos[numeroConteoMax] || 0;
+                const estado = stock >= eq.Mínimo ? 'OK' : 'BAJO';
+                const colorEstado = estado === 'OK' ? 'estado-funcionando' : 'estado-mantenimiento';
+
+                return `
+                    <tr>
+                        <td><strong>${eq.Nombre}</strong></td>
+                        <td>${eq.Área}</td>
+                        <td><strong>${stock}</strong> (Conteo ${numeroConteoMax})</td>
+                        <td>${eq.Mínimo}</td>
+                        <td><span class="estado-badge ${colorEstado}">${estado}</span></td>
+                        <td>
+                            <button class="btn-small" onclick="editarEquipo('${eq.Nombre}')">✏️ Editar</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function editarEquipo(nombre) {
+            const eq = equipos.find(e => e.Nombre === nombre);
+            const numeroConteoMax = Math.max(...Object.keys(eq.conteos).map(Number));
+            const actual = eq.conteos[numeroConteoMax];
+            
+            const nuevo = prompt(`Stock actual (Conteo ${numeroConteoMax}): ${actual}\n\nNuevo valor:`, actual);
+            if (nuevo !== null && !isNaN(nuevo)) {
+                eq.conteos[numeroConteoMax] = parseInt(nuevo);
+                guardarEnLocal();
+                actualizarTablaInventario();
+                mostrarMensaje('inventario', '✅ Actualizado', 'success');
+            }
+        }
+
+        function filtrarTabla(idTabla) {
+            const busqueda = document.getElementById('buscarEquipo').value.toLowerCase();
+            document.querySelectorAll(`#${idTabla} tr`).forEach(fila => {
+                fila.style.display = fila.textContent.toLowerCase().includes(busqueda) ? '' : 'none';
+            });
+        }
+
+        // ========== COMPARACIÓN ==========
+        function cargarSelectsComparacion() {
+            const select1 = document.getElementById('conteo1Comparacion');
+            const select2 = document.getElementById('conteo2Comparacion');
+
+            // Mostrar conteos del 1 al 10 (aunque no existan)
+            const opciones = [];
+            for (let i = 1; i <= 10; i++) {
+                opciones.push(i);
+            }
+
+            select1.innerHTML = opciones.map(num => 
+                `<option value="${num}" ${num === 1 ? 'selected' : ''}>Conteo ${num}</option>`
+            ).join('');
+            
+            select2.innerHTML = opciones.map(num => 
+                `<option value="${num}" ${num === 2 ? 'selected' : ''}>Conteo ${num}</option>`
+            ).join('');
+
+            actualizarComparacion();
+        }
+
+        function actualizarComparacion() {
+            const c1 = parseInt(document.getElementById('conteo1Comparacion').value);
+            const c2 = parseInt(document.getElementById('conteo2Comparacion').value);
+
+            const tbody = document.getElementById('tablaComparacion');
+            tbody.innerHTML = equipos.map(eq => {
+                const val1 = eq.conteos[c1] || 0;
+                const val2 = eq.conteos[c2] || 0;
+                const diff = val2 - val1;
+                const porcentaje = val1 > 0 ? ((diff / val1) * 100).toFixed(1) : 0;
+                
+                let estado = '✅';
+                if (val2 < eq.Mínimo) estado = '⚠️ BAJO';
+                
+                let classDiff = 'diff-zero';
+                if (diff > 0) classDiff = 'diff-positive';
+                if (diff < 0) classDiff = 'diff-negative';
+
+                return `
+                    <tr>
+                        <td><strong>${eq.Nombre}</strong></td>
+                        <td>${val1}</td>
+                        <td>${val2}</td>
+                        <td class="${classDiff}" style="font-weight: 600;">${diff > 0 ? '+' : ''}${diff}</td>
+                        <td class="${classDiff}" style="font-weight: 600;">${porcentaje}%</td>
+                        <td>${estado}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ========== HISTORIAL ==========
+        function mostrarHistorial() {
+            const div = document.getElementById('listaHistorial');
+            
+            if (historialConteos.length === 0) {
+                div.innerHTML = '<p style="color: #999; font-size: 13px;">📭 No hay conteos registrados aún</p>';
+                return;
+            }
+            
+            div.innerHTML = historialConteos.reverse().map((h, idx) => {
+                const fechaFormato = new Date(h.fecha).toLocaleDateString('es-CO', 
+                    { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                
+                return `
+                    <div class="historial-conteo" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background: white;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <strong style="font-size: 14px; color: #8B0000;">📊 Conteo #${h.numeroConteo}</strong><br>
+                                <span style="color: #666; font-size: 12px;">
+                                    📅 ${fechaFormato}<br>
+                                    🕐 ${h.hora}
+                                </span>
+                            </div>
+                            <div>
+                                <strong style="font-size: 14px; color: #333;">👤 ${h.responsable}</strong><br>
+                                <span style="color: #666; font-size: 12px;">
+                                    📦 ${h.equiposProcesados} equipos contados<br>
+                                    🌍 Área: ${h.area || 'Todas'}
+                                </span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; font-size: 12px; color: #666;">
+                            ℹ️ Stock anterior registrado para ${h.equiposProcesados} equipos
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ========== SINCRONIZACIÓN JSON ==========
+        function actualizarJSONExport() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                dispositivo: `${navigator.userAgent.substring(0, 50)}...`,
+                equipos: equipos,
+                responsables: responsables,
+                historialConteos: historialConteos
+            };
+
+            const jsonText = JSON.stringify(data, null, 2);
+            document.getElementById('jsonExport').value = jsonText;
+            
+            // Preview
+            document.getElementById('previewJSON').textContent = `Total de equipos: ${equipos.length}\nConteos registrados: ${historialConteos.length}\nÚltima actualización: ${new Date().toLocaleString('es-CO')}`;
+        }
+
+        function copiarAlPortapapeles(elementId) {
+            const elemento = document.getElementById(elementId);
+            elemento.select();
+            document.execCommand('copy');
+            mostrarMensaje('sincronia', '✅ Copiado al portapapeles', 'success');
+        }
+
+        function importarJSON() {
+            const jsonText = document.getElementById('jsonImport').value.trim();
+            if (!jsonText) {
+                mostrarMensaje('sincronia', '⚠️ Pega un JSON válido', 'error');
+                return;
+            }
+
+            try {
+                const data = JSON.parse(jsonText);
+                
+                // Fusionar equipos
+                data.equipos.forEach(eqImportado => {
+                    const eqExistente = equipos.find(e => e.Nombre === eqImportado.Nombre);
+                    if (eqExistente) {
+                        // Fusionar conteos
+                        Object.assign(eqExistente.conteos, eqImportado.conteos);
+                    } else {
+                        equipos.push(eqImportado);
+                    }
+                });
+
+                // Fusionar responsables
+                data.responsables.forEach(r => {
+                    if (!responsables.includes(r)) {
+                        responsables.push(r);
+                    }
+                });
+
+                // Fusionar historial
+                historialConteos = [...historialConteos, ...data.historialConteos];
+
+                guardarEnLocal();
+                mostrarMensaje('sincronia', '✅ Datos importados y sincronizados', 'success');
+                document.getElementById('jsonImport').value = '';
+                actualizarJSONExport();
+            } catch (e) {
+                mostrarMensaje('sincronia', '❌ JSON inválido: ' + e.message, 'error');
+            }
+        }
+
+        function descargarJSON() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                googleSheetId: GOOGLE_SHEET_ID,
+                equipos: equipos,
+                responsables: responsables,
+                historialConteos: historialConteos
+            };
+
+            const jsonString = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `control-equipos-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            mostrarMensaje('sincronia', '📊 JSON descargado correctamente', 'success');
+        }
+
+        function exportarTodoHistorial() {
+            descargarJSON();
+        }
+
+        // ========== ADMINISTRACIÓN ==========
+        function agregarResponsable() {
+            const resp = document.getElementById('nuevoResponsable').value.trim();
+            if (!resp) {
+                mostrarMensaje('admin', '⚠️ Ingresa un nombre', 'error');
+                return;
+            }
+            if (responsables.includes(resp)) {
+                mostrarMensaje('admin', '⚠️ Este responsable ya existe', 'error');
+                return;
+            }
+            responsables.push(resp);
+            document.getElementById('nuevoResponsable').value = '';
+            mostrarResponsables();
+            actualizarSelectsResponsables();
+            guardarEnLocal();
+            mostrarMensaje('admin', '✅ Responsable agregado', 'success');
+        }
+
+        function eliminarResponsable(responsable) {
+            responsables = responsables.filter(r => r !== responsable);
+            mostrarResponsables();
+            actualizarSelectsResponsables();
+            guardarEnLocal();
+        }
+
+        function mostrarResponsables() {
+            const div = document.getElementById('listaResponsables');
+            div.innerHTML = responsables.map(r => `
+                <div style="padding: 10px; background: #f0f0f0; margin: 5px 0; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                    <span><strong>${r}</strong></span>
+                    <button onclick="eliminarResponsable('${r}')" class="btn-delete">✕ Eliminar</button>
+                </div>
+            `).join('');
+        }
+
+        function actualizarSelectsResponsables() {
+            const select = document.getElementById('responsableConteo');
+            select.innerHTML = '<option value="">-- Seleccionar --</option>';
+            responsables.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r;
+                opt.textContent = r;
+                select.appendChild(opt);
+            });
+        }
+
+        function agregarEquipo() {
+            const nombre = document.getElementById('nombreEquipo').value.trim();
+            const area = document.getElementById('areaEquipo').value;
+            const minimo = parseInt(document.getElementById('minimoEquipo').value) || 0;
+
+            if (!nombre || !area) {
+                mostrarMensaje('admin', '⚠️ Nombre y área son obligatorios', 'error');
+                return;
+            }
+
+            if (equipos.find(e => e.Nombre === nombre)) {
+                mostrarMensaje('admin', '⚠️ Este equipo ya existe', 'error');
+                return;
+            }
+
+            equipos.push({
+                Nombre: nombre,
+                Área: area,
+                Mínimo: minimo,
+                conteos: { 1: 0 }
+            });
+
+            document.getElementById('nombreEquipo').value = '';
+            document.getElementById('areaEquipo').value = '';
+            document.getElementById('minimoEquipo').value = '0';
+
+            guardarEnLocal();
+            mostrarMensaje('admin', '✅ Equipo agregado', 'success');
+        }
+
+        function resetearTodo() {
+            if (confirm('⚠️ ¿Seguro? Esto eliminará todos los conteos (excepto historial)')) {
+                equipos.forEach(eq => {
+                    eq.conteos = { 1: eq.conteos[1] || 0 };
+                });
+                guardarEnLocal();
+                mostrarMensaje('admin', '✅ Datos reseteados', 'success');
+            }
+        }
+
+        // ========== INICIALIZACIÓN ==========
+        window.addEventListener('load', function() {
+            cargarDelLocal();
+            actualizarSelectsResponsables();
+            mostrarResponsables();
+            mostrarConteoRapido();
+        });
+    </script>
+</body>
+</html>
