@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Rincón del Barril - Sistemas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .sistemas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .sistema-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .sistema-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+        }
+
+        .sistema-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .sistema-title {
+            font-size: 1.5em;
+            color: #C41E3A;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .sistema-subtitle {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 35px;
+            background: #C41E3A;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            min-width: 180px;
+        }
+
+        .btn:hover {
+            background: #8B1528;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            margin-top: 40px;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .instrucciones {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .instrucciones h3 {
+            color: #FFD700;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .instrucciones ol {
+            text-align: left;
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .sistema-icon {
+                font-size: 3em;
+            }
+
+            .sistemas {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 El Rincón del Barril</h1>
+            <p>Sistemas de Gestión Operativa</p>
+        </div>
+
+        <div class="sistemas">
+            <!-- ENTRADAS COCINA -->
+            <div class="sistema-card">
+                <span class="sistema-icon">📥</span>
+                <h2 class="sistema-title">ENTRADAS</h2>
+                <p class="sistema-subtitle">Registrar llegada de productos</p>
+                <a href="./entradas.html" class="btn">ABRIR</a>
+            </div>
+
+            <!-- SALIDAS COCINA -->
+            <div class="sistema-card">
+                <span class="sistema-icon">📤</span>
+                <h2 class="sistema-title">SALIDAS</h2>
+                <p class="sistema-subtitle">Registrar uso de productos</p>
+                <a href="./salidas.html" class="btn">ABRIR</a>
+            </div>
+
+            <!-- BODEGA -->
+            <div class="sistema-card">
+                <span class="sistema-icon">📦</span>
+                <h2 class="sistema-title">BODEGA</h2>
+                <p class="sistema-subtitle">Inventario completo bodega</p>
+                <a href="./bodega.html" class="btn">ABRIR</a>
+            </div>
+
+            <!-- BAR -->
+            <div class="sistema-card">
+                <span class="sistema-icon">🍹</span>
+                <h2 class="sistema-title">BAR</h2>
+                <p class="sistema-subtitle">Inventario completo bar</p>
+                <a href="./bar.html" class="btn">ABRIR</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>📱 Optimizado para celulares</strong></p>
+            <p>Cada sistema funciona independiente</p>
+            
+            <div class="instrucciones">
+                <h3>🎯 Agregar a Pantalla de Inicio:</h3>
+                <ol>
+                    <li><strong>iPhone:</strong> Safari → Compartir → Agregar a inicio</li>
+                    <li><strong>Android:</strong> Chrome → Menú (⋮) → Agregar a pantalla de inicio</li>
+                </ol>
+            </div>
+            
+            <p style="margin-top: 25px; font-size: 0.9em; opacity: 0.8;">
+                El Rincón del Barril - Sistema Operativo
+            </p>
+        </div>
+    </div>
+</body>
+</html>

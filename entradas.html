@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entradas - El Rincón del Barril</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .header {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .stats { font-size: 14px; opacity: 0.9; }
+        
+        /* Botones grandes para celular */
+        .btn-grande {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+        .btn-grande:active { background: #1976D2; }
+        
+        .btn-conteo {
+            background: #FF9800;
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+        .btn-conteo:active { background: #F57C00; }
+        
+        .menu-principal {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .menu-btn {
+            background: white;
+            border: 3px solid #4CAF50;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            min-height: 100px;
+        }
+        .menu-btn:active { background: #e8f5e9; }
+        .menu-icon { font-size: 40px; margin-bottom: 8px; }
+        .menu-nombre { font-size: 18px; font-weight: bold; color: #333; }
+        .menu-desc { font-size: 12px; color: #666; margin-top: 5px; }
+        
+        .paso {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .paso h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 20px;
+        }
+        
+        /* Tipos de movimiento */
+        .tipos {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .tipo-btn {
+            background: #f9f9f9;
+            border: 3px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            min-height: 120px;
+        }
+        .tipo-btn.selected {
+            background: #e8f5e9;
+            border-color: #4CAF50;
+        }
+        .tipo-icon { font-size: 40px; margin-bottom: 8px; }
+        .tipo-nombre { font-size: 16px; font-weight: bold; }
+        .tipo-desc { font-size: 12px; color: #666; margin-top: 5px; }
+        
+        /* Formularios */
+        input, select, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            min-height: 50px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        /* Combo field (input + datalist) */
+        .combo-field {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .combo-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            min-height: 50px;
+        }
+        
+        /* Botones de acción */
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+            min-height: 60px;
+        }
+        .btn-registrar {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-registrar:active { background: #388E3C; }
+        .btn-cancelar {
+            background: #f44336;
+            color: white;
+        }
+        .btn-cancelar:active { background: #D32F2F; }
+        
+        .oculto { display: none !important; }
+        
+        /* Mensajes */
+        .mensaje {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            text-align: center;
+            min-width: 280px;
+        }
+        .mensaje.exito { border: 4px solid #4CAF50; }
+        .mensaje.error { border: 4px solid #f44336; }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+        .overlay.activo { display: block; }
+        
+        .resultado { 
+            background: #e3f2fd; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin: 10px 0;
+            border-left: 4px solid #2196F3;
+        }
+        
+        /* Producciones predefinidas */
+        .producciones-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .produccion-btn {
+            background: #fff3e0;
+            border: 3px solid #FF9800;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            min-height: 70px;
+        }
+        .produccion-btn.selected {
+            background: #FFE0B2;
+            border-color: #F57C00;
+        }
+        .produccion-btn:active { background: #FFE0B2; }
+        .produccion-nombre {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .produccion-desc {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        /* Productos resultantes */
+        .producto-resultante {
+            background: #f9f9f9;
+            border: 2px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .producto-resultante-titulo {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        
+        /* Modal Conteo Físico */
+        .modal-conteo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: none;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .modal-conteo.activo { display: block; }
+        
+        .modal-conteo-contenido {
+            background: white;
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .modal-conteo-header {
+            background: #FF9800;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .modal-conteo-header h2 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        /* Toggle modo conteo */
+        .toggle-modo {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .toggle-btn {
+            flex: 1;
+            padding: 15px;
+            border: 3px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            min-height: 60px;
+        }
+        .toggle-btn.activo {
+            background: #FF9800;
+            color: white;
+            border-color: #F57C00;
+        }
+        
+        /* Conteo items */
+        .conteo-item {
+            background: #f9f9f9;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .conteo-producto-nombre {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .conteo-sistema {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .conteo-input {
+            font-size: 18px;
+            padding: 18px;
+            border: 3px solid #ddd;
+            min-height: 60px;
+        }
+        .conteo-input:focus {
+            border-color: #FF9800;
+            outline: none;
+        }
+        .conteo-diferencia {
+            background: #fff;
+            padding: 12px;
+            border-radius: 5px;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .conteo-diferencia.positivo { 
+            color: #4CAF50;
+            background: #E8F5E9;
+        }
+        .conteo-diferencia.negativo { 
+            color: #f44336;
+            background: #FFEBEE;
+        }
+        .conteo-diferencia.neutro { 
+            color: #666;
+            background: #F5F5F5;
+        }
+        
+        /* Info boxes */
+        .info-box {
+            background: #E3F2FD;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #2196F3;
+        }
+        .info-box-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #1976D2;
+        }
+        .info-box-content {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+    
+    <div class="header">
+        <h1>📥 ENTRADAS</h1>
+        <div class="stats">
+            <span id="stats">0 movimientos registrados</span>
+        </div>
+    </div>
+    
+    <!-- MENÚ PRINCIPAL -->
+    <div id="menuPrincipal">
+        <div class="menu-principal">
+            <div class="menu-btn" onclick="mostrarRegistro()">
+                <div class="menu-icon">➕</div>
+                <div class="menu-nombre">NUEVA ENTRADA</div>
+                <div class="menu-desc">Registrar movimiento</div>
+            </div>
+            <div class="menu-btn" onclick="verListado()">
+                <div class="menu-icon">📋</div>
+                <div class="menu-nombre">VER LISTADO</div>
+                <div class="menu-desc">Historial</div>
+            </div>
+        </div>
+        
+        <button class="btn-grande" onclick="exportarExcel()">
+            📤 EXPORTAR EXCEL
+        </button>
+        
+        <button class="btn-conteo" onclick="abrirConteoFisico()">
+            📊 CONTEO FÍSICO
+        </button>
+    </div>
+
+    <!-- REGISTRO DE ENTRADA -->
+    <div id="secRegistro" class="oculto">
+        <!-- PASO 1: TIPO -->
+        <div id="paso1" class="paso">
+            <h2>1️⃣ Tipo de movimiento</h2>
+            <div class="tipos">
+                <div class="tipo-btn" onclick="selTipo('compra')">
+                    <div class="tipo-icon">🛒</div>
+                    <div class="tipo-nombre">COMPRA</div>
+                    <div class="tipo-desc">Entrada proveedor</div>
+                </div>
+                <div class="tipo-btn" onclick="selTipo('produccion')">
+                    <div class="tipo-icon">👨‍🍳</div>
+                    <div class="tipo-nombre">PRODUCCIÓN</div>
+                    <div class="tipo-desc">Entradas producción</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 2: DETALLES -->
+        <div id="paso2" class="paso oculto">
+            <button class="btn btn-cancelar" onclick="volverPaso1()" style="margin-bottom: 15px;">
+                ⬅️ VOLVER
+            </button>
+            <h2 id="tituloPaso2">2️⃣ Detalles</h2>
+            
+            <!-- COMPRA -->
+            <div id="secCompra" class="oculto">
+                <label>Producto (escribe o selecciona):</label>
+                <input list="listaProductos" id="productoCompra" class="combo-input" placeholder="Escribe o selecciona...">
+                <datalist id="listaProductos"></datalist>
+                
+                <label>Lote (si aplica):</label>
+                <input type="text" id="loteCompra" readonly style="background: #f0f0f0;" placeholder="Selecciona producto primero">
+                
+                <label>Cantidad:</label>
+                <input type="number" id="cantidadCompra" step="0.01" placeholder="Ej: 28">
+                
+                <label>Unidad:</label>
+                <select id="unidadCompra">
+                    <option>kg</option>
+                    <option>unidad</option>
+                    <option>litro</option>
+                    <option>gramo</option>
+                </select>
+                
+                <label>Proveedor (escribe o selecciona):</label>
+                <input list="listaProveedores" id="proveedorCompra" class="combo-input" placeholder="Escribe o selecciona...">
+                <datalist id="listaProveedores">
+                    <option value="Fruver La 14">
+                    <option value="Carnes El Barril">
+                    <option value="Distribuidora Norte">
+                    <option value="Supermercado Express">
+                    <option value="AVSA S.A">
+                    <option value="ATLANTIC FS S.A.S.">
+                    <option value="MCCORMICK BAKERY">
+                    <option value="COMERCIALIZADORA EL NOVILLON S.A.S">
+                </datalist>
+                
+                <label>Área destino:</label>
+                <select id="areaCompra">
+                    <option>Bodega</option>
+                    <option>Cocina</option>
+                    <option>Bar</option>
+                </select>
+                
+                <label>Factura / Remisión (opcional):</label>
+                <input type="text" id="facturaCompra" placeholder="Número de factura">
+                
+                <label>Total pagado ($):</label>
+                <input type="number" id="totalCompra" step="0.01" placeholder="Total factura">
+                
+                <div class="info-box oculto" id="costoUnitarioCompra">
+                    <div class="info-box-title">💰 Costo Unitario</div>
+                    <div class="info-box-content" id="costoUnitarioTexto">-</div>
+                </div>
+                
+                <label>Responsable:</label>
+                <input list="listaResponsables" id="responsableCompra" class="combo-input" placeholder="Tu nombre">
+                <datalist id="listaResponsables">
+                    <option value="María">
+                    <option value="Juan">
+                    <option value="Pedro">
+                    <option value="Ana">
+                    <option value="Carlos">
+                </datalist>
+                
+                <label>Observaciones (opcional):</label>
+                <textarea id="observacionesCompra" rows="2" placeholder="Notas adicionales"></textarea>
+                
+                <div class="info-box oculto" id="infoRegistroMultiple" style="background: #E8F5E9; border-left-color: #4CAF50;">
+                    <div class="info-box-title">✅ Registro múltiple activado</div>
+                    <div class="info-box-content">
+                        Se mantienen: Proveedor, Factura y Responsable<br>
+                        Solo cambia: Producto, Cantidad y Total<br>
+                        <strong>Para finalizar:</strong> Click en "Terminar y volver"
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PRODUCCIÓN -->
+            <div id="secProduccion" class="oculto">
+                <h3 style="margin-bottom: 15px;">Selecciona el proceso:</h3>
+                
+                <div class="producciones-grid">
+                    <div class="produccion-btn" onclick="selProduccion('filetes-pechuga')">
+                        <div class="produccion-nombre">🐔 Filetes de pechuga</div>
+                        <div class="produccion-desc">De X gramos</div>
+                    </div>
+                    <div class="produccion-btn" onclick="selProduccion('trozos-pechuga')">
+                        <div class="produccion-nombre">🐔 Trozos de pechuga</div>
+                        <div class="produccion-desc">De X gramos</div>
+                    </div>
+                    <div class="produccion-btn" onclick="selProduccion('croquetas')">
+                        <div class="produccion-nombre">🥩 Croquetas de carne</div>
+                        <div class="produccion-desc">De X gramos</div>
+                    </div>
+                    <div class="produccion-btn" onclick="selProduccion('lomo-cocinado')">
+                        <div class="produccion-nombre">🥩 Lomo cocinado</div>
+                        <div class="produccion-desc">XX kilos</div>
+                    </div>
+                    <div class="produccion-btn" onclick="selProduccion('nueva')">
+                        <div class="produccion-nombre">➕ Crear nueva producción</div>
+                        <div class="produccion-desc">Otro proceso</div>
+                    </div>
+                </div>
+                
+                <!-- Formulario de producción -->
+                <div id="formProduccion" class="oculto" style="margin-top: 20px;">
+                    <div class="info-box">
+                        <div class="info-box-title">🔖 ID de Transformación</div>
+                        <div class="info-box-content" id="idTransformacion">-</div>
+                    </div>
+                    
+                    <label>Producto origen:</label>
+                    <input list="listaProductosOrigen" id="productoOrigen" class="combo-input" placeholder="Escribe o selecciona...">
+                    <datalist id="listaProductosOrigen"></datalist>
+                    
+                    <label>Lote origen:</label>
+                    <input type="text" id="loteOrigen" placeholder="LOC-1812-001">
+                    
+                    <label>Cantidad origen:</label>
+                    <input type="number" id="cantidadOrigen" step="0.01" placeholder="10">
+                    
+                    <label>Unidad origen:</label>
+                    <select id="unidadOrigen">
+                        <option>kg</option>
+                        <option>unidad</option>
+                        <option>gramo</option>
+                    </select>
+                    
+                    <hr style="margin: 20px 0; border: 1px solid #ddd;">
+                    
+                    <h3 style="margin-bottom: 15px;">Productos Resultantes:</h3>
+                    <div id="productosResultantes"></div>
+                    
+                    <button class="btn" style="background: #2196F3; color: white; margin-bottom: 15px;" onclick="agregarProductoResultante()">
+                        ➕ Agregar Producto
+                    </button>
+                    
+                    <div class="resultado oculto" id="resumenMerma"></div>
+                    
+                    <label>Responsable:</label>
+                    <input list="listaResponsables" id="responsableProduccion" class="combo-input" placeholder="Tu nombre">
+                    
+                    <label>Observaciones (opcional):</label>
+                    <textarea id="observacionesProduccion" rows="2" placeholder="Notas del proceso"></textarea>
+                </div>
+            </div>
+            
+            <button class="btn btn-registrar" onclick="registrarMovimiento()">
+                ✅ REGISTRAR Y CONTINUAR
+            </button>
+            <button class="btn btn-cancelar" onclick="cancelarRegistro()">
+                🏠 TERMINAR Y VOLVER AL MENÚ
+            </button>
+        </div>
+    </div>
+
+    <!-- LISTADO -->
+    <div id="secListado" class="oculto">
+        <button class="btn btn-cancelar" onclick="volverMenu()" style="margin-bottom: 15px;">
+            ⬅️ VOLVER AL MENÚ
+        </button>
+        <div class="paso">
+            <h2>📋 Listado de Movimientos</h2>
+            <div id="listaMovimientos"></div>
+        </div>
+    </div>
+    
+    <!-- MODAL CONTEO FÍSICO -->
+    <div class="modal-conteo" id="modalConteo">
+        <div class="modal-conteo-contenido">
+            <div class="modal-conteo-header">
+                <h2>📊 CONTEO FÍSICO</h2>
+                <p>Entradas - <span id="fechaConteo"></span></p>
+            </div>
+            
+            <div class="toggle-modo">
+                <div class="toggle-btn activo" onclick="cambiarModoConteo('escribir')" id="btnEscribir">
+                    🔍 BUSCAR
+                </div>
+                <div class="toggle-btn" onclick="cambiarModoConteo('lista')" id="btnLista">
+                    📋 LISTA
+                </div>
+            </div>
+            
+            <!-- Modo Escribir -->
+            <div id="modoEscribir">
+                <label>Buscar producto:</label>
+                <input list="listaProductosConteo" id="buscarProductoConteo" class="combo-input" 
+                       placeholder="Escribe el producto..." onchange="agregarProductoConteo(this.value)">
+                <datalist id="listaProductosConteo"></datalist>
+            </div>
+            
+            <!-- Modo Lista -->
+            <div id="modoLista" class="oculto">
+                <label>Seleccionar producto:</label>
+                <select id="selectProductoConteo" class="combo-input" onchange="agregarProductoConteo(this.value)">
+                    <option value="">-- Selecciona un producto --</option>
+                </select>
+            </div>
+            
+            <div id="conteoProductos" style="margin-top: 20px;">
+                <!-- Se llenará dinámicamente -->
+            </div>
+            
+            <button class="btn btn-registrar" onclick="generarReporteConteo()">
+                ✅ GENERAR REPORTE
+            </button>
+            <button class="btn btn-cancelar" onclick="cerrarConteoFisico()">
+                ❌ CANCELAR
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // DATOS
+        var movimientos = [];
+        var tipoActual = '';
+        var produccionActual = '';
+        var contadorProductosResultantes = 0;
+        var productosEnConteo = [];
+        var modoConteoActual = 'escribir';
+        
+        // Productos base con categorización
+        var productosBase = [
+            // Carnes - CON LOTE
+            { nombre: 'Carne de Res', lote: true },
+            { nombre: 'Pechuga de Pollo', lote: true },
+            { nombre: 'PECHUGA REFRIGERADA', lote: true },
+            { nombre: 'PERNIL (CONTRAMUSLO SIN/RAB) REFRIGERA', lote: true },
+            { nombre: 'CARNE MOLIDA - CAB #8', lote: true },
+            { nombre: 'CARNE PARA MOLER 80/20', lote: true },
+            { nombre: 'LOMO DE CERDO', lote: true },
+            { nombre: 'Lomo de Cerdo', lote: true },
+            { nombre: 'Carne Molida', lote: true },
+            { nombre: 'COSTILLA ESPECIAL DE CERDO', lote: true },
+            { nombre: 'Costilla de Cerdo', lote: true },
+            { nombre: 'TOCINO DE CERDO CON PIEL', lote: true },
+            { nombre: 'Tocineta', lote: true },
+            { nombre: 'Chicharrón', lote: true },
+            { nombre: 'Chorizo', lote: true },
+            { nombre: 'Morcilla', lote: true },
+            { nombre: 'Salchicha Alemana', lote: true },
+            { nombre: 'CALLO REVUELTO', lote: true },
+            { nombre: 'CARNE DE RES PARA ASAR', lote: true },
+            { nombre: 'CARNE DE RES PARA GUISAR', lote: true },
+            { nombre: 'ESPINAZO', lote: true },
+            { nombre: 'PATA DE RES', lote: true },
+            { nombre: 'PUNTA DE ANCA PREMIUM NOVILLON', lote: true },
+            { nombre: 'RELLENAS', lote: true },
+            
+            // Vegetales/Frutas - CON LOTE
+            { nombre: 'Limón Fresco', lote: true },
+            { nombre: 'Papas', lote: true },
+            { nombre: 'PAPA MARQUISE 1 KG', lote: true },
+            { nombre: 'Lechuga', lote: true },
+            { nombre: 'Tomate', lote: true },
+            { nombre: 'Cebolla', lote: true },
+            { nombre: 'Aguacate', lote: true },
+            
+            // Lácteos - CON LOTE
+            { nombre: 'Queso Cheddar', lote: true },
+            { nombre: 'Queso Blanco', lote: true },
+            { nombre: 'KRAFT SINGLES AMERICAN 16 SLICES 48/12Z', lote: true },
+            { nombre: 'Leche de Coco', lote: true },
+            
+            // Productos elaborados - CON LOTE
+            { nombre: 'Croqueta de Carne', lote: true },
+            { nombre: 'Filetes de Pechuga', lote: true },
+            { nombre: 'Trozos de Pechuga', lote: true },
+            { nombre: 'Lomo Cocido', lote: true },
+            
+            // Panes/Suministros - SIN LOTE
+            { nombre: 'Pan Brioche', lote: false },
+            { nombre: 'BRIOCHE HAMBURGUESA AJONJOLI BLANCOU', lote: false },
+            { nombre: 'Pan Árabe', lote: false },
+            
+            // Insumos - SIN LOTE
+            { nombre: 'PAPEL ALUMINIO 300MT X 30CM', lote: false },
+            { nombre: 'Carbón Vegetal', lote: false },
+            { nombre: 'ACEITE SINAI 70/30 20 LT', lote: false },
+            { nombre: 'Azúcar Blanca', lote: false },
+            { nombre: 'Sal Marina', lote: false }
+        ];
+        
+        // INICIALIZACIÓN
+        window.onload = function() {
+            cargarDatos();
+            cargarListasProductos();
+            actualizarStats();
+            
+            // Listeners para calcular costo unitario
+            document.getElementById('cantidadCompra').addEventListener('input', calcularCostoUnitario);
+            document.getElementById('totalCompra').addEventListener('input', calcularCostoUnitario);
+        };
+        
+        function cargarListasProductos() {
+            // Lista de productos
+            var datalist = document.getElementById('listaProductos');
+            var datalistOrigen = document.getElementById('listaProductosOrigen');
+            var datalistConteo = document.getElementById('listaProductosConteo');
+            var selectConteo = document.getElementById('selectProductoConteo');
+            
+            productosBase.forEach(function(p) {
+                var option1 = document.createElement('option');
+                option1.value = p.nombre;
+                datalist.appendChild(option1);
+                
+                var option2 = document.createElement('option');
+                option2.value = p.nombre;
+                datalistOrigen.appendChild(option2);
+                
+                var option3 = document.createElement('option');
+                option3.value = p.nombre;
+                datalistConteo.appendChild(option3);
+                
+                var option4 = document.createElement('option');
+                option4.value = p.nombre;
+                option4.textContent = p.nombre;
+                selectConteo.appendChild(option4);
+            });
+            
+            // Generar lote automáticamente solo si el producto lo requiere
+            document.getElementById('productoCompra').addEventListener('change', function() {
+                var productoSeleccionado = productosBase.find(function(p) { return p.nombre === this.value; }.bind(this));
+                var inputLote = document.getElementById('loteCompra');
+                
+                if (this.value) {
+                    if (productoSeleccionado && productoSeleccionado.lote) {
+                        // Producto requiere lote
+                        if (!inputLote.value) {
+                            inputLote.value = generarLote();
+                        }
+                        inputLote.readOnly = false;
+                        inputLote.style.background = '#fff';
+                    } else {
+                        // Producto no requiere lote
+                        inputLote.value = 'N/A';
+                        inputLote.readOnly = true;
+                        inputLote.style.background = '#f0f0f0';
+                    }
+                }
+            });
+        }
+        
+        function generarLote() {
+            var fecha = new Date();
+            var dia = String(fecha.getDate()).padStart(2, '0');
+            var mes = String(fecha.getMonth() + 1).padStart(2, '0');
+            var contador = String(movimientos.length + 1).padStart(3, '0');
+            return 'LOC-' + dia + mes + '-' + contador;
+        }
+        
+        function generarIDTransformacion() {
+            var fecha = new Date();
+            var dia = String(fecha.getDate()).padStart(2, '0');
+            var mes = String(fecha.getMonth() + 1).padStart(2, '0');
+            var contador = String(movimientos.filter(function(m) { return m.tipo === 'produccion'; }).length + 1).padStart(3, '0');
+            return 'TRANS-' + dia + mes + '-' + contador;
+        }
+        
+        function generarLoteProducto(sufijo) {
+            var fecha = new Date();
+            var dia = String(fecha.getDate()).padStart(2, '0');
+            var mes = String(fecha.getMonth() + 1).padStart(2, '0');
+            var contador = String(movimientos.length + 1).padStart(3, '0');
+            return 'PROD-' + dia + mes + '-' + contador + '-' + sufijo;
+        }
+        
+        // NAVEGACIÓN
+        function mostrarRegistro() {
+            document.getElementById('menuPrincipal').classList.add('oculto');
+            document.getElementById('secRegistro').classList.remove('oculto');
+            document.getElementById('paso1').classList.remove('oculto');
+            document.getElementById('paso2').classList.add('oculto');
+        }
+        
+        function volverMenu() {
+            document.getElementById('secRegistro').classList.add('oculto');
+            document.getElementById('secListado').classList.add('oculto');
+            document.getElementById('menuPrincipal').classList.remove('oculto');
+        }
+        
+        function volverPaso1() {
+            document.getElementById('paso2').classList.add('oculto');
+            document.getElementById('paso1').classList.remove('oculto');
+            limpiarFormularios();
+        }
+        
+        function cancelarRegistro() {
+            volverMenu();
+            setTimeout(function() {
+                document.getElementById('paso1').classList.remove('oculto');
+                document.getElementById('paso2').classList.add('oculto');
+                limpiarFormularios();
+            }, 300);
+        }
+        
+        function verListado() {
+            if (movimientos.length === 0) {
+                mostrarMensaje('📋 NO HAY MOVIMIENTOS\n\nRegistra tu primera entrada', 'error');
+                return;
+            }
+            
+            document.getElementById('menuPrincipal').classList.add('oculto');
+            document.getElementById('secListado').classList.remove('oculto');
+            mostrarListado();
+        }
+        
+        // SELECCIÓN DE TIPO
+        function selTipo(tipo) {
+            tipoActual = tipo;
+            
+            document.querySelectorAll('.tipo-btn').forEach(function(btn) {
+                btn.classList.remove('selected');
+            });
+            event.target.closest('.tipo-btn').classList.add('selected');
+            
+            document.getElementById('secCompra').classList.add('oculto');
+            document.getElementById('secProduccion').classList.add('oculto');
+            
+            document.getElementById('paso1').classList.add('oculto');
+            document.getElementById('paso2').classList.remove('oculto');
+            
+            if (tipo === 'compra') {
+                document.getElementById('tituloPaso2').textContent = '2️⃣ Detalles de Compra';
+                document.getElementById('secCompra').classList.remove('oculto');
+                document.getElementById('loteCompra').value = '';
+                document.getElementById('loteCompra').placeholder = 'Selecciona producto primero';
+            } else if (tipo === 'produccion') {
+                document.getElementById('tituloPaso2').textContent = '2️⃣ Entradas de Producción';
+                document.getElementById('secProduccion').classList.remove('oculto');
+            }
+        }
+        
+        // PRODUCCIÓN
+        function selProduccion(tipo) {
+            produccionActual = tipo;
+            
+            document.querySelectorAll('.produccion-btn').forEach(function(btn) {
+                btn.classList.remove('selected');
+            });
+            event.target.closest('.produccion-btn').classList.add('selected');
+            
+            document.getElementById('formProduccion').classList.remove('oculto');
+            document.getElementById('idTransformacion').textContent = generarIDTransformacion();
+            
+            // Limpiar productos resultantes
+            contadorProductosResultantes = 0;
+            document.getElementById('productosResultantes').innerHTML = '';
+            
+            // Pre-configurar según tipo
+            if (tipo === 'filetes-pechuga') {
+                document.getElementById('productoOrigen').value = 'Pechuga de Pollo';
+                agregarProductoResultante('Filetes de Pechuga', 'A');
+            } else if (tipo === 'trozos-pechuga') {
+                document.getElementById('productoOrigen').value = 'Pechuga de Pollo';
+                agregarProductoResultante('Trozos de Pechuga', 'A');
+            } else if (tipo === 'croquetas') {
+                document.getElementById('productoOrigen').value = 'Carne Molida';
+                agregarProductoResultante('Croqueta de Carne', 'A');
+            } else if (tipo === 'lomo-cocinado') {
+                document.getElementById('productoOrigen').value = 'Lomo de Cerdo';
+                agregarProductoResultante('Lomo Cocido', 'A');
+            }
+        }
+        
+        function agregarProductoResultante(nombreDefault, sufijoDefault) {
+            contadorProductosResultantes++;
+            var sufijo = sufijoDefault || String.fromCharCode(64 + contadorProductosResultantes);
+            var lote = generarLoteProducto(sufijo);
+            
+            var html = '<div class="producto-resultante" id="prodRes' + contadorProductosResultantes + '">';
+            html += '<div class="producto-resultante-titulo">Producto Resultante ' + sufijo + '</div>';
+            
+            html += '<label>Nombre:</label>';
+            html += '<input list="listaProductos" class="combo-input prod-nombre" placeholder="Nombre del producto" value="' + (nombreDefault || '') + '">';
+            
+            html += '<label>Lote:</label>';
+            html += '<input type="text" class="prod-lote" readonly style="background: #f0f0f0;" value="' + lote + '">';
+            
+            html += '<label>Cantidad:</label>';
+            html += '<input type="number" step="0.01" class="prod-cantidad" placeholder="0" onchange="calcularMermaProduccion()">';
+            
+            html += '<label>Unidad:</label>';
+            html += '<select class="prod-unidad">';
+            html += '<option>kg</option>';
+            html += '<option>unidad</option>';
+            html += '<option>gramo</option>';
+            html += '</select>';
+            
+            html += '<button class="btn btn-cancelar" style="margin-top: 10px;" onclick="eliminarProductoResultante(' + contadorProductosResultantes + ')">🗑️ Eliminar</button>';
+            html += '</div>';
+            
+            document.getElementById('productosResultantes').insertAdjacentHTML('beforeend', html);
+            calcularMermaProduccion();
+        }
+        
+        function eliminarProductoResultante(id) {
+            var elem = document.getElementById('prodRes' + id);
+            if (elem) {
+                elem.remove();
+                calcularMermaProduccion();
+            }
+        }
+        
+        function calcularMermaProduccion() {
+            var origen = parseFloat(document.getElementById('cantidadOrigen').value) || 0;
+            var totalSalida = 0;
+            
+            document.querySelectorAll('.prod-cantidad').forEach(function(input) {
+                totalSalida += parseFloat(input.value) || 0;
+            });
+            
+            var merma = origen - totalSalida;
+            var porcMerma = origen > 0 ? ((merma / origen) * 100).toFixed(2) : 0;
+            
+            var resumen = document.getElementById('resumenMerma');
+            if (origen > 0) {
+                resumen.innerHTML = '<strong>Origen:</strong> ' + origen.toFixed(2) + ' kg<br>' +
+                                   '<strong>Salida Total:</strong> ' + totalSalida.toFixed(2) + ' kg<br>' +
+                                   '<strong>Merma:</strong> ' + merma.toFixed(2) + ' kg (' + porcMerma + '%)';
+                resumen.classList.remove('oculto');
+            } else {
+                resumen.classList.add('oculto');
+            }
+        }
+        
+        // COSTO UNITARIO
+        function calcularCostoUnitario() {
+            var cantidad = parseFloat(document.getElementById('cantidadCompra').value) || 0;
+            var total = parseFloat(document.getElementById('totalCompra').value) || 0;
+            
+            if (cantidad > 0 && total > 0) {
+                var costoUnit = (total / cantidad).toFixed(2);
+                document.getElementById('costoUnitarioTexto').textContent = '$' + costoUnit + ' por unidad';
+                document.getElementById('costoUnitarioCompra').classList.remove('oculto');
+            } else {
+                document.getElementById('costoUnitarioCompra').classList.add('oculto');
+            }
+        }
+        
+        // REGISTRAR MOVIMIENTO
+        function registrarMovimiento() {
+            var movimiento = {
+                id: Date.now(),
+                fecha: new Date().toLocaleDateString('es-CO'),
+                hora: new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+                tipo: tipoActual
+            };
+            
+            if (tipoActual === 'compra') {
+                var producto = document.getElementById('productoCompra').value;
+                var cantidad = parseFloat(document.getElementById('cantidadCompra').value);
+                var proveedor = document.getElementById('proveedorCompra').value;
+                var responsable = document.getElementById('responsableCompra').value;
+                
+                if (!producto || !cantidad || !proveedor || !responsable) {
+                    mostrarMensaje('❌ FALTAN DATOS\n\nCompleta todos los campos obligatorios', 'error');
+                    return;
+                }
+                
+                var total = parseFloat(document.getElementById('totalCompra').value) || 0;
+                var lote = document.getElementById('loteCompra').value;
+                
+                // Verificar si el producto requiere lote
+                var productoObj = productosBase.find(function(p) { return p.nombre === producto; });
+                var requiereLote = productoObj ? productoObj.lote : false;
+                
+                movimiento.lote = (requiereLote && lote !== 'N/A') ? lote : 'N/A';
+                movimiento.producto = producto;
+                movimiento.cantidad = cantidad;
+                movimiento.unidad = document.getElementById('unidadCompra').value;
+                movimiento.proveedor = proveedor;
+                movimiento.area = document.getElementById('areaCompra').value;
+                movimiento.factura = document.getElementById('facturaCompra').value || '-';
+                movimiento.total = total;
+                movimiento.costoUnitario = cantidad > 0 ? (total / cantidad).toFixed(2) : 0;
+                movimiento.responsable = responsable;
+                movimiento.observaciones = document.getElementById('observacionesCompra').value || '-';
+                
+            } else if (tipoActual === 'produccion') {
+                if (!produccionActual) {
+                    mostrarMensaje('❌ SELECCIONA PROCESO\n\nElige un tipo de producción', 'error');
+                    return;
+                }
+                
+                var productoOrigen = document.getElementById('productoOrigen').value;
+                var loteOrigen = document.getElementById('loteOrigen').value;
+                var cantidadOrigen = parseFloat(document.getElementById('cantidadOrigen').value);
+                var responsable = document.getElementById('responsableProduccion').value;
+                
+                if (!productoOrigen || !loteOrigen || !cantidadOrigen || !responsable) {
+                    mostrarMensaje('❌ FALTAN DATOS\n\nCompleta todos los campos obligatorios', 'error');
+                    return;
+                }
+                
+                // Obtener productos resultantes
+                var productosResultantes = [];
+                var totalSalida = 0;
+                
+                document.querySelectorAll('.producto-resultante').forEach(function(div) {
+                    var nombre = div.querySelector('.prod-nombre').value;
+                    var lote = div.querySelector('.prod-lote').value;
+                    var cantidad = parseFloat(div.querySelector('.prod-cantidad').value) || 0;
+                    var unidad = div.querySelector('.prod-unidad').value;
+                    
+                    if (nombre && cantidad > 0) {
+                        productosResultantes.push({
+                            nombre: nombre,
+                            lote: lote,
+                            cantidad: cantidad,
+                            unidad: unidad
+                        });
+                        totalSalida += cantidad;
+                    }
+                });
+                
+                if (productosResultantes.length === 0) {
+                    mostrarMensaje('❌ FALTAN PRODUCTOS\n\nAgrega al menos un producto resultante', 'error');
+                    return;
+                }
+                
+                movimiento.idTransformacion = document.getElementById('idTransformacion').textContent;
+                movimiento.productoOrigen = productoOrigen;
+                movimiento.loteOrigen = loteOrigen;
+                movimiento.cantidadOrigen = cantidadOrigen;
+                movimiento.unidadOrigen = document.getElementById('unidadOrigen').value;
+                movimiento.productosResultantes = productosResultantes;
+                movimiento.totalSalida = totalSalida;
+                movimiento.merma = cantidadOrigen - totalSalida;
+                movimiento.porcentajeMerma = ((movimiento.merma / cantidadOrigen) * 100).toFixed(2);
+                movimiento.responsable = responsable;
+                movimiento.observaciones = document.getElementById('observacionesProduccion').value || '-';
+            }
+            
+            movimientos.push(movimiento);
+            guardarDatos();
+            actualizarStats();
+            
+            mostrarMensaje('✅ REGISTRADO\n\n¿Continuar con mismo proveedor?', 'exito');
+            
+            setTimeout(function() {
+                // Guardar valores para mantener
+                var proveedorGuardado = '';
+                var facturaGuardada = '';
+                var responsableGuardado = '';
+                
+                if (tipoActual === 'compra') {
+                    proveedorGuardado = document.getElementById('proveedorCompra').value;
+                    facturaGuardada = document.getElementById('facturaCompra').value;
+                    responsableGuardado = document.getElementById('responsableCompra').value;
+                }
+                
+                // Limpiar solo algunos campos
+                limpiarCamposProducto();
+                
+                // Restaurar proveedor, factura y responsable
+                if (tipoActual === 'compra' && proveedorGuardado) {
+                    document.getElementById('proveedorCompra').value = proveedorGuardado;
+                    document.getElementById('facturaCompra').value = facturaGuardada;
+                    document.getElementById('responsableCompra').value = responsableGuardado;
+                }
+                
+                // Mantener en paso 2 para siguiente registro rápido
+                // NO cerrar, solo limpiar campos de producto
+                
+            }, 1500);
+        }
+        
+        // LISTADO
+        function mostrarListado() {
+            var lista = document.getElementById('listaMovimientos');
+            
+            if (movimientos.length === 0) {
+                lista.innerHTML = '<p style="text-align: center; color: #999; padding: 30px;">No hay movimientos</p>';
+                return;
+            }
+            
+            var html = '';
+            movimientos.slice().reverse().forEach(function(m, index) {
+                var realIndex = movimientos.length - 1 - index;
+                var colorTipo = m.tipo === 'compra' ? '#4CAF50' : '#FF9800';
+                var iconoTipo = m.tipo === 'compra' ? '🛒' : '👨‍🍳';
+                
+                html += '<div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid ' + colorTipo + ';">';
+                html += '<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">';
+                html += '<div style="font-weight: bold; color: ' + colorTipo + ';">' + iconoTipo + ' ' + m.tipo.toUpperCase() + '</div>';
+                html += '<div style="font-size: 12px; color: #999;">' + m.fecha + ' ' + m.hora + '</div>';
+                html += '</div>';
+                
+                if (m.tipo === 'compra') {
+                    html += '<div style="font-size: 16px; font-weight: bold;">' + m.producto + '</div>';
+                    if (m.lote && m.lote !== 'N/A') {
+                        html += '<div style="font-size: 13px; color: #999;">Lote: ' + m.lote + '</div>';
+                    }
+                    html += '<div style="font-size: 14px; color: #666;">Cantidad: ' + m.cantidad + ' ' + m.unidad + '</div>';
+                    html += '<div style="font-size: 14px; color: #666;">Proveedor: ' + m.proveedor + '</div>';
+                    if (m.costoUnitario > 0) {
+                        html += '<div style="font-size: 14px; color: #666;">Costo unit: $' + m.costoUnitario + '</div>';
+                    }
+                } else if (m.tipo === 'produccion') {
+                    html += '<div style="font-size: 16px; font-weight: bold;">ID: ' + m.idTransformacion + '</div>';
+                    html += '<div style="font-size: 14px; color: #666;">Origen: ' + m.productoOrigen + ' (' + m.cantidadOrigen + ' ' + m.unidadOrigen + ')</div>';
+                    html += '<div style="font-size: 14px; color: #666;">Productos: ' + m.productosResultantes.length + '</div>';
+                    html += '<div style="font-size: 14px; color: #f44336;">Merma: ' + m.merma.toFixed(2) + ' (' + m.porcentajeMerma + '%)</div>';
+                }
+                
+                html += '<div style="font-size: 13px; color: #999; margin-top: 5px;">👤 ' + m.responsable + '</div>';
+                html += '<button onclick="eliminarMovimiento(' + realIndex + ')" style="background: #f44336; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; width: 100%;">🗑️ Eliminar</button>';
+                html += '</div>';
+            });
+            
+            lista.innerHTML = html;
+        }
+        
+        function eliminarMovimiento(index) {
+            if (confirm('¿Eliminar este movimiento?')) {
+                movimientos.splice(index, 1);
+                guardarDatos();
+                actualizarStats();
+                mostrarListado();
+                mostrarMensaje('✅ ELIMINADO', 'exito');
+            }
+        }
+        
+        // EXPORTAR XLSX REAL
+        function exportarExcel() {
+            if (movimientos.length === 0) {
+                mostrarMensaje('❌ NO HAY MOVIMIENTOS', 'error');
+                return;
+            }
+            
+            // Verificar que XLSX esté disponible
+            if (typeof XLSX === 'undefined') {
+                mostrarMensaje('❌ ERROR\n\nLibrería Excel no cargada.\nRecarga la página.', 'error');
+                console.error('XLSX library not loaded');
+                return;
+            }
+            
+            try {
+                // Crear datos para Excel
+                var datos = [];
+                
+                movimientos.forEach(function(m) {
+                    if (m.tipo === 'compra') {
+                        datos.push({
+                            'FECHA': m.fecha,
+                            'HORA': m.hora,
+                            'TIPO': m.tipo,
+                            'LOTE': m.lote || 'N/A',
+                            'PRODUCTO': m.producto,
+                            'CANTIDAD': m.cantidad,
+                            'UNIDAD': m.unidad,
+                            'PROVEEDOR': m.proveedor,
+                            'AREA': m.area,
+                            'FACTURA': m.factura,
+                            'TOTAL': m.total,
+                            'COSTO_UNITARIO': m.costoUnitario,
+                            'ID_TRANSFORMACION': '-',
+                            'PRODUCTO_ORIGEN': '-',
+                            'LOTE_ORIGEN': '-',
+                            'MERMA': '-',
+                            'RESPONSABLE': m.responsable,
+                            'OBSERVACIONES': m.observaciones
+                        });
+                    } else if (m.tipo === 'produccion') {
+                        m.productosResultantes.forEach(function(pr) {
+                            datos.push({
+                                'FECHA': m.fecha,
+                                'HORA': m.hora,
+                                'TIPO': m.tipo,
+                                'LOTE': pr.lote,
+                                'PRODUCTO': pr.nombre,
+                                'CANTIDAD': pr.cantidad,
+                                'UNIDAD': pr.unidad,
+                                'PROVEEDOR': 'Producción Interna',
+                                'AREA': 'Cocina',
+                                'FACTURA': '-',
+                                'TOTAL': 0,
+                                'COSTO_UNITARIO': 0,
+                                'ID_TRANSFORMACION': m.idTransformacion,
+                                'PRODUCTO_ORIGEN': m.productoOrigen,
+                                'LOTE_ORIGEN': m.loteOrigen,
+                                'MERMA': m.merma.toFixed(2),
+                                'RESPONSABLE': m.responsable,
+                                'OBSERVACIONES': m.observaciones
+                            });
+                        });
+                    }
+                });
+                
+                // Crear libro de Excel
+                var wb = XLSX.utils.book_new();
+                var ws = XLSX.utils.json_to_sheet(datos);
+                
+                // Ajustar ancho de columnas
+                var colWidths = [
+                    {wch: 12}, // FECHA
+                    {wch: 8},  // HORA
+                    {wch: 12}, // TIPO
+                    {wch: 15}, // LOTE
+                    {wch: 35}, // PRODUCTO
+                    {wch: 10}, // CANTIDAD
+                    {wch: 10}, // UNIDAD
+                    {wch: 30}, // PROVEEDOR
+                    {wch: 10}, // AREA
+                    {wch: 15}, // FACTURA
+                    {wch: 12}, // TOTAL
+                    {wch: 15}, // COSTO_UNITARIO
+                    {wch: 18}, // ID_TRANSFORMACION
+                    {wch: 30}, // PRODUCTO_ORIGEN
+                    {wch: 15}, // LOTE_ORIGEN
+                    {wch: 10}, // MERMA
+                    {wch: 20}, // RESPONSABLE
+                    {wch: 40}  // OBSERVACIONES
+                ];
+                ws['!cols'] = colWidths;
+                
+                XLSX.utils.book_append_sheet(wb, ws, "Entradas");
+                
+                var fecha = new Date().toLocaleDateString('es-CO').replace(/\//g, '-');
+                XLSX.writeFile(wb, 'Entradas_' + fecha + '.xlsx');
+                
+                mostrarMensaje('✅ EXPORTADO\n\n' + movimientos.length + ' movimientos', 'exito');
+                
+            } catch (error) {
+                console.error('Error al exportar:', error);
+                mostrarMensaje('❌ ERROR AL EXPORTAR\n\n' + error.message, 'error');
+            }
+        }
+        
+        // CONTEO FÍSICO
+        function abrirConteoFisico() {
+            if (movimientos.length === 0) {
+                mostrarMensaje('❌ NO HAY MOVIMIENTOS\n\nRegistra entradas primero', 'error');
+                return;
+            }
+            
+            var fecha = new Date().toLocaleDateString('es-CO');
+            document.getElementById('fechaConteo').textContent = fecha;
+            
+            productosEnConteo = [];
+            document.getElementById('conteoProductos').innerHTML = '';
+            document.getElementById('buscarProductoConteo').value = '';
+            document.getElementById('selectProductoConteo').selectedIndex = 0;
+            
+            document.getElementById('modalConteo').classList.add('activo');
+        }
+        
+        function cambiarModoConteo(modo) {
+            modoConteoActual = modo;
+            
+            if (modo === 'escribir') {
+                document.getElementById('btnEscribir').classList.add('activo');
+                document.getElementById('btnLista').classList.remove('activo');
+                document.getElementById('modoEscribir').classList.remove('oculto');
+                document.getElementById('modoLista').classList.add('oculto');
+            } else {
+                document.getElementById('btnLista').classList.add('activo');
+                document.getElementById('btnEscribir').classList.remove('activo');
+                document.getElementById('modoLista').classList.remove('oculto');
+                document.getElementById('modoEscribir').classList.add('oculto');
+            }
+        }
+        
+        function agregarProductoConteo(producto) {
+            if (!producto || producto === '') return;
+            if (productosEnConteo.includes(producto)) {
+                mostrarMensaje('⚠️ YA AGREGADO\n\nEste producto ya está en el conteo', 'error');
+                return;
+            }
+            
+            // Calcular stock sistema
+            var stock = 0;
+            movimientos.forEach(function(m) {
+                if (m.tipo === 'compra' && m.producto === producto) {
+                    stock += m.cantidad;
+                } else if (m.tipo === 'produccion') {
+                    m.productosResultantes.forEach(function(pr) {
+                        if (pr.nombre === producto) {
+                            stock += pr.cantidad;
+                        }
+                    });
+                }
+            });
+            
+            productosEnConteo.push(producto);
+            
+            var html = '<div class="conteo-item" id="conteo_' + producto.replace(/\s+/g, '_') + '">';
+            html += '<div class="conteo-producto-nombre">' + producto + '</div>';
+            html += '<div class="conteo-sistema">Sistema: <strong>' + stock.toFixed(2) + ' kg</strong></div>';
+            html += '<label>Cantidad Física:</label>';
+            html += '<input type="number" step="0.01" placeholder="0.00" class="conteo-input" ';
+            html += 'data-producto="' + producto + '" data-sistema="' + stock + '" ';
+            html += 'onchange="calcularDiferenciaConteo(this)">';
+            html += '<div class="conteo-diferencia neutro" id="dif_' + producto.replace(/\s+/g, '_') + '">Ingresa cantidad física</div>';
+            html += '<button class="btn btn-cancelar" style="margin-top: 10px;" onclick="eliminarProductoConteo(\'' + producto + '\')">🗑️ Quitar</button>';
+            html += '</div>';
+            
+            document.getElementById('conteoProductos').insertAdjacentHTML('beforeend', html);
+            
+            // Limpiar campos
+            document.getElementById('buscarProductoConteo').value = '';
+            document.getElementById('selectProductoConteo').selectedIndex = 0;
+        }
+        
+        function eliminarProductoConteo(producto) {
+            var index = productosEnConteo.indexOf(producto);
+            if (index > -1) {
+                productosEnConteo.splice(index, 1);
+            }
+            var elem = document.getElementById('conteo_' + producto.replace(/\s+/g, '_'));
+            if (elem) elem.remove();
+        }
+        
+        function calcularDiferenciaConteo(input) {
+            var producto = input.getAttribute('data-producto');
+            var sistema = parseFloat(input.getAttribute('data-sistema'));
+            var fisico = parseFloat(input.value) || 0;
+            var diferencia = fisico - sistema;
+            var porcentaje = sistema > 0 ? ((Math.abs(diferencia) / sistema) * 100).toFixed(1) : 0;
+            
+            var productoId = producto.replace(/\s+/g, '_');
+            var divDif = document.getElementById('dif_' + productoId);
+            
+            if (divDif) {
+                if (diferencia > 0.1) {
+                    divDif.textContent = 'Exceso: +' + diferencia.toFixed(2) + ' kg (+' + porcentaje + '%)';
+                    divDif.className = 'conteo-diferencia positivo';
+                } else if (diferencia < -0.1) {
+                    divDif.textContent = 'Faltante: ' + diferencia.toFixed(2) + ' kg (-' + porcentaje + '%)';
+                    divDif.className = 'conteo-diferencia negativo';
+                } else {
+                    divDif.textContent = 'Coincide ✓';
+                    divDif.className = 'conteo-diferencia neutro';
+                }
+            }
+        }
+        
+        function generarReporteConteo() {
+            if (productosEnConteo.length === 0) {
+                mostrarMensaje('❌ SIN PRODUCTOS\n\nAgrega productos al conteo', 'error');
+                return;
+            }
+            
+            // Verificar que XLSX esté disponible
+            if (typeof XLSX === 'undefined') {
+                mostrarMensaje('❌ ERROR\n\nLibrería Excel no cargada.\nRecarga la página.', 'error');
+                return;
+            }
+            
+            try {
+                var fecha = new Date().toLocaleDateString('es-CO');
+                var hora = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                
+                // Crear datos para Excel
+                var datos = [];
+                
+                productosEnConteo.forEach(function(producto) {
+                    var input = document.querySelector('input[data-producto="' + producto + '"]');
+                    var sistema = parseFloat(input.getAttribute('data-sistema'));
+                    var fisico = parseFloat(input.value) || 0;
+                    var diferencia = fisico - sistema;
+                    var porcentaje = sistema > 0 ? ((Math.abs(diferencia) / sistema) * 100).toFixed(1) : 0;
+                    var estado = diferencia > 0.1 ? 'Exceso' : (diferencia < -0.1 ? 'Faltante' : 'OK');
+                    
+                    datos.push({
+                        'PRODUCTO': producto,
+                        'SISTEMA': sistema,
+                        'FISICO': fisico,
+                        'DIFERENCIA': diferencia,
+                        'PORCENTAJE': (diferencia >= 0 ? '+' : '') + porcentaje + '%',
+                        'ESTADO': estado
+                    });
+                });
+                
+                // Crear libro de Excel
+                var wb = XLSX.utils.book_new();
+                var ws = XLSX.utils.json_to_sheet(datos);
+                
+                // Ajustar ancho de columnas
+                var colWidths = [
+                    {wch: 35}, // PRODUCTO
+                    {wch: 12}, // SISTEMA
+                    {wch: 12}, // FISICO
+                    {wch: 12}, // DIFERENCIA
+                    {wch: 12}, // PORCENTAJE
+                    {wch: 15}  // ESTADO
+                ];
+                ws['!cols'] = colWidths;
+                
+                XLSX.utils.book_append_sheet(wb, ws, "Conteo Físico");
+                
+                XLSX.writeFile(wb, 'Conteo_Fisico_Entradas_' + fecha.replace(/\//g, '-') + '.xlsx');
+                
+                mostrarMensaje('✅ REPORTE GENERADO\n\nExcel descargado', 'exito');
+                cerrarConteoFisico();
+                
+            } catch (error) {
+                console.error('Error al generar reporte:', error);
+                mostrarMensaje('❌ ERROR AL EXPORTAR\n\n' + error.message, 'error');
+            }
+        }
+        
+        function cerrarConteoFisico() {
+            document.getElementById('modalConteo').classList.remove('activo');
+        }
+        
+        // UTILIDADES
+        function limpiarCamposProducto() {
+            // Solo limpiar campos de producto, NO proveedor/factura/responsable
+            if (tipoActual === 'compra') {
+                document.getElementById('productoCompra').value = '';
+                document.getElementById('loteCompra').value = '';
+                document.getElementById('loteCompra').placeholder = 'Selecciona producto primero';
+                document.getElementById('cantidadCompra').value = '';
+                document.getElementById('unidadCompra').selectedIndex = 0;
+                document.getElementById('totalCompra').value = '';
+                document.getElementById('observacionesCompra').value = '';
+                document.getElementById('costoUnitarioCompra').classList.add('oculto');
+                
+                // Mostrar info de registro múltiple
+                document.getElementById('infoRegistroMultiple').classList.remove('oculto');
+                
+                // Enfocar en campo producto para siguiente
+                setTimeout(function() {
+                    document.getElementById('productoCompra').focus();
+                }, 100);
+            } else if (tipoActual === 'produccion') {
+                // Para producción limpiar todo normal
+                limpiarFormularios();
+            }
+        }
+        
+        function limpiarFormularios() {
+            document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(function(input) {
+                if (!input.readOnly) input.value = '';
+            });
+            document.querySelectorAll('select').forEach(function(select) {
+                select.selectedIndex = 0;
+            });
+            // Ocultar info boxes
+            document.getElementById('costoUnitarioCompra').classList.add('oculto');
+            document.getElementById('infoRegistroMultiple').classList.add('oculto');
+            
+            tipoActual = '';
+            produccionActual = '';
+            contadorProductosResultantes = 0;
+            document.getElementById('productosResultantes').innerHTML = '';
+            document.getElementById('formProduccion').classList.add('oculto');
+        }
+        
+        function mostrarMensaje(texto, tipo) {
+            var overlay = document.getElementById('overlay');
+            var mensaje = document.createElement('div');
+            mensaje.className = 'mensaje ' + tipo;
+            mensaje.innerHTML = '<div style="font-size: 18px; white-space: pre-line;">' + texto + '</div>';
+            
+            document.body.appendChild(mensaje);
+            overlay.classList.add('activo');
+            
+            setTimeout(function() {
+                document.body.removeChild(mensaje);
+                overlay.classList.remove('activo');
+            }, 2000);
+        }
+        
+        function actualizarStats() {
+            document.getElementById('stats').textContent = movimientos.length + ' movimientos registrados';
+        }
+        
+        function guardarDatos() {
+            localStorage.setItem('movimientos_rb', JSON.stringify(movimientos));
+        }
+        
+        function cargarDatos() {
+            var datos = localStorage.getItem('movimientos_rb');
+            if (datos) {
+                movimientos = JSON.parse(datos);
+            }
+        }
+    </script>
+</body>
+</html>
