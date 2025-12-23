@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Cocina - El Rincón del Barril</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 0;
+            font-size: 16px;
+        }
+        
+        /* PANTALLA DE SELECCIÓN DE ROL */
+        .role-selector {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .role-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 100%;
+        }
+        .role-title {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .role-subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .role-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .role-btn {
+            background: white;
+            border: 3px solid #ddd;
+            padding: 30px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .role-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .role-btn.eloy {
+            border-color: #4CAF50;
+        }
+        .role-btn.eloy:hover {
+            background: #e8f5e9;
+            border-color: #4CAF50;
+        }
+        .role-btn.oscar {
+            border-color: #2196F3;
+        }
+        .role-btn.oscar:hover {
+            background: #e3f2fd;
+            border-color: #2196F3;
+        }
+        .role-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        .role-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .role-description {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        /* HEADER PRINCIPAL */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-title { font-size: 20px; font-weight: bold; }
+        .header-user {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .header-subtitle { font-size: 12px; opacity: 0.9; margin-top: 5px; }
+        
+        /* TABS/PESTAÑAS */
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid #ddd;
+            position: sticky;
+            top: 75px;
+            z-index: 99;
+        }
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: bold;
+            color: #666;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: #f9f9f9;
+        }
+        .tab.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .tab-icon { font-size: 24px; display: block; margin-bottom: 5px; }
+        .tab-name { font-size: 13px; }
+        
+        /* CONTENIDO */
+        .content {
+            padding: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* TARJETAS */
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* FORMULARIOS */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .input-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 3px;
+        }
+        
+        /* BOTONES */
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #45a049;
+        }
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        /* TABLA */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        tr:hover {
+            background: #f9f9f9;
+        }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 2px;
+            width: auto;
+        }
+        
+        /* ESTADOS Y BADGES */
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-success {
+            background: #e8f5e9;
+            color: #4CAF50;
+        }
+        .badge-warning {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+        .badge-danger {
+            background: #ffebee;
+            color: #f44336;
+        }
+        
+        /* BÚSQUEDA */
+        .search-box {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        .search-input {
+            padding-left: 40px;
+        }
+        
+        /* ALERTAS */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .alert-info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-left: 4px solid #2196F3;
+        }
+        .alert-warning {
+            background: #fff3e0;
+            color: #f57c00;
+            border-left: 4px solid #ff9800;
+        }
+        
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        /* OCULTAR */
+        .hidden { display: none !important; }
+        
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .role-buttons {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- PANTALLA DE SELECCIÓN DE ROL -->
+<div id="roleSelector" class="role-selector">
+    <div class="role-container">
+        <h1 class="role-title">🔑 Sistema Cocina</h1>
+        <p class="role-subtitle">El Rincón del Barril - Selecciona tu rol</p>
+        
+        <div class="role-buttons">
+            <div class="role-btn eloy" onclick="selectRole('eloy')">
+                <div class="role-icon">👨‍🍳</div>
+                <div class="role-name">SOY ELOY</div>
+                <div class="role-description">Registro de Entradas</div>
+            </div>
+            
+            <div class="role-btn oscar" onclick="selectRole('oscar')">
+                <div class="role-icon">📦</div>
+                <div class="role-name">SOY OSCAR</div>
+                <div class="role-description">Salidas e Inventario</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SISTEMA PRINCIPAL -->
+<div id="mainSystem" class="hidden">
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-content">
+            <div>
+                <div class="header-title">Sistema Cocina</div>
+                <div class="header-subtitle" id="headerSubtitle">El Rincón del Barril</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="header-user" id="currentUser">Usuario</div>
+                <button onclick="volverAlMenu()" style="background: rgba(255,255,255,0.3); border: 2px solid white; color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px;">
+                    🔙 Volver al Menú
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- TABS -->
+    <div class="tabs">
+        <div class="tab" id="tabEntradas" onclick="switchTab('entradas')">
+            <span class="tab-icon">📥</span>
+            <span class="tab-name">Entradas</span>
+        </div>
+        <div class="tab" id="tabSalidas" onclick="switchTab('salidas')">
+            <span class="tab-icon">📤</span>
+            <span class="tab-name">Salidas</span>
+        </div>
+        <div class="tab" id="tabInventario" onclick="switchTab('inventario')">
+            <span class="tab-icon">📊</span>
+            <span class="tab-name">Inventario</span>
+        </div>
+    </div>
+    
+    <!-- CONTENIDO -->
+    <div class="content">
+        
+        <!-- TAB 1: ENTRADAS -->
+        <div id="contentEntradas" class="tab-content">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statsEntradasHoy">0</div>
+                    <div class="stat-label">Entradas Hoy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statsEntradasMes">0</div>
+                    <div class="stat-label">Este Mes</div>
+                </div>
+            </div>
+            
+            <!-- Formulario -->
+            <div class="card">
+                <h2 class="card-title">📥 Registrar Entrada</h2>
+                
+                <div class="form-group">
+                    <label>Producto *</label>
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="entradaProductoSearch" class="search-input" 
+                               placeholder="Buscar producto..." oninput="filterProductsEntrada()">
+                    </div>
+                    <select id="entradaProducto" onchange="autoCompleteEntrada()">
+                        <option value="">Seleccionar producto...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Cantidad *</label>
+                    <input type="number" id="entradaCantidad" step="0.01" placeholder="0.00">
+                </div>
+                
+                <div class="form-group">
+                    <label>Unidad</label>
+                    <input type="text" id="entradaUnidad" placeholder="kg, Un, Ml...">
+                    <div class="input-hint">Se completa automático según producto</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Proveedor</label>
+                    <select id="entradaProveedor">
+                        <option value="">Seleccionar proveedor...</option>
+                        <option value="SURTIEMBUTIDOS SAN NICOLAS">SURTIEMBUTIDOS SAN NICOLAS</option>
+                        <option value="CHARCUTERIA">CHARCUTERIA</option>
+                        <option value="ATLANTIC">ATLANTIC</option>
+                        <option value="NOVILLON">NOVILLON</option>
+                        <option value="MC POLLO">MC POLLO</option>
+                        <option value="MCCORMICK">MCCORMICK</option>
+                        <option value="BODEGA">BODEGA</option>
+                        <option value="MIS TRES AMORES">MIS TRES AMORES</option>
+                        <option value="MAKRO">MAKRO</option>
+                        <option value="COCA COLA">COCA COLA</option>
+                        <option value="CENABASTOS">CENABASTOS</option>
+                        <option value="PLASTICOS">PLASTICOS</option>
+                        <option value="produccion">Producción Interna</option>
+                        <option value="Barril">Barril</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                    <div class="input-hint">Se completa automático según producto (editable)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Responsable</label>
+                    <input type="text" id="entradaResponsable" placeholder="Nombre responsable">
+                    <div class="input-hint">Se completa automático</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Factura (opcional)</label>
+                    <input type="text" id="entradaFactura" placeholder="Número de factura">
+                </div>
+                
+                <div class="form-group">
+                    <label>Lote (opcional)</label>
+                    <input type="text" id="entradaLote" placeholder="Número de lote">
+                </div>
+                
+                <button class="btn btn-success" onclick="guardarEntrada()">
+                    ✅ GUARDAR ENTRADA
+                </button>
+            </div>
+            
+            <!-- Tabla de entradas -->
+            <div class="card">
+                <h2 class="card-title">📋 Entradas Registradas</h2>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-primary" onclick="exportarExcelEntradas()" style="flex: 1;">
+                        📊 EXPORTAR ENTRADAS
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportarAuditoria()" style="flex: 1;">
+                        📋 EXPORTAR AUDITORÍA
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="tablaEntradas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Proveedor</th>
+                                <th>Responsable</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyEntradas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB 2: SALIDAS -->
+        <div id="contentSalidas" class="tab-content">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statsSalidasHoy">0</div>
+                    <div class="stat-label">Salidas Hoy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statsMermasHoy">0</div>
+                    <div class="stat-label">Mermas Hoy</div>
+                </div>
+            </div>
+            
+            <!-- Formulario -->
+            <div class="card">
+                <h2 class="card-title">📤 Registrar Salida</h2>
+                
+                <div class="form-group">
+                    <label>Tipo de Salida *</label>
+                    <select id="salidaTipo" onchange="mostrarProductosSalida()">
+                        <option value="">Seleccionar tipo...</option>
+                        <option value="produccion">📦 Producción</option>
+                        <option value="barril">🔥 Barril</option>
+                        <option value="consumo">🍽️ Consumo</option>
+                        <option value="merma">🗑️ Merma</option>
+                    </select>
+                </div>
+                
+                <!-- Contenedor dinámico según tipo -->
+                <div id="salidaFormDinamico"></div>
+                
+                <button class="btn btn-success" onclick="guardarSalida()" id="btnGuardarSalida" style="display:none;">
+                    ✅ GUARDAR SALIDA
+                </button>
+            </div>
+            
+            <!-- Tabla de salidas -->
+            <div class="card">
+                <h2 class="card-title">📋 Salidas Registradas</h2>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-primary" onclick="exportarExcelSalidas()" style="flex: 1;">
+                        📊 EXPORTAR SALIDAS
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportarAuditoria()" style="flex: 1;">
+                        📋 EXPORTAR AUDITORÍA
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Detalles</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodySalidas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB 3: INVENTARIO -->
+        <div id="contentInventario" class="tab-content">
+            <!-- Alerta de inventario inicial -->
+            <div class="alert alert-info" id="alertInventarioInicial">
+                📦 <strong>Inventario del día:</strong> 
+                <span id="totalProductosInventario">0</span> productos registrados con fecha de hoy.
+                <button class="btn btn-secondary btn-small" onclick="scrollToTablaInventario()" style="margin-left:10px;">
+                    Ver Productos
+                </button>
+            </div>
+            
+            <!-- Ver entradas (solo lectura para Oscar) -->
+            <div class="alert alert-info" id="alertVerEntradas" style="display:none;">
+                👁️ <strong>Entradas registradas:</strong> Aquí puedes ver lo que Eloy registró
+                <button class="btn btn-secondary btn-small" onclick="toggleVerEntradas()" style="margin-left:10px;">
+                    Ver Entradas
+                </button>
+            </div>
+            
+            <div id="verEntradasContainer" style="display:none;" class="card">
+                <h2 class="card-title">👁️ Entradas (Solo Lectura)</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Proveedor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyVerEntradas"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statsProductosTotal">34</div>
+                    <div class="stat-label">Productos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statsConteoHoy">0</div>
+                    <div class="stat-label">Conteos Hoy</div>
+                </div>
+            </div>
+            
+            <!-- Formulario -->
+            <div class="card">
+                <h2 class="card-title">📊 Registrar Conteo Físico</h2>
+                
+                <div class="form-group">
+                    <label>Producto *</label>
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="inventarioProductoSearch" class="search-input" 
+                               placeholder="Buscar producto..." oninput="filterProductsInventario()">
+                    </div>
+                    <select id="inventarioProducto" onchange="autoCompleteInventario()">
+                        <option value="">Seleccionar producto...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Cantidad Contada *</label>
+                    <input type="number" id="inventarioCantidad" step="0.01" placeholder="0.00">
+                </div>
+                
+                <div id="inventarioEstadoContainer" class="form-group" style="display:none;">
+                    <label>Estado *</label>
+                    <select id="inventarioEstado">
+                        <option value="">Seleccionar...</option>
+                        <option value="crudo">Crudo</option>
+                        <option value="cocido">Cocido</option>
+                    </select>
+                    <div class="input-hint">Solo para carnes y comidas preparadas</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Proveedor</label>
+                    <input type="text" id="inventarioProveedor" placeholder="Auto-completa" readonly style="background:#f5f5f5;">
+                </div>
+                
+                <div class="form-group">
+                    <label>Unidad</label>
+                    <input type="text" id="inventarioUnidad" placeholder="Auto-completa" readonly style="background:#f5f5f5;">
+                </div>
+                
+                <button class="btn btn-success" onclick="guardarInventario()">
+                    ✅ GUARDAR CONTEO
+                </button>
+            </div>
+            
+            <!-- Tabla inventario -->
+            <div class="card">
+                <h2 class="card-title">📋 Inventario Actual</h2>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-primary" onclick="exportarExcelInventario()" style="flex: 2;">
+                        📊 EXPORTAR INVENTARIO
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportarAuditoria()" style="flex: 2;">
+                        📋 EXPORTAR AUDITORÍA
+                    </button>
+                    <button class="btn btn-danger" onclick="reiniciarInventario()" style="flex: 1;">
+                        🔄 Reiniciar
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyInventario"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+// ========================================
+// CONFIGURACIÓN Y DATOS
+// ========================================
+
+let currentRole = null;
+let currentUser = '';
+
+// Base de datos de productos de COCINA con cantidades iniciales
+const PRODUCTOS_COCINA = [
+    {nombre: 'Tocineta', proveedor: 'SURTIEMBUTIDOS SAN NICOLAS', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 3.34},
+    {nombre: 'Salchicha alemana', proveedor: 'CHARCUTERIA', unidad: 'Un', categoria: 'Carnes', tieneEstado: false, stockInicial: 9},
+    {nombre: 'Queso paisa', proveedor: 'CHARCUTERIA', unidad: 'Kg', categoria: 'Lácteos', tieneEstado: false, stockInicial: 1},
+    {nombre: 'Queso cheddar x16', proveedor: 'ATLANTIC', unidad: 'Un', categoria: 'Lácteos', tieneEstado: false, stockInicial: 93},
+    {nombre: 'Punta de anca de res', proveedor: 'NOVILLON', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 6.72},
+    {nombre: 'Pollo en trozos', proveedor: 'produccion', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 9.1},
+    {nombre: 'Pechuga de pollo', proveedor: 'MC POLLO', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 10.6},
+    {nombre: 'Pecho de res', proveedor: 'ATLANTIC', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 0},
+    {nombre: 'Papa marquise', proveedor: 'ATLANTIC', unidad: 'Kg', categoria: 'Verduras', tieneEstado: false, stockInicial: 5},
+    {nombre: 'Pan de mini hamburguesa', proveedor: 'MCCORMICK', unidad: 'Un', categoria: 'Panadería', tieneEstado: false, stockInicial: 64},
+    {nombre: 'Panceta de cerdo', proveedor: 'ATLANTIC', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 1.79},
+    {nombre: 'Pan brioche de perro', proveedor: 'MCCORMICK', unidad: 'Un', categoria: 'Panadería', tieneEstado: false, stockInicial: 9},
+    {nombre: 'Pan brioche de hamburguesa', proveedor: 'MCCORMICK', unidad: 'Un', categoria: 'Panadería', tieneEstado: false, stockInicial: 16},
+    {nombre: 'Morcilla', proveedor: 'NOVILLON', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 0.77},
+    {nombre: 'Mini croqueta de carne', proveedor: 'produccion', unidad: 'Un', categoria: 'Preparados', tieneEstado: true, stockInicial: 79},
+    {nombre: 'Lomo de cerdo', proveedor: 'ATLANTIC', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 0},
+    {nombre: 'Frijol bolon grande', proveedor: 'BODEGA', unidad: 'Kg', categoria: 'Granos', tieneEstado: false, stockInicial: 1.5},
+    {nombre: 'Croqueta de carne', proveedor: 'produccion', unidad: 'Un', categoria: 'Preparados', tieneEstado: true, stockInicial: 50},
+    {nombre: 'Costilla de cerdo', proveedor: 'ATLANTIC', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 1.5, estadoInicial: 'crudo'},
+    {nombre: 'Costilla de cerdo cocida', proveedor: 'Barril', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 3.8, estadoInicial: 'cocido'},
+    {nombre: 'Contramuslos de pollo', proveedor: 'MC POLLO', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 0},
+    {nombre: 'Colita de cadera', proveedor: 'NOVILLON', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 0.75},
+    {nombre: 'Chorizo x25', proveedor: 'SURTIEMBUTIDOS SAN NICOLAS', unidad: 'Un', categoria: 'Carnes', tieneEstado: true, stockInicial: 3.23},
+    {nombre: 'Cebolla cabezona', proveedor: 'MIS TRES AMORES', unidad: 'Kg', categoria: 'Verduras', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Tomate', proveedor: 'MIS TRES AMORES', unidad: 'Kg', categoria: 'Verduras', tieneEstado: false, stockInicial: 6},
+    {nombre: 'Panela', proveedor: 'MIS TRES AMORES', unidad: 'Un', categoria: 'Despensa', tieneEstado: false, stockInicial: 1},
+    {nombre: 'Mayonesa', proveedor: 'MIS TRES AMORES', unidad: 'Un', categoria: 'Salsas', tieneEstado: false, stockInicial: 1},
+    {nombre: 'Arroz', proveedor: 'MIS TRES AMORES', unidad: 'Kg', categoria: 'Granos', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Carne molida regular', proveedor: '', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 0},
+    {nombre: 'Carne molida angus CAB', proveedor: '', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 0},
+    {nombre: 'Sancocho preparado', proveedor: '', unidad: 'Kg', categoria: 'Preparados', tieneEstado: true, stockInicial: 0},
+    {nombre: 'Arroz preparado', proveedor: '', unidad: 'Kg', categoria: 'Preparados', tieneEstado: true, stockInicial: 0},
+    {nombre: 'Frijoles preparados', proveedor: '', unidad: 'Kg', categoria: 'Preparados', tieneEstado: true, stockInicial: 0},
+    {nombre: 'Chicharrón', proveedor: '', unidad: 'Kg', categoria: 'Carnes', tieneEstado: true, stockInicial: 0}
+];
+
+// Productos específicos por tipo de salida
+const PRODUCTOS_PRODUCCION = ['Pechuga de pollo', 'Carne molida regular', 'Carne molida angus CAB'];
+const PRODUCTOS_BARRIL = ['Chicharrón', 'Lomo de cerdo', 'Costilla de cerdo'];
+
+// ========================================
+// GESTIÓN DE ROL Y ACCESO
+// ========================================
+
+function selectRole(role) {
+    currentRole = role;
+    currentUser = role === 'eloy' ? 'Eloy' : 'Oscar';
+    
+    // Guardar rol en localStorage
+    localStorage.setItem('currentRole', role);
+    
+    // Ocultar selector y mostrar sistema
+    document.getElementById('roleSelector').classList.add('hidden');
+    document.getElementById('mainSystem').classList.remove('hidden');
+    document.getElementById('currentUser').textContent = currentUser;
+    
+    // Configurar tabs según rol
+    if (role === 'eloy') {
+        // Eloy: solo Entradas activo
+        document.getElementById('tabEntradas').classList.remove('disabled');
+        document.getElementById('tabSalidas').classList.add('disabled');
+        document.getElementById('tabInventario').classList.add('disabled');
+        switchTab('entradas');
+        document.getElementById('headerSubtitle').textContent = 'Registro de Entradas';
+    } else {
+        // Oscar: Salidas e Inventario activos, Entradas solo lectura
+        document.getElementById('tabEntradas').classList.add('disabled');
+        document.getElementById('tabSalidas').classList.remove('disabled');
+        document.getElementById('tabInventario').classList.remove('disabled');
+        switchTab('salidas');
+        document.getElementById('headerSubtitle').textContent = 'Salidas e Inventario';
+        document.getElementById('alertVerEntradas').style.display = 'block';
+    }
+    
+    // Cargar datos
+    cargarProductos();
+    
+    // Cargar inventario inicial si no existe
+    const inventarioCargado = cargarInventarioInicial();
+    if (inventarioCargado && currentRole === 'oscar') {
+        setTimeout(() => {
+            alert('📦 Inventario inicial cargado con 28 productos. Revisa la pestaña Inventario para ver las cantidades.');
+        }, 500);
+    }
+    
+    cargarDatos();
+    registrarAuditoria('Inicio de sesión', '', `${currentUser} inició sesión`);
+}
+
+function switchTab(tab) {
+    // Si es disabled, no hacer nada
+    const tabElement = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+    if (tabElement.classList.contains('disabled')) {
+        return;
+    }
+    
+    // Desactivar todos
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    // Activar seleccionado
+    tabElement.classList.add('active');
+    document.getElementById('content' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+}
+
+// ========================================
+// GESTIÓN DE PRODUCTOS
+// ========================================
+
+function cargarProductos() {
+    // Cargar en select de entradas
+    const selectEntrada = document.getElementById('entradaProducto');
+    selectEntrada.innerHTML = '<option value="">Seleccionar producto...</option>';
+    PRODUCTOS_COCINA.forEach(prod => {
+        selectEntrada.innerHTML += `<option value="${prod.nombre}">${prod.nombre}</option>`;
+    });
+    
+    // Cargar en select de inventario
+    const selectInventario = document.getElementById('inventarioProducto');
+    selectInventario.innerHTML = '<option value="">Seleccionar producto...</option>';
+    PRODUCTOS_COCINA.forEach(prod => {
+        selectInventario.innerHTML += `<option value="${prod.nombre}">${prod.nombre}</option>`;
+    });
+}
+
+function filterProductsEntrada() {
+    const search = document.getElementById('entradaProductoSearch').value.toLowerCase();
+    const select = document.getElementById('entradaProducto');
+    const options = select.querySelectorAll('option');
+    
+    options.forEach((option, index) => {
+        if (index === 0) return; // Skip first option
+        const text = option.text.toLowerCase();
+        option.style.display = text.includes(search) ? '' : 'none';
+    });
+}
+
+function filterProductsInventario() {
+    const search = document.getElementById('inventarioProductoSearch').value.toLowerCase();
+    const select = document.getElementById('inventarioProducto');
+    const options = select.querySelectorAll('option');
+    
+    options.forEach((option, index) => {
+        if (index === 0) return;
+        const text = option.text.toLowerCase();
+        option.style.display = text.includes(search) ? '' : 'none';
+    });
+}
+
+function autoCompleteEntrada() {
+    const productoNombre = document.getElementById('entradaProducto').value;
+    const producto = PRODUCTOS_COCINA.find(p => p.nombre === productoNombre);
+    
+    if (producto) {
+        document.getElementById('entradaUnidad').value = producto.unidad;
+        document.getElementById('entradaProveedor').value = producto.proveedor;
+        document.getElementById('entradaResponsable').value = currentUser;
+    }
+}
+
+function autoCompleteInventario() {
+    const productoNombre = document.getElementById('inventarioProducto').value;
+    const producto = PRODUCTOS_COCINA.find(p => p.nombre === productoNombre);
+    
+    if (producto) {
+        document.getElementById('inventarioUnidad').value = producto.unidad;
+        document.getElementById('inventarioProveedor').value = producto.proveedor;
+        
+        // Mostrar campo Estado solo si el producto lo requiere
+        if (producto.tieneEstado) {
+            document.getElementById('inventarioEstadoContainer').style.display = 'block';
+        } else {
+            document.getElementById('inventarioEstadoContainer').style.display = 'none';
+            document.getElementById('inventarioEstado').value = '';
+        }
+    }
+}
+
+// ========================================
+// SALIDAS - FORMULARIO DINÁMICO
+// ========================================
+
+function mostrarProductosSalida() {
+    const tipo = document.getElementById('salidaTipo').value;
+    const container = document.getElementById('salidaFormDinamico');
+    const btnGuardar = document.getElementById('btnGuardarSalida');
+    
+    if (!tipo) {
+        container.innerHTML = '';
+        btnGuardar.style.display = 'none';
+        return;
+    }
+    
+    let html = '';
+    
+    if (tipo === 'produccion') {
+        html = `
+            <div class="alert alert-info">
+                📦 <strong>Producción:</strong> Producto transformado para venta
+            </div>
+            <div class="form-group">
+                <label>Producto *</label>
+                <select id="salidaProducto">
+                    <option value="">Seleccionar...</option>
+                    ${PRODUCTOS_PRODUCCION.map(p => `<option value="${p}">${p}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Cantidad *</label>
+                <input type="number" id="salidaCantidad" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Lote (opcional)</label>
+                <input type="text" id="salidaLote" placeholder="Número de lote">
+            </div>
+        `;
+    }
+    else if (tipo === 'barril') {
+        html = `
+            <div class="alert alert-info">
+                🔥 <strong>Barril:</strong> Producto para cocinar al barril
+            </div>
+            <div class="form-group">
+                <label>Producto *</label>
+                <select id="salidaProducto">
+                    <option value="">Seleccionar...</option>
+                    ${PRODUCTOS_BARRIL.map(p => `<option value="${p}">${p}</option>`).join('')}
+                    <option value="__nuevo__">➕ Crear nuevo producto</option>
+                </select>
+            </div>
+            <div class="form-group" id="nuevoProductoContainer" style="display:none;">
+                <label>Nombre del nuevo producto</label>
+                <input type="text" id="nuevoProductoNombre" placeholder="Ej: Chicharrón especial">
+            </div>
+            <div class="form-group">
+                <label>Cantidad *</label>
+                <input type="number" id="salidaCantidad" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Lote (opcional)</label>
+                <input type="text" id="salidaLote" placeholder="Número de lote">
+            </div>
+        `;
+    }
+    else if (tipo === 'consumo') {
+        html = `
+            <div class="alert alert-info">
+                🍽️ <strong>Consumo:</strong> Consumo interno
+            </div>
+            <div class="form-group">
+                <label>Producto *</label>
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="consumoProductoSearch" class="search-input" 
+                           placeholder="Buscar producto..." oninput="filterProductsConsumo()">
+                </div>
+                <select id="salidaProducto">
+                    <option value="">Seleccionar producto...</option>
+                    ${PRODUCTOS_COCINA.map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Cantidad *</label>
+                <input type="number" id="salidaCantidad" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Lote (opcional)</label>
+                <input type="text" id="salidaLote" placeholder="Número de lote">
+            </div>
+        `;
+    }
+    else if (tipo === 'merma') {
+        html = `
+            <div class="alert alert-warning">
+                🗑️ <strong>Merma:</strong> Producto perdido o dañado
+            </div>
+            <div class="form-group">
+                <label>Categoría de Merma *</label>
+                <select id="mermaCategoria" onchange="mostrarFormMerma()">
+                    <option value="">Seleccionar...</option>
+                    <option value="produccion">🏭 Merma por Producción/Transformación</option>
+                    <option value="dano">🗑️ Merma por Daño/Pérdida</option>
+                </select>
+            </div>
+            <div id="mermaFormContainer"></div>
+        `;
+    }
+    
+    container.innerHTML = html;
+    btnGuardar.style.display = 'block';
+    
+    // Si es barril, detectar cuando selecciona "nuevo producto"
+    if (tipo === 'barril') {
+        document.getElementById('salidaProducto').addEventListener('change', function() {
+            const nuevoContainer = document.getElementById('nuevoProductoContainer');
+            if (this.value === '__nuevo__') {
+                nuevoContainer.style.display = 'block';
+            } else {
+                nuevoContainer.style.display = 'none';
+            }
+        });
+    }
+}
+
+function filterProductsConsumo() {
+    const search = document.getElementById('consumoProductoSearch').value.toLowerCase();
+    const select = document.getElementById('salidaProducto');
+    const options = select.querySelectorAll('option');
+    
+    options.forEach((option, index) => {
+        if (index === 0) return;
+        const text = option.text.toLowerCase();
+        option.style.display = text.includes(search) ? '' : 'none';
+    });
+}
+
+function mostrarFormMerma() {
+    const categoria = document.getElementById('mermaCategoria').value;
+    const container = document.getElementById('mermaFormContainer');
+    
+    if (!categoria) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    
+    if (categoria === 'produccion') {
+        html = `
+            <div class="form-group">
+                <label>Producto Origen *</label>
+                <select id="mermaProductoOrigen">
+                    <option value="">Seleccionar...</option>
+                    ${PRODUCTOS_COCINA.map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Cantidad Origen *</label>
+                <input type="number" id="mermaCantidadOrigen" step="0.01" placeholder="0.00">
+                <div class="input-hint">Cantidad inicial procesada</div>
+            </div>
+            <div class="form-group">
+                <label>Proceso *</label>
+                <select id="mermaProceso">
+                    <option value="">Seleccionar...</option>
+                    <option value="filetear">Filetear</option>
+                    <option value="trozar">Trozar</option>
+                    <option value="limpiar">Limpiar/Desgrasar</option>
+                    <option value="deshuesar">Deshuesar</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-group" id="mermaProcesoOtroContainer" style="display:none;">
+                <label>Especificar proceso</label>
+                <input type="text" id="mermaProcesoOtro" placeholder="Ej: Cortar en cubos">
+            </div>
+            <div class="form-group">
+                <label>Merma Generada *</label>
+                <input type="number" id="mermaCantidadGenerada" step="0.01" placeholder="0.00">
+                <div class="input-hint">Cantidad perdida en el proceso</div>
+            </div>
+            <div class="form-group">
+                <label>Porcentaje de Merma</label>
+                <input type="text" id="mermaPorcentaje" readonly style="background:#f5f5f5;" placeholder="Se calcula automático">
+            </div>
+            <div class="form-group">
+                <label>Notas (opcional)</label>
+                <textarea id="mermaNotas" placeholder="Ej: Huesos, piel y grasa"></textarea>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        
+        // Calcular porcentaje automático
+        document.getElementById('mermaCantidadOrigen').addEventListener('input', calcularPorcentajeMerma);
+        document.getElementById('mermaCantidadGenerada').addEventListener('input', calcularPorcentajeMerma);
+        
+        // Mostrar campo "otro" si selecciona otro
+        document.getElementById('mermaProceso').addEventListener('change', function() {
+            const otroContainer = document.getElementById('mermaProcesoOtroContainer');
+            if (this.value === 'otro') {
+                otroContainer.style.display = 'block';
+            } else {
+                otroContainer.style.display = 'none';
+            }
+        });
+    }
+    else if (categoria === 'dano') {
+        html = `
+            <div class="form-group">
+                <label>Producto *</label>
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="mermaDanoProductoSearch" class="search-input" 
+                           placeholder="Buscar producto..." oninput="filterProductsMermaDano()">
+                </div>
+                <select id="salidaProducto">
+                    <option value="">Seleccionar producto...</option>
+                    ${PRODUCTOS_COCINA.map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Cantidad *</label>
+                <input type="number" id="salidaCantidad" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Motivo *</label>
+                <select id="mermaMotivo">
+                    <option value="">Seleccionar...</option>
+                    <option value="dano">Se dañó/Descompuso</option>
+                    <option value="caida">Se cayó al piso</option>
+                    <option value="vencido">Producto vencido</option>
+                    <option value="mal_almacenado">Mal almacenado</option>
+                    <option value="quemado">Quemado/Sobrecocido</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-group" id="mermaMotivoOtroContainer" style="display:none;">
+                <label>Especificar motivo</label>
+                <input type="text" id="mermaMotivoOtro" placeholder="Describir motivo">
+            </div>
+            <div class="form-group">
+                <label>Notas (opcional)</label>
+                <textarea id="mermaNotas" placeholder="Detalles adicionales"></textarea>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        
+        // Mostrar campo "otro" si selecciona otro
+        document.getElementById('mermaMotivo').addEventListener('change', function() {
+            const otroContainer = document.getElementById('mermaMotivoOtroContainer');
+            if (this.value === 'otro') {
+                otroContainer.style.display = 'block';
+            } else {
+                otroContainer.style.display = 'none';
+            }
+        });
+    }
+}
+
+function filterProductsMermaDano() {
+    const search = document.getElementById('mermaDanoProductoSearch').value.toLowerCase();
+    const select = document.getElementById('salidaProducto');
+    const options = select.querySelectorAll('option');
+    
+    options.forEach((option, index) => {
+        if (index === 0) return;
+        const text = option.text.toLowerCase();
+        option.style.display = text.includes(search) ? '' : 'none';
+    });
+}
+
+function calcularPorcentajeMerma() {
+    const origen = parseFloat(document.getElementById('mermaCantidadOrigen').value) || 0;
+    const generada = parseFloat(document.getElementById('mermaCantidadGenerada').value) || 0;
+    
+    if (origen > 0) {
+        const porcentaje = (generada / origen * 100).toFixed(1);
+        document.getElementById('mermaPorcentaje').value = porcentaje + '%';
+    } else {
+        document.getElementById('mermaPorcentaje').value = '';
+    }
+}
+
+// ========================================
+// GUARDAR DATOS
+// ========================================
+
+function guardarEntrada() {
+    const producto = document.getElementById('entradaProducto').value;
+    const cantidad = document.getElementById('entradaCantidad').value;
+    
+    if (!producto || !cantidad) {
+        alert('Por favor completa los campos obligatorios (*)');
+        return;
+    }
+    
+    const entrada = {
+        id: Date.now(),
+        fecha: new Date().toISOString(),
+        producto: producto,
+        cantidad: parseFloat(cantidad),
+        unidad: document.getElementById('entradaUnidad').value,
+        proveedor: document.getElementById('entradaProveedor').value,
+        responsable: document.getElementById('entradaResponsable').value,
+        factura: document.getElementById('entradaFactura').value,
+        lote: document.getElementById('entradaLote').value,
+        usuario: currentUser
+    };
+    
+    // Guardar
+    let entradas = JSON.parse(localStorage.getItem('entradas') || '[]');
+    entradas.push(entrada);
+    localStorage.setItem('entradas', JSON.stringify(entradas));
+    
+    // Auditoría
+    registrarAuditoria('Creó', producto, `Entrada: ${cantidad} ${entrada.unidad}`);
+    
+    // Limpiar form
+    document.getElementById('entradaProducto').value = '';
+    document.getElementById('entradaCantidad').value = '';
+    document.getElementById('entradaUnidad').value = '';
+    document.getElementById('entradaProveedor').value = '';
+    document.getElementById('entradaFactura').value = '';
+    document.getElementById('entradaLote').value = '';
+    
+    // Recargar
+    cargarDatos();
+    alert('✅ Entrada guardada correctamente');
+}
+
+function guardarSalida() {
+    const tipo = document.getElementById('salidaTipo').value;
+    
+    if (!tipo) {
+        alert('Selecciona el tipo de salida');
+        return;
+    }
+    
+    let salida = {
+        id: Date.now(),
+        fecha: new Date().toISOString(),
+        tipo: tipo,
+        usuario: currentUser
+    };
+    
+    // Según tipo, capturar datos
+    if (tipo === 'produccion' || tipo === 'barril' || tipo === 'consumo') {
+        let producto = document.getElementById('salidaProducto').value;
+        const cantidad = document.getElementById('salidaCantidad').value;
+        
+        if (!producto || !cantidad) {
+            alert('Completa los campos obligatorios');
+            return;
+        }
+        
+        // Si es barril y seleccionó "nuevo"
+        if (tipo === 'barril' && producto === '__nuevo__') {
+            const nuevoNombre = document.getElementById('nuevoProductoNombre').value;
+            if (!nuevoNombre) {
+                alert('Escribe el nombre del nuevo producto');
+                return;
+            }
+            producto = nuevoNombre;
+        }
+        
+        salida.producto = producto;
+        salida.cantidad = parseFloat(cantidad);
+        salida.lote = document.getElementById('salidaLote').value;
+        
+        // Buscar unidad del producto
+        const prodData = PRODUCTOS_COCINA.find(p => p.nombre === producto);
+        salida.unidad = prodData ? prodData.unidad : 'Un';
+    }
+    else if (tipo === 'merma') {
+        const categoria = document.getElementById('mermaCategoria').value;
+        
+        if (!categoria) {
+            alert('Selecciona la categoría de merma');
+            return;
+        }
+        
+        salida.mermaCategoria = categoria;
+        
+        if (categoria === 'produccion') {
+            const productoOrigen = document.getElementById('mermaProductoOrigen').value;
+            const cantidadOrigen = document.getElementById('mermaCantidadOrigen').value;
+            const proceso = document.getElementById('mermaProceso').value;
+            const cantidadGenerada = document.getElementById('mermaCantidadGenerada').value;
+            
+            if (!productoOrigen || !cantidadOrigen || !proceso || !cantidadGenerada) {
+                alert('Completa todos los campos obligatorios');
+                return;
+            }
+            
+            salida.producto = productoOrigen;
+            salida.cantidadOrigen = parseFloat(cantidadOrigen);
+            salida.proceso = proceso === 'otro' ? document.getElementById('mermaProcesoOtro').value : proceso;
+            salida.cantidad = parseFloat(cantidadGenerada);
+            salida.porcentaje = document.getElementById('mermaPorcentaje').value;
+            salida.notas = document.getElementById('mermaNotas').value;
+            
+            const prodData = PRODUCTOS_COCINA.find(p => p.nombre === productoOrigen);
+            salida.unidad = prodData ? prodData.unidad : 'Un';
+        }
+        else if (categoria === 'dano') {
+            const producto = document.getElementById('salidaProducto').value;
+            const cantidad = document.getElementById('salidaCantidad').value;
+            const motivo = document.getElementById('mermaMotivo').value;
+            
+            if (!producto || !cantidad || !motivo) {
+                alert('Completa todos los campos obligatorios');
+                return;
+            }
+            
+            salida.producto = producto;
+            salida.cantidad = parseFloat(cantidad);
+            salida.motivo = motivo === 'otro' ? document.getElementById('mermaMotivoOtro').value : motivo;
+            salida.notas = document.getElementById('mermaNotas').value;
+            
+            const prodData = PRODUCTOS_COCINA.find(p => p.nombre === producto);
+            salida.unidad = prodData ? prodData.unidad : 'Un';
+        }
+    }
+    
+    // Guardar
+    let salidas = JSON.parse(localStorage.getItem('salidas') || '[]');
+    salidas.push(salida);
+    localStorage.setItem('salidas', JSON.stringify(salidas));
+    
+    // Auditoría
+    registrarAuditoria('Creó', salida.producto, `Salida ${tipo}: ${salida.cantidad} ${salida.unidad || ''}`);
+    
+    // Limpiar
+    document.getElementById('salidaTipo').value = '';
+    document.getElementById('salidaFormDinamico').innerHTML = '';
+    document.getElementById('btnGuardarSalida').style.display = 'none';
+    
+    // Recargar
+    cargarDatos();
+    alert('✅ Salida guardada correctamente');
+}
+
+function guardarInventario() {
+    const producto = document.getElementById('inventarioProducto').value;
+    const cantidad = document.getElementById('inventarioCantidad').value;
+    
+    if (!producto || !cantidad) {
+        alert('Completa los campos obligatorios');
+        return;
+    }
+    
+    const prodData = PRODUCTOS_COCINA.find(p => p.nombre === producto);
+    const estado = prodData && prodData.tieneEstado ? document.getElementById('inventarioEstado').value : '';
+    
+    if (prodData && prodData.tieneEstado && !estado) {
+        alert('Selecciona el estado (Crudo/Cocido)');
+        return;
+    }
+    
+    const inventario = {
+        id: Date.now(),
+        fecha: new Date().toISOString(),
+        producto: producto,
+        cantidad: parseFloat(cantidad),
+        estado: estado,
+        unidad: document.getElementById('inventarioUnidad').value,
+        proveedor: document.getElementById('inventarioProveedor').value,
+        usuario: currentUser
+    };
+    
+    // Guardar
+    let inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    inventarios.push(inventario);
+    localStorage.setItem('inventarios', JSON.stringify(inventarios));
+    
+    // Auditoría
+    registrarAuditoria('Contó', producto, `${cantidad} ${inventario.unidad} - ${estado || 'N/A'}`);
+    
+    // Limpiar
+    document.getElementById('inventarioProducto').value = '';
+    document.getElementById('inventarioCantidad').value = '';
+    document.getElementById('inventarioEstado').value = '';
+    document.getElementById('inventarioUnidad').value = '';
+    document.getElementById('inventarioProveedor').value = '';
+    document.getElementById('inventarioEstadoContainer').style.display = 'none';
+    
+    // Recargar
+    cargarDatos();
+    alert('✅ Conteo guardado correctamente');
+}
+
+// ========================================
+// CARGAR Y MOSTRAR DATOS
+// ========================================
+
+function cargarDatos() {
+    cargarTablaEntradas();
+    cargarTablaSalidas();
+    cargarTablaInventario();
+    actualizarStats();
+}
+
+function cargarTablaEntradas() {
+    const entradas = JSON.parse(localStorage.getItem('entradas') || '[]');
+    const tbody = document.getElementById('bodyEntradas');
+    
+    tbody.innerHTML = entradas.map(e => `
+        <tr>
+            <td>${new Date(e.fecha).toLocaleDateString('es-CO')}</td>
+            <td>${e.producto}</td>
+            <td>${e.cantidad} ${e.unidad}</td>
+            <td>${e.proveedor}</td>
+            <td>${e.responsable}</td>
+            <td>
+                <button class="btn btn-danger btn-small" onclick="eliminarEntrada(${e.id})">🗑️</button>
+            </td>
+        </tr>
+    `).reverse().join('');
+    
+    // También cargar en "Ver Entradas" (para Oscar)
+    const bodyVer = document.getElementById('bodyVerEntradas');
+    bodyVer.innerHTML = entradas.map(e => `
+        <tr>
+            <td>${new Date(e.fecha).toLocaleDateString('es-CO')}</td>
+            <td>${e.producto}</td>
+            <td>${e.cantidad} ${e.unidad}</td>
+            <td>${e.proveedor}</td>
+        </tr>
+    `).reverse().join('');
+}
+
+function cargarTablaSalidas() {
+    const salidas = JSON.parse(localStorage.getItem('salidas') || '[]');
+    const tbody = document.getElementById('bodySalidas');
+    
+    tbody.innerHTML = salidas.map(s => {
+        let detalles = '';
+        if (s.tipo === 'merma' && s.mermaCategoria === 'produccion') {
+            detalles = `${s.proceso} - Merma: ${s.cantidad}${s.unidad} (${s.porcentaje})`;
+        } else if (s.tipo === 'merma' && s.mermaCategoria === 'dano') {
+            detalles = s.motivo;
+        } else {
+            detalles = s.lote || '-';
+        }
+        
+        return `
+            <tr>
+                <td>${new Date(s.fecha).toLocaleDateString('es-CO')}</td>
+                <td><span class="badge badge-${s.tipo === 'merma' ? 'danger' : 'success'}">${s.tipo.toUpperCase()}</span></td>
+                <td>${s.producto}</td>
+                <td>${s.cantidad} ${s.unidad || ''}</td>
+                <td>${detalles}</td>
+                <td>
+                    <button class="btn btn-danger btn-small" onclick="eliminarSalida(${s.id})">🗑️</button>
+                </td>
+            </tr>
+        `;
+    }).reverse().join('');
+}
+
+function cargarTablaInventario() {
+    const inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    const tbody = document.getElementById('bodyInventario');
+    
+    tbody.innerHTML = inventarios.map(i => `
+        <tr>
+            <td>${i.producto}</td>
+            <td>${i.cantidad} ${i.unidad}</td>
+            <td>${i.estado ? '<span class="badge badge-' + (i.estado === 'crudo' ? 'warning' : 'success') + '">' + i.estado.toUpperCase() + '</span>' : '-'}</td>
+            <td>${new Date(i.fecha).toLocaleDateString('es-CO')}</td>
+            <td>
+                <button class="btn btn-danger btn-small" onclick="eliminarInventario(${i.id})">🗑️</button>
+            </td>
+        </tr>
+    `).reverse().join('');
+    
+    // Actualizar contador
+    document.getElementById('totalProductosInventario').textContent = inventarios.length;
+}
+
+function scrollToTablaInventario() {
+    const tabla = document.getElementById('bodyInventario');
+    if (tabla) {
+        tabla.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function actualizarStats() {
+    const hoy = new Date().toDateString();
+    
+    // Entradas
+    const entradas = JSON.parse(localStorage.getItem('entradas') || '[]');
+    const entradasHoy = entradas.filter(e => new Date(e.fecha).toDateString() === hoy).length;
+    const entradasMes = entradas.filter(e => new Date(e.fecha).getMonth() === new Date().getMonth()).length;
+    document.getElementById('statsEntradasHoy').textContent = entradasHoy;
+    document.getElementById('statsEntradasMes').textContent = entradasMes;
+    
+    // Salidas
+    const salidas = JSON.parse(localStorage.getItem('salidas') || '[]');
+    const salidasHoy = salidas.filter(s => new Date(s.fecha).toDateString() === hoy && s.tipo !== 'merma').length;
+    const mermasHoy = salidas.filter(s => new Date(s.fecha).toDateString() === hoy && s.tipo === 'merma').length;
+    document.getElementById('statsSalidasHoy').textContent = salidasHoy;
+    document.getElementById('statsMermasHoy').textContent = mermasHoy;
+    
+    // Inventario
+    const inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    const conteosHoy = inventarios.filter(i => new Date(i.fecha).toDateString() === hoy).length;
+    document.getElementById('statsConteoHoy').textContent = conteosHoy;
+}
+
+// ========================================
+// ELIMINAR DATOS
+// ========================================
+
+function eliminarEntrada(id) {
+    if (!confirm('¿Eliminar esta entrada?')) return;
+    
+    let entradas = JSON.parse(localStorage.getItem('entradas') || '[]');
+    const entrada = entradas.find(e => e.id === id);
+    entradas = entradas.filter(e => e.id !== id);
+    localStorage.setItem('entradas', JSON.stringify(entradas));
+    
+    registrarAuditoria('Eliminó', entrada.producto, 'Entrada eliminada');
+    cargarDatos();
+}
+
+function eliminarSalida(id) {
+    if (!confirm('¿Eliminar esta salida?')) return;
+    
+    let salidas = JSON.parse(localStorage.getItem('salidas') || '[]');
+    const salida = salidas.find(s => s.id === id);
+    salidas = salidas.filter(s => s.id !== id);
+    localStorage.setItem('salidas', JSON.stringify(salidas));
+    
+    registrarAuditoria('Eliminó', salida.producto, 'Salida eliminada');
+    cargarDatos();
+}
+
+function eliminarInventario(id) {
+    if (!confirm('¿Eliminar este conteo?')) return;
+    
+    let inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    const inventario = inventarios.find(i => i.id === id);
+    inventarios = inventarios.filter(i => i.id !== id);
+    localStorage.setItem('inventarios', JSON.stringify(inventarios));
+    
+    registrarAuditoria('Eliminó', inventario.producto, 'Conteo eliminado');
+    cargarDatos();
+}
+
+// ========================================
+// AUDITORÍA
+// ========================================
+
+function registrarAuditoria(accion, producto, detalles) {
+    const registro = {
+        fecha: new Date().toISOString(),
+        usuario: currentUser,
+        accion: accion,
+        producto: producto,
+        detalles: detalles
+    };
+    
+    let auditoria = JSON.parse(localStorage.getItem('auditoria') || '[]');
+    auditoria.push(registro);
+    localStorage.setItem('auditoria', JSON.stringify(auditoria));
+}
+
+// ========================================
+// EXPORTAR A EXCEL
+// ========================================
+
+function exportarExcelEntradas() {
+    const entradas = JSON.parse(localStorage.getItem('entradas') || '[]');
+    
+    const data = entradas.map(e => ({
+        'Fecha': new Date(e.fecha).toLocaleDateString('es-CO'),
+        'Hora': new Date(e.fecha).toLocaleTimeString('es-CO'),
+        'Producto': e.producto,
+        'Cantidad': e.cantidad,
+        'Unidad': e.unidad,
+        'Proveedor': e.proveedor,
+        'Responsable': e.responsable,
+        'Factura': e.factura,
+        'Lote': e.lote,
+        'Usuario': e.usuario
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Entradas');
+    
+    const fechaHoy = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `entradas_${fechaHoy}.xlsx`);
+}
+
+function exportarExcelSalidas() {
+    const salidas = JSON.parse(localStorage.getItem('salidas') || '[]');
+    
+    const data = salidas.map(s => {
+        let obj = {
+            'Fecha': new Date(s.fecha).toLocaleDateString('es-CO'),
+            'Hora': new Date(s.fecha).toLocaleTimeString('es-CO'),
+            'Tipo': s.tipo,
+            'Producto': s.producto,
+            'Cantidad': s.cantidad,
+            'Unidad': s.unidad || ''
+        };
+        
+        if (s.tipo === 'merma') {
+            obj['Categoría Merma'] = s.mermaCategoria;
+            if (s.mermaCategoria === 'produccion') {
+                obj['Proceso'] = s.proceso;
+                obj['Cantidad Origen'] = s.cantidadOrigen;
+                obj['Porcentaje'] = s.porcentaje;
+            } else {
+                obj['Motivo'] = s.motivo;
+            }
+            obj['Notas'] = s.notas;
+        } else {
+            obj['Lote'] = s.lote;
+        }
+        
+        obj['Usuario'] = s.usuario;
+        return obj;
+    });
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Salidas');
+    
+    const fechaHoy = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `salidas_${fechaHoy}.xlsx`);
+}
+
+function exportarExcelInventario() {
+    const inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    
+    const data = inventarios.map(i => ({
+        'Fecha': new Date(i.fecha).toLocaleDateString('es-CO'),
+        'Hora': new Date(i.fecha).toLocaleTimeString('es-CO'),
+        'Producto': i.producto,
+        'Cantidad': i.cantidad,
+        'Unidad': i.unidad,
+        'Estado': i.estado || '-',
+        'Proveedor': i.proveedor,
+        'Usuario': i.usuario
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+    
+    // Agregar fecha de exportación en nombre del archivo
+    const fechaHoy = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `cocina_${fechaHoy}.xlsx`);
+}
+
+// Exportar auditoría
+function exportarAuditoria() {
+    const auditoria = JSON.parse(localStorage.getItem('auditoria') || '[]');
+    
+    const data = auditoria.map(a => ({
+        'Fecha': new Date(a.fecha).toLocaleDateString('es-CO'),
+        'Hora': new Date(a.fecha).toLocaleTimeString('es-CO'),
+        'Usuario': a.usuario,
+        'Acción': a.accion,
+        'Producto': a.producto,
+        'Detalles': a.detalles
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Auditoría');
+    
+    const fechaHoy = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `auditoria-cocina_${fechaHoy}.xlsx`);
+}
+
+// ========================================
+// UTILIDADES
+// ========================================
+
+function toggleVerEntradas() {
+    const container = document.getElementById('verEntradasContainer');
+    container.style.display = container.style.display === 'none' ? 'block' : 'none';
+}
+
+function volverAlMenu() {
+    if (confirm('¿Volver al menú de selección? (No perderás los datos guardados)')) {
+        currentRole = null;
+        currentUser = '';
+        localStorage.removeItem('currentRole');
+        
+        // Ocultar sistema y mostrar selector
+        document.getElementById('mainSystem').classList.add('hidden');
+        document.getElementById('roleSelector').classList.remove('hidden');
+    }
+}
+
+function reiniciarInventario() {
+    if (confirm('⚠️ ¿REINICIAR inventario a valores iniciales? Esto borrará todos los conteos actuales y recargará las cantidades del primer día.')) {
+        localStorage.removeItem('inventarios');
+        cargarInventarioInicial();
+        cargarDatos();
+        alert('✅ Inventario reiniciado con valores iniciales');
+        registrarAuditoria('Reinició inventario', '', 'Inventario reiniciado a valores iniciales');
+    }
+}
+
+// ========================================
+// INICIALIZACIÓN
+// ========================================
+
+// Función para cargar inventario inicial con fecha de hoy
+function cargarInventarioInicial() {
+    // Solo cargar si no existe inventario
+    const inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    
+    if (inventarios.length === 0) {
+        console.log('🔄 Cargando inventario inicial...');
+        const hoy = new Date().toISOString();
+        const inventarioInicial = [];
+        
+        let contador = 0;
+        PRODUCTOS_COCINA.forEach((prod, index) => {
+            if (prod.stockInicial > 0) {
+                inventarioInicial.push({
+                    id: Date.now() + index,
+                    fecha: hoy,
+                    producto: prod.nombre,
+                    cantidad: prod.stockInicial,
+                    estado: prod.estadoInicial || (prod.tieneEstado ? 'crudo' : ''),
+                    unidad: prod.unidad,
+                    proveedor: prod.proveedor,
+                    usuario: 'Sistema - Carga Inicial'
+                });
+                contador++;
+            }
+        });
+        
+        localStorage.setItem('inventarios', JSON.stringify(inventarioInicial));
+        console.log('✅ Inventario inicial cargado:', contador, 'productos con stock');
+        console.log('📦 Productos cargados:', inventarioInicial.map(i => i.producto + ': ' + i.cantidad + i.unidad).join(', '));
+        return true;
+    } else {
+        console.log('ℹ️ Inventario ya existe:', inventarios.length, 'productos');
+        return false;
+    }
+}
+
+// Cargar datos al inicio (si ya hay sesión activa)
+if (localStorage.getItem('currentRole')) {
+    const savedRole = localStorage.getItem('currentRole');
+    selectRole(savedRole);
+} else {
+    // Cargar inventario inicial aunque no haya sesión
+    cargarInventarioInicial();
+}
+
+</script>
+
+</body>
+</html>
