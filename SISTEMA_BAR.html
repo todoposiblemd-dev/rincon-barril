@@ -1,0 +1,3727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario de Insumos - Bar | El Rincón del Barril</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #C41E3A 0%, #8B1528 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #C41E3A;
+            font-size: 1.5em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 3px solid #C41E3A;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 18px 30px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -3px;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: rgba(196, 30, 58, 0.1);
+            color: #C41E3A;
+        }
+
+        .tab.active {
+            background: white;
+            color: #C41E3A;
+            border-bottom-color: #C41E3A;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.6em;
+            color: #C41E3A;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #C41E3A;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #8B1528;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+        }
+
+        .btn-secondary {
+            background: #666;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #444;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #C41E3A;
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .required::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .card {
+            background: white;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #C41E3A;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #C41E3A 0%, #8B1528 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(196, 30, 58, 0.05);
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status.entrada {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.salida {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.bajo {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.optimo {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.alto {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin: 0 3px;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.edit {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .action-btn.edit:hover {
+            background: #e0a800;
+        }
+
+        .action-btn.delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .action-btn.delete:hover {
+            background: #c82333;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #C41E3A;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .stat-card h3 {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #C41E3A;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #C41E3A 0%, #8B1528 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5em;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .search-filter input,
+        .search-filter select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .badge-ingrediente {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-gaseosa {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .badge-material {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .badge-otro {
+            background: #e0e0e0;
+            color: #424242;
+        }
+
+        .ingredients-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .ingredient-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 60px;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .ingredient-item input,
+        .ingredient-item select {
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+        }
+
+        .ingredient-item button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .add-ingredient-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .logo {
+                position: static;
+                margin: 0 auto 15px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                width: 100%;
+                text-align: left;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* En móvil, grid de 2 columnas se vuelve 1 columna */
+            .form-row-2cols {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            .search-filter input,
+            .search-filter select {
+                width: 100%;
+            }
+
+            .ingredient-item {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* Grid de 2 columnas para insumo y proveedor */
+        .form-row-2cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .info-box h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .info-box p {
+            color: #424242;
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🍺</div>
+            <h1>Gestión de Inventario - Bar</h1>
+            <p>El Rincón del Barril - Control de Insumos y Materiales</p>
+            <button onclick="limpiarTodoAHORA()" style="position:absolute;top:30px;right:210px;background:#ff4444;border:3px solid white;color:white;padding:12px 25px;border-radius:10px;cursor:pointer;font-weight:bold;font-size:16px;box-shadow:0 4px 8px rgba(0,0,0,0.3);">⚠️ RESETEAR TODO</button>
+            <button onclick="if(confirm('¿Volver al menú principal?')) window.location.reload();" style="position:absolute;top:30px;right:30px;background:rgba(255,255,255,0.2);border:2px solid white;color:white;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:bold;">🔙 Volver al Menú</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('reportes')">📊 Reportes</button>
+            <button class="tab" onclick="showTab('entrada')">📥 Registrar Entrada</button>
+            <button class="tab" onclick="showTab('salida')">📤 Registrar Salida</button>
+            <button class="tab" onclick="showTab('conteo')">📋 Conteo Físico</button>
+            <button class="tab" onclick="showTab('insumos')">🧊 Gestión de Insumos</button>
+            <button class="tab" onclick="showTab('recetas')">📝 Recetas de Bebidas</button>
+            <button class="tab" onclick="showTab('inventario')">📦 Inventario Actual</button>
+            <button class="tab" onclick="showTab('proveedores')">🚚 Proveedores</button>
+        </div>
+
+        <div class="content">
+            <div id="alert-container"></div>
+
+            <!-- TAB: REPORTES -->
+            <div id="reportes" class="tab-content active">
+                <div class="section-title">
+                    <span>📊 Reportes de Movimientos</span>
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="exportarExcel('completo')">
+                            📥 Exportar Todo
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Insumos</h3>
+                        <div class="value" id="stat-total-insumos">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Entradas del Mes</h3>
+                        <div class="value" id="stat-entradas-mes">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Salidas del Mes</h3>
+                        <div class="value" id="stat-salidas-mes">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Proveedores Activos</h3>
+                        <div class="value" id="stat-proveedores">0</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 15px;">Filtros de Reporte</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Fecha Inicio</label>
+                            <input type="date" id="filtro-fecha-inicio">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha Fin</label>
+                            <input type="date" id="filtro-fecha-fin">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Movimiento</label>
+                            <select id="filtro-tipo">
+                                <option value="todos">Todos</option>
+                                <option value="entrada">Entradas</option>
+                                <option value="salida">Salidas</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Responsable</label>
+                            <input type="text" id="filtro-responsable" placeholder="Nombre del responsable">
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="filtrarReportes()">🔍 Filtrar</button>
+                        <button class="btn btn-success" onclick="exportarExcel('filtrado')">📥 Exportar Filtrado</button>
+                        <button class="btn btn-secondary" onclick="limpiarFiltros()">🔄 Limpiar</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Insumo</th>
+                                <th>Cantidad</th>
+                                <th>Unidad</th>
+                                <th>Proveedor/Motivo</th>
+                                <th>Responsable</th>
+                                <th>Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-reportes">
+                            <tr>
+                                <td colspan="8" class="empty-state">
+                                    <div>
+                                        <h3>No hay movimientos registrados</h3>
+                                        <p>Los movimientos de entrada y salida aparecerán aquí</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: ENTRADA -->
+            <div id="entrada" class="tab-content">
+                <div class="section-title">
+                    <span>📥 Registrar Entrada de Insumos</span>
+                </div>
+
+                <div class="info-box">
+                    <h4>ℹ️ ¿Qué son las entradas?</h4>
+                    <p>• Ingredientes: Limones, crema de coco, azúcar, hielo, frutas</p>
+                    <p>• Gaseosas compradas: Coca-Cola, Sprite, etc.</p>
+                    <p>• Materiales: Sombrillitas, vasos, servilletas, sal para micheladas</p>
+                    <p>• Decoraciones: Rodajas de limón, carambolo, cerezas</p>
+                </div>
+
+                <form id="form-entrada" onsubmit="registrarEntrada(event)">
+                    <div class="form-row-2cols">
+                        <div class="form-group">
+                            <label class="required">Insumo</label>
+                            <div style="display: flex; gap: 8px; align-items: flex-end;">
+                                <select id="entrada-insumo" required style="flex: 1;">
+                                    <option value="">Seleccione un insumo...</option>
+                                </select>
+                                <button type="button" class="btn btn-success" onclick="abrirCreacionRapidaInsumo()" 
+                                        style="padding: 12px 16px; white-space: nowrap; font-size: 0.9em;" 
+                                        title="Crear insumo nuevo sin salir del formulario">
+                                    ➕ Nuevo
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Proveedor</label>
+                            <div style="display: flex; gap: 8px; align-items: flex-end;">
+                                <select id="entrada-proveedor" required style="flex: 1;">
+                                    <option value="">Seleccione un proveedor...</option>
+                                </select>
+                                <button type="button" class="btn btn-success" onclick="abrirCreacionRapidaProveedor()" 
+                                        style="padding: 12px 16px; white-space: nowrap; font-size: 0.9em;" 
+                                        title="Crear proveedor nuevo sin salir del formulario">
+                                    ➕ Nuevo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="required">Cantidad</label>
+                            <input type="number" id="entrada-cantidad" min="0.01" step="0.01" required 
+                                   placeholder="Ej: 24">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Unidad de Medida</label>
+                            <select id="entrada-unidad" required>
+                                <option value="unidades">Unidades</option>
+                                <option value="kg">Kilogramos</option>
+                                <option value="gramos">Gramos</option>
+                                <option value="litros">Litros</option>
+                                <option value="ml">Mililitros</option>
+                                <option value="cajas">Cajas</option>
+                                <option value="paquetes">Paquetes</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Costo Unitario ($)</label>
+                            <input type="number" id="entrada-costo" min="0" step="1" 
+                                   placeholder="Opcional">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Costo Total ($)</label>
+                            <input type="number" id="entrada-costo-total" min="0" step="1" 
+                                   placeholder="Calculado automáticamente" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Fecha de Entrada</label>
+                            <input type="date" id="entrada-fecha" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Responsable del Registro</label>
+                            <input type="text" id="entrada-responsable" required 
+                                   placeholder="Tu nombre completo">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Observaciones</label>
+                        <textarea id="entrada-observaciones" 
+                                  placeholder="Notas adicionales: estado del producto, condiciones de entrega, etc."></textarea>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">✅ Registrar Entrada</button>
+                        <button type="button" class="btn btn-secondary" onclick="limpiarFormulario('entrada')">
+                            🔄 Limpiar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- TAB: SALIDA -->
+            <div id="salida" class="tab-content">
+                <div class="section-title">
+                    <span>📤 Registrar Salida de Insumos</span>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary" onclick="cambiarModoSalida('individual')">
+                            📦 Salida Individual
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="cambiarModoSalida('receta')">
+                            🍹 Salida por Receta (Rápido)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>ℹ️ ¿Cuándo usar cada modo?</h4>
+                    <p><strong>Salida Individual:</strong> Venta directa de gaseosas, un solo insumo</p>
+                    <p><strong>Salida por Receta:</strong> Preparaste 5 Limonadas de Coco → registra todos los insumos automáticamente</p>
+                    <p>💡 Los campos Responsable y Fecha se mantienen para registros rápidos seguidos</p>
+                </div>
+
+                <!-- MODO INDIVIDUAL -->
+                <form id="form-salida" onsubmit="registrarSalida(event)" style="display: block;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="required">Insumo</label>
+                            <select id="salida-insumo" required onchange="verificarStock(this.value)">
+                                <option value="">Seleccione un insumo...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Stock Disponible</label>
+                            <input type="text" id="salida-stock-disponible" readonly 
+                                   placeholder="Seleccione un insumo"
+                                   style="background: #f8f9fa; font-weight: bold;">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Cantidad</label>
+                            <input type="number" id="salida-cantidad" min="0.01" step="0.01" required 
+                                   placeholder="Ej: 5">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Unidad de Medida</label>
+                            <select id="salida-unidad" required>
+                                <option value="unidades">Unidades</option>
+                                <option value="kg">Kilogramos</option>
+                                <option value="gramos">Gramos</option>
+                                <option value="litros">Litros</option>
+                                <option value="ml">Mililitros</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Motivo de Salida</label>
+                            <select id="salida-motivo" required>
+                                <option value="">Seleccione un motivo...</option>
+                                <option value="venta-directa">Venta Directa (Cliente)</option>
+                                <option value="preparacion">Preparación de Bebida</option>
+                                <option value="consumo-interno">Consumo Interno/Staff</option>
+                                <option value="merma">Merma/Pérdida</option>
+                                <option value="cortesia">Cortesía</option>
+                                <option value="degustacion">Degustación</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Bebida Preparada (si aplica)</label>
+                            <select id="salida-receta">
+                                <option value="">No aplica / Venta directa</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Fecha de Salida</label>
+                            <input type="date" id="salida-fecha" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Responsable del Registro</label>
+                            <input type="text" id="salida-responsable" required 
+                                   placeholder="Tu nombre completo">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Observaciones</label>
+                        <textarea id="salida-observaciones" 
+                                  placeholder="Detalles adicionales: mesa, evento, cliente, etc."></textarea>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">✅ Registrar Salida</button>
+                        <button type="button" class="btn btn-success" onclick="registrarYContinuar('salida')">
+                            ✅➕ Registrar y Continuar
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="limpiarFormulario('salida')">
+                            🔄 Limpiar
+                        </button>
+                    </div>
+                </form>
+
+                <!-- MODO RECETA RÁPIDA -->
+                <form id="form-salida-receta" onsubmit="registrarSalidaPorReceta(event)" style="display: none;">
+                    <div class="card" style="background: #e8f5e9; border-color: #4caf50;">
+                        <h3 style="color: #2e7d32; margin-bottom: 15px;">⚡ Modo Producción Rápida</h3>
+                        <p>Registra todos los insumos de una receta automáticamente con un solo clic</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="required">Bebida Preparada</label>
+                            <select id="salida-receta-bebida" required onchange="mostrarInsumosReceta(this.value)">
+                                <option value="">Seleccione una bebida...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Cantidad de Bebidas</label>
+                            <input type="number" id="salida-receta-cantidad" min="1" step="1" required 
+                                   placeholder="Ej: 5" onchange="calcularInsumosNecesarios()">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Fecha</label>
+                            <input type="date" id="salida-receta-fecha" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Responsable</label>
+                            <input type="text" id="salida-receta-responsable" required 
+                                   placeholder="Tu nombre completo">
+                        </div>
+                    </div>
+
+                    <div id="preview-insumos-receta" style="display: none;">
+                        <div class="card" style="background: #fff3e0; border-color: #ff9800;">
+                            <h4 style="color: #e65100; margin-bottom: 15px;">📋 Insumos que se consumirán:</h4>
+                            <div id="lista-insumos-consumo"></div>
+                            <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 8px;">
+                                <strong>✅ Verificar stock antes de registrar</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Observaciones</label>
+                        <textarea id="salida-receta-observaciones" 
+                                  placeholder="Notas adicionales: turno, evento especial, etc."></textarea>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-success">⚡ Registrar Salida Completa</button>
+                        <button type="button" class="btn btn-primary" onclick="registrarYContinuar('salida-receta')">
+                            ⚡➕ Registrar y Preparar Otra
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="limpiarFormulario('salida-receta')">
+                            🔄 Limpiar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- TAB: INSUMOS -->
+            <div id="insumos" class="tab-content">
+                <div class="section-title">
+                    <span>🧊 Gestión de Insumos y Materiales</span>
+                    <button class="btn btn-primary" onclick="abrirModalInsumo()">
+                        ➕ Nuevo Insumo
+                    </button>
+                </div>
+
+                <div class="search-filter">
+                    <input type="text" id="buscar-insumo" placeholder="🔍 Buscar por nombre..."
+                           oninput="filtrarInsumos()">
+                    <select id="filtro-categoria-insumo" onchange="filtrarInsumos()">
+                        <option value="">Todas las categorías</option>
+                        <option value="ingrediente">Ingredientes</option>
+                        <option value="gaseosa">Gaseosas</option>
+                        <option value="material">Materiales/Decoración</option>
+                        <option value="otro">Otros</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Stock Actual</th>
+                                <th>Unidad</th>
+                                <th>Estado Stock</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-insumos">
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    <div>
+                                        <h3>No hay insumos registrados</h3>
+                                        <p>Presione "Nuevo Insumo" para comenzar</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: RECETAS -->
+            <div id="recetas" class="tab-content">
+                <div class="section-title">
+                    <span>📝 Recetas de Bebidas Preparadas</span>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="abrirModalReceta()">
+                            ➕ Nueva Receta
+                        </button>
+                        <button class="btn btn-success" onclick="cargarRecetasEjemplo()">
+                            📥 Cargar Recetas de Ejemplo
+                        </button>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>ℹ️ ¿Para qué sirven las recetas?</h4>
+                    <p>• Registra qué insumos y cantidades EXACTAS necesitas para cada bebida</p>
+                    <p>• Ya incluye 5 recetas: Limonadas de Coco, Cerezada, Aguacate, Copa y Jarra de Panela</p>
+                    <p>• Facilita el control de salidas cuando preparas bebidas múltiples veces</p>
+                    <p>• Ejemplo: Limonada Coco = 30ml limón + 50ml crema coco + 50g azúcar + 250ml agua + 100g hielo + cereza</p>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre de la Bebida</th>
+                                <th>Insumos Requeridos</th>
+                                <th>Rendimiento</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-recetas">
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    <div>
+                                        <h3>No hay recetas registradas</h3>
+                                        <p>Presione "Nueva Receta" para comenzar</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: CONTEO FÍSICO -->
+            <div id="conteo" class="tab-content">
+                <div class="section-title">
+                    <span>📋 Conteo Físico - Bar</span>
+                    <button class="btn btn-success" onclick="exportarConteoFisico()">
+                        📊 EXPORTAR CONTEO
+                    </button>
+                </div>
+
+                <!-- Formulario de Conteo -->
+                <div class="card">
+                    <h3>Registrar Conteo Físico</h3>
+                    <form id="form-conteo" onsubmit="registrarConteoFisico(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="conteo-insumo">Insumo *</label>
+                                <select id="conteo-insumo" required>
+                                    <option value="">Seleccione un insumo...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="conteo-cantidad-fisica">Cantidad Física *</label>
+                                <input type="number" id="conteo-cantidad-fisica" step="0.01" required placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="conteo-cantidad-sistema">Cantidad en Sistema</label>
+                                <input type="text" id="conteo-cantidad-sistema" readonly style="background: #f5f5f5;">
+                            </div>
+                            <div class="form-group">
+                                <label for="conteo-diferencia">Diferencia</label>
+                                <input type="text" id="conteo-diferencia" readonly style="background: #fff3cd;">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="conteo-responsable">Responsable *</label>
+                                <input type="text" id="conteo-responsable" required placeholder="Nombre del responsable">
+                            </div>
+                            <div class="form-group">
+                                <label for="conteo-fecha">Fecha *</label>
+                                <input type="date" id="conteo-fecha" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="conteo-observaciones">Observaciones</label>
+                            <textarea id="conteo-observaciones" rows="2" placeholder="Opcional"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            ✅ REGISTRAR CONTEO
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Tabla de Conteos -->
+                <div class="card">
+                    <h3>Conteos Registrados</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Insumo</th>
+                                    <th>Cant. Sistema</th>
+                                    <th>Cant. Física</th>
+                                    <th>Diferencia</th>
+                                    <th>% Dif</th>
+                                    <th>Responsable</th>
+                                    <th>Observaciones</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-conteos"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: INVENTARIO -->
+            <div id="inventario" class="tab-content">
+                <div class="section-title">
+                    <span>📦 Inventario Actual</span>
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="exportarExcel('inventario')">
+                            📥 Exportar Inventario
+                        </button>
+                        <button class="btn btn-warning" onclick="generarAlertasStock()">
+                            ⚠️ Alertas de Stock
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Insumo</th>
+                                <th>Categoría</th>
+                                <th>Stock Actual</th>
+                                <th>Unidad</th>
+                                <th>Stock Mínimo</th>
+                                <th>Estado</th>
+                                <th>Última Actualización</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-inventario">
+                            <tr>
+                                <td colspan="9" class="empty-state">
+                                    <div>
+                                        <h3>No hay inventario registrado</h3>
+                                        <p>Registre entradas de insumos para ver el inventario</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: PROVEEDORES -->
+            <div id="proveedores" class="tab-content">
+                <div class="section-title">
+                    <span>🚚 Gestión de Proveedores</span>
+                    <button class="btn btn-primary" onclick="abrirModalProveedor()">
+                        ➕ Nuevo Proveedor
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Contacto</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Productos</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-proveedores">
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    <div>
+                                        <h3>No hay proveedores registrados</h3>
+                                        <p>Presione "Nuevo Proveedor" para comenzar</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: INSUMO -->
+    <div id="modal-insumo" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-insumo-titulo">Nuevo Insumo</h2>
+            </div>
+            <form id="form-insumo" onsubmit="guardarInsumo(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="insumo-id">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="required">Código</label>
+                            <input type="text" id="insumo-codigo" required 
+                                   placeholder="Ej: INS-LIM-001">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Nombre</label>
+                            <input type="text" id="insumo-nombre" required 
+                                   placeholder="Ej: Limón Tahití">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Categoría</label>
+                            <select id="insumo-categoria" required>
+                                <option value="">Seleccione...</option>
+                                <option value="ingrediente">Ingrediente</option>
+                                <option value="gaseosa">Gaseosa</option>
+                                <option value="material">Material/Decoración</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Unidad de Medida</label>
+                            <select id="insumo-unidad" required>
+                                <option value="unidades">Unidades</option>
+                                <option value="kg">Kilogramos</option>
+                                <option value="gramos">Gramos</option>
+                                <option value="litros">Litros</option>
+                                <option value="ml">Mililitros</option>
+                                <option value="paquetes">Paquetes</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Stock Inicial</label>
+                            <input type="number" id="insumo-stock" min="0" step="0.01" 
+                                   placeholder="Opcional - Por defecto 0">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Stock Mínimo (Alerta)</label>
+                            <input type="number" id="insumo-stock-minimo" min="0" step="0.01" 
+                                   placeholder="Deja en blanco si no aplica">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descripción/Notas</label>
+                        <textarea id="insumo-descripcion" 
+                                  placeholder="Detalles del insumo: marca, proveedor habitual, etc."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">💾 Guardar</button>
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal('insumo')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: RECETA -->
+    <div id="modal-receta" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-receta-titulo">Nueva Receta</h2>
+            </div>
+            <form id="form-receta" onsubmit="guardarReceta(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="receta-id">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="required">Código</label>
+                            <input type="text" id="receta-codigo" required 
+                                   placeholder="Ej: REC-LIMO-COCO-001">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Nombre de la Bebida</label>
+                            <input type="text" id="receta-nombre" required 
+                                   placeholder="Ej: Limonada de Coco">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Rendimiento</label>
+                            <input type="text" id="receta-rendimiento" 
+                                   placeholder="Ej: 1 litro (4 vasos)">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tiempo de Preparación</label>
+                            <input type="text" id="receta-tiempo" 
+                                   placeholder="Ej: 22 minutos">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Insumos Requeridos</label>
+                        <div id="receta-insumos" class="ingredients-list">
+                            <!-- Los insumos se añadirán dinámicamente -->
+                        </div>
+                        <button type="button" class="add-ingredient-btn" onclick="agregarInsumoReceta()">
+                            ➕ Agregar Insumo
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Instrucciones de Preparación</label>
+                        <textarea id="receta-instrucciones" 
+                                  placeholder="Pasos para preparar la bebida..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">💾 Guardar</button>
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal('receta')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: PROVEEDOR -->
+    <div id="modal-proveedor" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-proveedor-titulo">Nuevo Proveedor</h2>
+            </div>
+            <form id="form-proveedor" onsubmit="guardarProveedor(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="proveedor-id">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="required">Código</label>
+                            <input type="text" id="proveedor-codigo" required 
+                                   placeholder="Ej: PROV-001">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Nombre/Razón Social</label>
+                            <input type="text" id="proveedor-nombre" required 
+                                   placeholder="Ej: Coca-Cola FEMSA">
+                        </div>
+
+                        <div class="form-group">
+                            <label>NIT/RUT</label>
+                            <input type="text" id="proveedor-nit" 
+                                   placeholder="Ej: 890.903.858-7">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Contacto</label>
+                            <input type="text" id="proveedor-contacto" required 
+                                   placeholder="Nombre del contacto">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Teléfono</label>
+                            <input type="tel" id="proveedor-telefono" required 
+                                   placeholder="Ej: 3001234567">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="proveedor-email" 
+                                   placeholder="proveedor@ejemplo.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dirección</label>
+                        <textarea id="proveedor-direccion" 
+                                  placeholder="Dirección completa del proveedor"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Productos que Suministra</label>
+                        <textarea id="proveedor-productos" 
+                                  placeholder="Lista de productos que ofrece este proveedor"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notas</label>
+                        <textarea id="proveedor-notas" 
+                                  placeholder="Información adicional, términos de pago, etc."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">💾 Guardar</button>
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal('proveedor')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ==============================================
+        // ALMACENAMIENTO LOCAL
+        // ==============================================
+        const storage = {
+            insumos: JSON.parse(localStorage.getItem('bar_insumos') || '[]'),
+            recetas: JSON.parse(localStorage.getItem('bar_recetas') || '[]'),
+            movimientos: JSON.parse(localStorage.getItem('bar_movimientos') || '[]'),
+            proveedores: JSON.parse(localStorage.getItem('bar_proveedores') || '[]'),
+            inventario: JSON.parse(localStorage.getItem('bar_inventario') || '{}')
+        };
+
+        // ==============================================
+        // INICIALIZACIÓN
+        // ==============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarDatos();
+            cargarSelects();
+            actualizarEstadisticas();
+            actualizarTablas();
+            establecerFechaHoy();
+            calcularCostoTotal();
+            cargarInsumosConteo();
+            cargarTablaConteos();
+            
+            // Establecer fecha de hoy en conteo
+            const fechaConteo = document.getElementById('conteo-fecha');
+            if (fechaConteo) {
+                fechaConteo.value = new Date().toISOString().split('T')[0];
+            }
+        });
+
+        function inicializarDatos() {
+            // Inicializar con datos de la factura de Coca-Cola si no hay datos
+            if (storage.insumos.length === 0) {
+                const insumosIniciales = [
+                    {id: 1, codigo: 'BAR-001', nombre: 'P250', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 20, proveedor: 'COCA COLA'},
+                    {id: 2, codigo: 'BAR-002', nombre: 'Limon', categoria: 'ingredientes', unidad: 'Kg', stock: 0, stockMinimo: 5, proveedor: 'CENABASTOS'},
+                    {id: 3, codigo: 'BAR-003', nombre: 'Crema de coco x400ml', categoria: 'ingredientes', unidad: 'Ml', stock: 0, stockMinimo: 500, proveedor: 'MAKRO'},
+                    {id: 4, codigo: 'BAR-004', nombre: 'Cerezas', categoria: 'ingredientes', unidad: 'Ml', stock: 0, stockMinimo: 1000, proveedor: 'MAKRO'},
+                    {id: 5, codigo: 'BAR-005', nombre: 'Quatro 1.5lt', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 10, proveedor: 'COCA COLA'},
+                    {id: 6, codigo: 'BAR-006', nombre: 'Coca-Cola Zero 1.5lt', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 10, proveedor: 'COCA COLA'},
+                    {id: 7, codigo: 'BAR-007', nombre: 'Agua sin Gas', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 15, proveedor: 'COCA COLA'},
+                    {id: 8, codigo: 'BAR-008', nombre: 'Coca-Cola Zero P400', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 20, proveedor: 'COCA COLA'},
+                    {id: 9, codigo: 'BAR-009', nombre: 'Coca-Cola P400', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 20, proveedor: 'COCA COLA'},
+                    {id: 10, codigo: 'BAR-010', nombre: 'Coca-Cola 1.5lt', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 10, proveedor: 'COCA COLA'},
+                    {id: 11, codigo: 'BAR-011', nombre: 'Soda P400', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 15, proveedor: 'COCA COLA'},
+                    {id: 12, codigo: 'BAR-012', nombre: 'Sprite P400', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 15, proveedor: 'COCA COLA'},
+                    {id: 13, codigo: 'BAR-013', nombre: 'Quatro P400', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 15, proveedor: 'COCA COLA'},
+                    {id: 14, codigo: 'BAR-014', nombre: 'Kola Roman P400', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 15, proveedor: 'COCA COLA'},
+                    {id: 15, codigo: 'BAR-015', nombre: 'Kola Roman 1.5lt', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 10, proveedor: 'COCA COLA'},
+                    {id: 16, codigo: 'BAR-016', nombre: 'Sprite 1.5lt', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 10, proveedor: 'COCA COLA'},
+                    {id: 17, codigo: 'BAR-017', nombre: 'Soda de frutos rojos', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 10, proveedor: 'MAKRO'},
+                    {id: 18, codigo: 'BAR-018', nombre: 'Soda de frutos amarillos', categoria: 'bebidas', unidad: 'Un', stock: 0, stockMinimo: 10, proveedor: 'MAKRO'}
+                ];
+
+                
+                storage.insumos = insumosIniciales;
+                localStorage.setItem('bar_insumos', JSON.stringify(storage.insumos));
+            }
+
+            // Inicializar proveedor de Coca-Cola
+            if (storage.proveedores.length === 0) {
+                const proveedoresIniciales = [
+                    {
+                        id: 1,
+                        codigo: 'PROV-COCACOLA',
+                        nombre: 'Industria Nacional de Gaseosas S.A.S. (Coca-Cola FEMSA)',
+                        nit: '890.903.858-7',
+                        contacto: 'Cucuta Distribuidora',
+                        telefono: '5735273',
+                        email: '',
+                        direccion: 'AV EL PORTICO N 44 130',
+                        productos: 'Coca-Cola, Sprite, Quatro, Agua Brisa, Schweppes',
+                        notas: 'Distribuidor oficial Coca-Cola para la región'
+                    }
+                ];
+                
+                storage.proveedores = proveedoresIniciales;
+                localStorage.setItem('bar_proveedores', JSON.stringify(storage.proveedores));
+            }
+
+            // Inicializar recetas de ejemplo con fichas técnicas reales
+            // Siempre cargar las 5 recetas si hay menos de 5
+            if (storage.recetas.length < 5) {
+                const recetasIniciales = [
+                    {
+                        id: 1,
+                        codigo: 'REC-LIMO-COCO-001',
+                        nombre: 'Limonada de Coco',
+                        rendimiento: '1 copa de 600ml',
+                        tiempo: '5 minutos',
+                        insumos: [
+                            {insumoId: 13, insumoNombre: 'Limón Fresco (Zumo)', cantidad: 30, unidad: 'ml'},
+                            {insumoId: 14, insumoNombre: 'Crema de Coco (Lata)', cantidad: 50, unidad: 'ml'},
+                            {insumoId: 15, insumoNombre: 'Azúcar Blanca', cantidad: 50, unidad: 'gramos'},
+                            {insumoId: 16, insumoNombre: 'Agua Purificada/Filtrada', cantidad: 250, unidad: 'ml'},
+                            {insumoId: 17, insumoNombre: 'Hielo Picado', cantidad: 100, unidad: 'gramos'},
+                            {insumoId: 19, insumoNombre: 'Cereza Decoración', cantidad: 1, unidad: 'unidades'}
+                        ],
+                        instrucciones: 'PASO 1: Verter en licuadora zumo de limón (30ml), crema de coco (50ml), azúcar (50g), agua (250ml) e hielo picado (100g)\nPASO 2: Licuar por 90 segundos aproximadamente\nPASO 3: Servir y decorar con cereza\n\n⚠️ TEMPERATURA 3-5°C - Vaso frío. Si templada pierde cremosidad\n⚠️ 50ml CREMA COCO EXACTO - Medir con copa medidora\n⚠️ COLOR BLANCO PURO - Si rosado/marrón = error\n⚠️ 50g AZÚCAR exacto - Usar balanza'
+                    },
+                    {
+                        id: 2,
+                        codigo: 'REC-LIMO-CERE-001',
+                        nombre: 'Limonada Cerezada',
+                        rendimiento: '1 copa de 600ml',
+                        tiempo: '5 minutos',
+                        insumos: [
+                            {insumoId: 13, insumoNombre: 'Limón Fresco (Zumo)', cantidad: 30, unidad: 'ml'},
+                            {insumoId: 18, insumoNombre: 'Cereza (con agua)', cantidad: 50, unidad: 'gramos'},
+                            {insumoId: 15, insumoNombre: 'Azúcar Blanca', cantidad: 40, unidad: 'gramos'},
+                            {insumoId: 16, insumoNombre: 'Agua Purificada/Filtrada', cantidad: 250, unidad: 'ml'},
+                            {insumoId: 17, insumoNombre: 'Hielo Picado', cantidad: 100, unidad: 'gramos'},
+                            {insumoId: 19, insumoNombre: 'Cereza Decoración', cantidad: 1, unidad: 'unidades'}
+                        ],
+                        instrucciones: 'PASO 1: Verter en licuadora zumo de limón (30ml), cereza con agua (50g = 8 cerezas), azúcar (40g), agua (250ml) e hielo picado (100g)\nPASO 2: Licuar por 90 segundos aproximadamente\nPASO 3: Servir y decorar con cereza\n\n⚠️ TEMPERATURA 3-5°C - Vaso frío\n⚠️ 50g CEREZA - Medir con balanza\n⚠️ COLOR ROJO CREMOSO\n⚠️ 40g AZÚCAR exacto - MENOS que Coco (50g)'
+                    },
+                    {
+                        id: 3,
+                        codigo: 'REC-LIMO-AGUA-001',
+                        nombre: 'Limonada de Aguacate',
+                        rendimiento: '1 copa de 600ml',
+                        tiempo: '5 minutos',
+                        insumos: [
+                            {insumoId: 13, insumoNombre: 'Limón Fresco (Zumo)', cantidad: 30, unidad: 'ml'},
+                            {insumoId: 20, insumoNombre: 'Aguacate', cantidad: 100, unidad: 'gramos'},
+                            {insumoId: 15, insumoNombre: 'Azúcar Blanca', cantidad: 50, unidad: 'gramos'},
+                            {insumoId: 16, insumoNombre: 'Agua Purificada/Filtrada', cantidad: 250, unidad: 'ml'},
+                            {insumoId: 17, insumoNombre: 'Hielo Picado', cantidad: 100, unidad: 'gramos'}
+                        ],
+                        instrucciones: 'PASO 1: Verter en licuadora zumo de limón (30ml), aguacate (100g = aprox medio aguacate), azúcar (50g), agua (250ml) e hielo picado (100g)\nPASO 2: Licuar por 90 segundos aproximadamente\nPASO 3: Servir\n\n⚠️ TEMPERATURA 3-5°C - Vaso frío\n⚠️ 100g AGUACATE - Aproximadamente medio aguacate\n⚠️ 50g AZÚCAR exacto - Usar balanza'
+                    },
+                    {
+                        id: 4,
+                        codigo: 'REC-LIMO-PANE-COPA-001',
+                        nombre: 'Copa Limonada de Panela',
+                        rendimiento: '1 copa de 600ml',
+                        tiempo: '5 minutos',
+                        insumos: [
+                            {insumoId: 13, insumoNombre: 'Limón Fresco (Zumo)', cantidad: 30, unidad: 'ml'},
+                            {insumoId: 21, insumoNombre: 'Panela Derretida', cantidad: 150, unidad: 'ml'},
+                            {insumoId: 16, insumoNombre: 'Agua Purificada/Filtrada', cantidad: 250, unidad: 'ml'},
+                            {insumoId: 17, insumoNombre: 'Hielo Picado', cantidad: 100, unidad: 'gramos'}
+                        ],
+                        instrucciones: 'PASO 1: Verter en la copa zumo de limón (30ml), panela derretida (150ml), agua (250ml) e hielo picado (100g)\nPASO 2: Mezclar bien todos los ingredientes\nPASO 3: Servir\n\n⚠️ TEMPERATURA 3-5°C - Vaso frío\n⚠️ 150ml PANELA DERRETIDA - Medir con copa medidora'
+                    },
+                    {
+                        id: 5,
+                        codigo: 'REC-LIMO-PANE-JARRA-001',
+                        nombre: 'Jarra Limonada de Panela',
+                        rendimiento: '1 jarra (4 vasos de 600ml)',
+                        tiempo: '7 minutos',
+                        insumos: [
+                            {insumoId: 13, insumoNombre: 'Limón Fresco (Zumo)', cantidad: 100, unidad: 'ml'},
+                            {insumoId: 21, insumoNombre: 'Panela Derretida', cantidad: 350, unidad: 'ml'},
+                            {insumoId: 16, insumoNombre: 'Agua Purificada/Filtrada', cantidad: 250, unidad: 'ml'},
+                            {insumoId: 17, insumoNombre: 'Hielo Picado', cantidad: 100, unidad: 'gramos'}
+                        ],
+                        instrucciones: 'PASO 1: Verter en la jarra zumo de limón (100ml), panela derretida (350ml), agua (250ml) e hielo picado (100g)\nPASO 2: Mezclar bien todos los ingredientes\nPASO 3: Servir\n\n⚠️ TEMPERATURA 3-5°C\n⚠️ 350ml PANELA DERRETIDA - Medir con copa medidora\n⚠️ Rinde para 4 vasos'
+                    }
+                ];
+                
+                storage.recetas = recetasIniciales;
+                localStorage.setItem('bar_recetas', JSON.stringify(storage.recetas));
+            }
+        }
+
+        function establecerFechaHoy() {
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('entrada-fecha').value = hoy;
+            document.getElementById('salida-fecha').value = hoy;
+            document.getElementById('salida-receta-fecha').value = hoy;
+            document.getElementById('filtro-fecha-inicio').value = new Date(new Date().setDate(1)).toISOString().split('T')[0];
+            document.getElementById('filtro-fecha-fin').value = hoy;
+        }
+
+        // ==============================================
+        // GESTIÓN DE TABS
+        // ==============================================
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'reportes') {
+                actualizarEstadisticas();
+                cargarReportes();
+            } else if (tabName === 'insumos') {
+                cargarTablaInsumos();
+            } else if (tabName === 'recetas') {
+                cargarTablaRecetas();
+            } else if (tabName === 'inventario') {
+                cargarTablaInventario();
+            } else if (tabName === 'proveedores') {
+                cargarTablaProveedores();
+            }
+        }
+
+        // ==============================================
+        // CARGAR SELECTS
+        // ==============================================
+        function cargarSelects() {
+            // Cargar insumos en selects
+            const selectsInsumos = ['entrada-insumo', 'salida-insumo'];
+            selectsInsumos.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Seleccione un insumo...</option>';
+                storage.insumos.forEach(insumo => {
+                    const option = document.createElement('option');
+                    option.value = insumo.id;
+                    option.textContent = `${insumo.nombre} (${insumo.codigo})`;
+                    select.appendChild(option);
+                });
+            });
+
+            // Cargar proveedores en select
+            const selectProveedor = document.getElementById('entrada-proveedor');
+            selectProveedor.innerHTML = '<option value="">Seleccione un proveedor...</option>';
+            storage.proveedores.forEach(proveedor => {
+                const option = document.createElement('option');
+                option.value = proveedor.id;
+                option.textContent = `${proveedor.nombre} (${proveedor.codigo})`;
+                selectProveedor.appendChild(option);
+            });
+
+            // Cargar recetas en select de salida
+            const selectReceta = document.getElementById('salida-receta');
+            selectReceta.innerHTML = '<option value="">No aplica / Venta directa</option>';
+            storage.recetas.forEach(receta => {
+                const option = document.createElement('option');
+                option.value = receta.id;
+                option.textContent = `${receta.nombre} (${receta.codigo})`;
+                selectReceta.appendChild(option);
+            });
+        }
+
+        // ==============================================
+        // CALCULAR COSTO TOTAL AUTOMÁTICO
+        // ==============================================
+        function calcularCostoTotal() {
+            const cantidad = document.getElementById('entrada-cantidad');
+            const costo = document.getElementById('entrada-costo');
+            const costoTotal = document.getElementById('entrada-costo-total');
+
+            [cantidad, costo].forEach(input => {
+                input.addEventListener('input', () => {
+                    const cant = parseFloat(cantidad.value) || 0;
+                    const precio = parseFloat(costo.value) || 0;
+                    costoTotal.value = (cant * precio).toFixed(0);
+                });
+            });
+        }
+
+        // ==============================================
+        // VERIFICAR STOCK DISPONIBLE
+        // ==============================================
+        function verificarStock(insumoId) {
+            const stockDisplay = document.getElementById('salida-stock-disponible');
+            if (!insumoId) {
+                stockDisplay.value = '';
+                return;
+            }
+
+            const insumo = storage.insumos.find(i => i.id == insumoId);
+            if (insumo) {
+                const stock = storage.inventario[insumoId] || 0;
+                stockDisplay.value = `${stock} ${insumo.unidad}`;
+                
+                if (stock <= 0) {
+                    mostrarAlerta('⚠️ No hay stock disponible de este insumo', 'warning');
+                } else if (insumo.stockMinimo && stock <= insumo.stockMinimo) {
+                    mostrarAlerta(`⚠️ Stock bajo: ${stock} ${insumo.unidad}`, 'warning');
+                }
+            }
+        }
+
+        // ==============================================
+        // REGISTRO DE ENTRADA
+        // ==============================================
+        function registrarEntrada(event) {
+            event.preventDefault();
+
+            const insumoId = parseInt(document.getElementById('entrada-insumo').value);
+            const cantidad = parseFloat(document.getElementById('entrada-cantidad').value);
+            const unidad = document.getElementById('entrada-unidad').value;
+            const proveedorId = parseInt(document.getElementById('entrada-proveedor').value);
+            const costo = parseFloat(document.getElementById('entrada-costo').value) || 0;
+            const costoTotal = parseFloat(document.getElementById('entrada-costo-total').value) || 0;
+            const fecha = document.getElementById('entrada-fecha').value;
+            const responsable = document.getElementById('entrada-responsable').value.trim();
+            const observaciones = document.getElementById('entrada-observaciones').value;
+
+            if (!responsable) {
+                mostrarAlerta('Por favor ingrese el nombre del responsable', 'error');
+                return;
+            }
+
+            const insumo = storage.insumos.find(i => i.id === insumoId);
+            const proveedor = storage.proveedores.find(p => p.id === proveedorId);
+
+            // Crear movimiento
+            const movimiento = {
+                id: Date.now(),
+                tipo: 'entrada',
+                insumoId: insumoId,
+                insumoNombre: insumo.nombre,
+                cantidad: cantidad,
+                unidad: unidad,
+                proveedorId: proveedorId,
+                proveedorNombre: proveedor.nombre,
+                costo: costo,
+                costoTotal: costoTotal,
+                fecha: fecha,
+                responsable: responsable,
+                observaciones: observaciones,
+                fechaRegistro: new Date().toISOString()
+            };
+
+            storage.movimientos.push(movimiento);
+            localStorage.setItem('bar_movimientos', JSON.stringify(storage.movimientos));
+
+            // Actualizar inventario
+            storage.inventario[insumoId] = (storage.inventario[insumoId] || 0) + cantidad;
+            localStorage.setItem('bar_inventario', JSON.stringify(storage.inventario));
+
+            mostrarAlerta('✅ Entrada registrada exitosamente', 'success');
+            limpiarFormulario('entrada');
+            
+            // ✅ ACTUALIZAR TODAS LAS TABLAS
+            actualizarEstadisticas();
+            cargarTablaInsumos();
+            cargarTablaInventario();
+            cargarReportes();
+        }
+
+        // ==============================================
+        // REGISTRO DE SALIDA
+        // ==============================================
+        function registrarSalida(event) {
+            event.preventDefault();
+
+            const insumoId = parseInt(document.getElementById('salida-insumo').value);
+            const cantidad = parseFloat(document.getElementById('salida-cantidad').value);
+            const unidad = document.getElementById('salida-unidad').value;
+            const motivo = document.getElementById('salida-motivo').value;
+            const recetaId = document.getElementById('salida-receta').value;
+            const fecha = document.getElementById('salida-fecha').value;
+            const responsable = document.getElementById('salida-responsable').value.trim();
+            const observaciones = document.getElementById('salida-observaciones').value;
+
+            if (!responsable) {
+                mostrarAlerta('Por favor ingrese el nombre del responsable', 'error');
+                return;
+            }
+
+            // Guardar campos persistentes
+            camposPersistentes.responsable = responsable;
+            camposPersistentes.fecha = fecha;
+
+            // Verificar stock
+            const stockActual = storage.inventario[insumoId] || 0;
+            if (cantidad > stockActual) {
+                mostrarAlerta('❌ La cantidad excede el stock disponible', 'error');
+                return;
+            }
+
+            const insumo = storage.insumos.find(i => i.id === insumoId);
+            const receta = recetaId ? storage.recetas.find(r => r.id == recetaId) : null;
+
+            // Crear movimiento
+            const movimiento = {
+                id: Date.now(),
+                tipo: 'salida',
+                insumoId: insumoId,
+                insumoNombre: insumo.nombre,
+                cantidad: cantidad,
+                unidad: unidad,
+                motivo: motivo,
+                recetaId: recetaId || null,
+                recetaNombre: receta ? receta.nombre : null,
+                fecha: fecha,
+                responsable: responsable,
+                observaciones: observaciones,
+                fechaRegistro: new Date().toISOString()
+            };
+
+            storage.movimientos.push(movimiento);
+            localStorage.setItem('bar_movimientos', JSON.stringify(storage.movimientos));
+
+            // Actualizar inventario
+            storage.inventario[insumoId] = stockActual - cantidad;
+            localStorage.setItem('bar_inventario', JSON.stringify(storage.inventario));
+
+            mostrarAlerta('✅ Salida registrada exitosamente', 'success');
+            
+            // Limpiar pero mantener campos persistentes
+            document.getElementById('salida-insumo').value = '';
+            document.getElementById('salida-cantidad').value = '';
+            document.getElementById('salida-motivo').value = '';
+            document.getElementById('salida-receta').value = '';
+            document.getElementById('salida-observaciones').value = '';
+            document.getElementById('salida-stock-disponible').value = '';
+            
+            // ✅ ACTUALIZAR TODAS LAS TABLAS
+            actualizarEstadisticas();
+            cargarTablaInsumos();
+            cargarTablaInventario();
+            cargarReportes();
+        }
+
+        // ==============================================
+        // GESTIÓN DE INSUMOS
+        // ==============================================
+        function abrirModalInsumo(id = null) {
+            const modal = document.getElementById('modal-insumo');
+            const titulo = document.getElementById('modal-insumo-titulo');
+            
+            if (id) {
+                titulo.textContent = 'Editar Insumo';
+                const insumo = storage.insumos.find(i => i.id === id);
+                document.getElementById('insumo-id').value = insumo.id;
+                document.getElementById('insumo-codigo').value = insumo.codigo;
+                document.getElementById('insumo-nombre').value = insumo.nombre;
+                document.getElementById('insumo-categoria').value = insumo.categoria;
+                document.getElementById('insumo-unidad').value = insumo.unidad;
+                document.getElementById('insumo-stock').value = insumo.stock || 0;
+                document.getElementById('insumo-stock-minimo').value = insumo.stockMinimo || '';
+                document.getElementById('insumo-descripcion').value = insumo.descripcion || '';
+            } else {
+                titulo.textContent = 'Nuevo Insumo';
+                document.getElementById('form-insumo').reset();
+                document.getElementById('insumo-id').value = '';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function guardarInsumo(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('insumo-id').value;
+            const insumo = {
+                id: id ? parseInt(id) : Date.now(),
+                codigo: document.getElementById('insumo-codigo').value,
+                nombre: document.getElementById('insumo-nombre').value,
+                categoria: document.getElementById('insumo-categoria').value,
+                unidad: document.getElementById('insumo-unidad').value,
+                stock: parseFloat(document.getElementById('insumo-stock').value) || 0,
+                stockMinimo: parseFloat(document.getElementById('insumo-stock-minimo').value) || null,
+                descripcion: document.getElementById('insumo-descripcion').value
+            };
+
+            if (id) {
+                const index = storage.insumos.findIndex(i => i.id === parseInt(id));
+                storage.insumos[index] = insumo;
+                mostrarAlerta('✅ Insumo actualizado exitosamente', 'success');
+            } else {
+                storage.insumos.push(insumo);
+                storage.inventario[insumo.id] = insumo.stock;
+                mostrarAlerta('✅ Insumo creado exitosamente', 'success');
+            }
+
+            localStorage.setItem('bar_insumos', JSON.stringify(storage.insumos));
+            localStorage.setItem('bar_inventario', JSON.stringify(storage.inventario));
+            
+            cerrarModal('insumo');
+            cargarSelects();
+            cargarTablaInsumos();
+            actualizarEstadisticas();
+        }
+
+        function eliminarInsumo(id) {
+            if (!confirm('¿Está seguro de eliminar este insumo?')) return;
+
+            storage.insumos = storage.insumos.filter(i => i.id !== id);
+            delete storage.inventario[id];
+            
+            localStorage.setItem('bar_insumos', JSON.stringify(storage.insumos));
+            localStorage.setItem('bar_inventario', JSON.stringify(storage.inventario));
+            
+            mostrarAlerta('✅ Insumo eliminado exitosamente', 'success');
+            cargarSelects();
+            cargarTablaInsumos();
+            actualizarEstadisticas();
+        }
+
+        // ==============================================
+        // GESTIÓN DE RECETAS
+        // ==============================================
+        function abrirModalReceta(id = null) {
+            const modal = document.getElementById('modal-receta');
+            const titulo = document.getElementById('modal-receta-titulo');
+            
+            if (id) {
+                titulo.textContent = 'Editar Receta';
+                const receta = storage.recetas.find(r => r.id === id);
+                document.getElementById('receta-id').value = receta.id;
+                document.getElementById('receta-codigo').value = receta.codigo;
+                document.getElementById('receta-nombre').value = receta.nombre;
+                document.getElementById('receta-rendimiento').value = receta.rendimiento || '';
+                document.getElementById('receta-tiempo').value = receta.tiempo || '';
+                document.getElementById('receta-instrucciones').value = receta.instrucciones || '';
+                
+                // Cargar insumos de la receta
+                const container = document.getElementById('receta-insumos');
+                container.innerHTML = '';
+                receta.insumos.forEach(insumo => {
+                    agregarInsumoReceta(insumo);
+                });
+            } else {
+                titulo.textContent = 'Nueva Receta';
+                document.getElementById('form-receta').reset();
+                document.getElementById('receta-id').value = '';
+                document.getElementById('receta-insumos').innerHTML = '';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function agregarInsumoReceta(insumoData = null) {
+            const container = document.getElementById('receta-insumos');
+            const insumoItem = document.createElement('div');
+            insumoItem.className = 'ingredient-item';
+            
+            let selectOptions = '<option value="">Seleccione insumo...</option>';
+            storage.insumos.forEach(ins => {
+                const selected = insumoData && ins.id === insumoData.insumoId ? 'selected' : '';
+                selectOptions += `<option value="${ins.id}" ${selected}>${ins.nombre}</option>`;
+            });
+            
+            insumoItem.innerHTML = `
+                <select class="receta-insumo-select" required>${selectOptions}</select>
+                <input type="number" class="receta-cantidad" step="0.01" placeholder="Cantidad" 
+                       value="${insumoData ? insumoData.cantidad : ''}" required>
+                <input type="text" class="receta-unidad" placeholder="Unidad" 
+                       value="${insumoData ? insumoData.unidad : ''}" required>
+                <button type="button" onclick="this.parentElement.remove()">🗑️</button>
+            `;
+            container.appendChild(insumoItem);
+        }
+
+        function guardarReceta(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('receta-id').value;
+            
+            // Recopilar insumos
+            const insumosItems = document.querySelectorAll('#receta-insumos .ingredient-item');
+            const insumos = [];
+            
+            insumosItems.forEach(item => {
+                const insumoId = parseInt(item.querySelector('.receta-insumo-select').value);
+                const cantidad = parseFloat(item.querySelector('.receta-cantidad').value);
+                const unidad = item.querySelector('.receta-unidad').value;
+                
+                const insumo = storage.insumos.find(i => i.id === insumoId);
+                if (insumo) {
+                    insumos.push({
+                        insumoId: insumoId,
+                        insumoNombre: insumo.nombre,
+                        cantidad: cantidad,
+                        unidad: unidad
+                    });
+                }
+            });
+
+            if (insumos.length === 0) {
+                mostrarAlerta('Debe agregar al menos un insumo a la receta', 'error');
+                return;
+            }
+
+            const receta = {
+                id: id ? parseInt(id) : Date.now(),
+                codigo: document.getElementById('receta-codigo').value,
+                nombre: document.getElementById('receta-nombre').value,
+                rendimiento: document.getElementById('receta-rendimiento').value,
+                tiempo: document.getElementById('receta-tiempo').value,
+                instrucciones: document.getElementById('receta-instrucciones').value,
+                insumos: insumos
+            };
+
+            if (id) {
+                const index = storage.recetas.findIndex(r => r.id === parseInt(id));
+                storage.recetas[index] = receta;
+                mostrarAlerta('✅ Receta actualizada exitosamente', 'success');
+            } else {
+                storage.recetas.push(receta);
+                mostrarAlerta('✅ Receta creada exitosamente', 'success');
+            }
+
+            localStorage.setItem('bar_recetas', JSON.stringify(storage.recetas));
+            
+            cerrarModal('receta');
+            cargarSelects();
+            cargarTablaRecetas();
+        }
+
+        function eliminarReceta(id) {
+            if (!confirm('¿Está seguro de eliminar esta receta?')) return;
+
+            storage.recetas = storage.recetas.filter(r => r.id !== id);
+            localStorage.setItem('bar_recetas', JSON.stringify(storage.recetas));
+            
+            mostrarAlerta('✅ Receta eliminada exitosamente', 'success');
+            cargarSelects();
+            cargarTablaRecetas();
+        }
+
+        function cargarRecetasEjemplo() {
+            if (storage.recetas.length > 0) {
+                if (!confirm('Ya tienes recetas guardadas. ¿Deseas reemplazarlas con las 5 recetas de ejemplo del restaurante?\n\n- Limonada de Coco\n- Limonada Cerezada\n- Limonada de Aguacate\n- Copa Limonada de Panela\n- Jarra Limonada de Panela')) {
+                    return;
+                }
+            }
+
+            const recetasEjemplo = [
+                {
+                    id: Date.now() + 1,
+                    codigo: 'REC-LIMO-COCO-001',
+                    nombre: 'Limonada de Coco',
+                    rendimiento: '1 copa de 600ml',
+                    tiempo: '5 minutos',
+                    insumos: [
+                        {insumoId: 13, insumoNombre: 'Limón Fresco (Zumo)', cantidad: 30, unidad: 'ml'},
+                        {insumoId: 14, insumoNombre: 'Crema de Coco (Lata)', cantidad: 50, unidad: 'ml'},
+                        {insumoId: 15, insumoNombre: 'Azúcar Blanca', cantidad: 50, unidad: 'gramos'},
+                        {insumoId: 16, insumoNombre: 'Agua Purificada/Filtrada', cantidad: 250, unidad: 'ml'},
+                        {insumoId: 17, insumoNombre: 'Hielo Picado', cantidad: 100, unidad: 'gramos'},
+                        {insumoId: 19, insumoNombre: 'Cereza Decoración', cantidad: 1, unidad: 'unidades'}
+                    ],
+                    instrucciones: 'PASO 1: Verter en licuadora zumo de limón (30ml), crema de coco (50ml), azúcar (50g), agua (250ml) e hielo picado (100g)\nPASO 2: Licuar por 90 segundos aproximadamente\nPASO 3: Servir y decorar con cereza\n\n⚠️ TEMPERATURA 3-5°C - Vaso frío. Si templada pierde cremosidad\n⚠️ 50ml CREMA COCO EXACTO - Medir con copa medidora\n⚠️ COLOR BLANCO PURO - Si rosado/marrón = error\n⚠️ 50g AZÚCAR exacto - Usar balanza'
+                },
+                {
+                    id: Date.now() + 2,
+                    codigo: 'REC-LIMO-CERE-001',
+                    nombre: 'Limonada Cerezada',
+                    rendimiento: '1 copa de 600ml',
+                    tiempo: '5 minutos',
+                    insumos: [
+                        {insumoId: 13, insumoNombre: 'Limón Fresco (Zumo)', cantidad: 30, unidad: 'ml'},
+                        {insumoId: 18, insumoNombre: 'Cereza (con agua)', cantidad: 50, unidad: 'gramos'},
+                        {insumoId: 15, insumoNombre: 'Azúcar Blanca', cantidad: 40, unidad: 'gramos'},
+                        {insumoId: 16, insumoNombre: 'Agua Purificada/Filtrada', cantidad: 250, unidad: 'ml'},
+                        {insumoId: 17, insumoNombre: 'Hielo Picado', cantidad: 100, unidad: 'gramos'},
+                        {insumoId: 19, insumoNombre: 'Cereza Decoración', cantidad: 1, unidad: 'unidades'}
+                    ],
+                    instrucciones: 'PASO 1: Verter en licuadora zumo de limón (30ml), cereza con agua (50g = 8 cerezas), azúcar (40g), agua (250ml) e hielo picado (100g)\nPASO 2: Licuar por 90 segundos aproximadamente\nPASO 3: Servir y decorar con cereza\n\n⚠️ TEMPERATURA 3-5°C - Vaso frío\n⚠️ 50g CEREZA - Medir con balanza\n⚠️ COLOR ROJO CREMOSO\n⚠️ 40g AZÚCAR exacto - MENOS que Coco (50g)'
+                },
+                {
+                    id: Date.now() + 3,
+                    codigo: 'REC-LIMO-AGUA-001',
+                    nombre: 'Limonada de Aguacate',
+                    rendimiento: '1 copa de 600ml',
+                    tiempo: '5 minutos',
+                    insumos: [
+                        {insumoId: 13, insumoNombre: 'Limón Fresco (Zumo)', cantidad: 30, unidad: 'ml'},
+                        {insumoId: 20, insumoNombre: 'Aguacate', cantidad: 100, unidad: 'gramos'},
+                        {insumoId: 15, insumoNombre: 'Azúcar Blanca', cantidad: 50, unidad: 'gramos'},
+                        {insumoId: 16, insumoNombre: 'Agua Purificada/Filtrada', cantidad: 250, unidad: 'ml'},
+                        {insumoId: 17, insumoNombre: 'Hielo Picado', cantidad: 100, unidad: 'gramos'}
+                    ],
+                    instrucciones: 'PASO 1: Verter en licuadora zumo de limón (30ml), aguacate (100g = aprox medio aguacate), azúcar (50g), agua (250ml) e hielo picado (100g)\nPASO 2: Licuar por 90 segundos aproximadamente\nPASO 3: Servir\n\n⚠️ TEMPERATURA 3-5°C - Vaso frío\n⚠️ 100g AGUACATE - Aproximadamente medio aguacate\n⚠️ 50g AZÚCAR exacto - Usar balanza'
+                },
+                {
+                    id: Date.now() + 4,
+                    codigo: 'REC-LIMO-PANE-COPA-001',
+                    nombre: 'Copa Limonada de Panela',
+                    rendimiento: '1 copa de 600ml',
+                    tiempo: '5 minutos',
+                    insumos: [
+                        {insumoId: 13, insumoNombre: 'Limón Fresco (Zumo)', cantidad: 30, unidad: 'ml'},
+                        {insumoId: 21, insumoNombre: 'Panela Derretida', cantidad: 150, unidad: 'ml'},
+                        {insumoId: 16, insumoNombre: 'Agua Purificada/Filtrada', cantidad: 250, unidad: 'ml'},
+                        {insumoId: 17, insumoNombre: 'Hielo Picado', cantidad: 100, unidad: 'gramos'}
+                    ],
+                    instrucciones: 'PASO 1: Verter en la copa zumo de limón (30ml), panela derretida (150ml), agua (250ml) e hielo picado (100g)\nPASO 2: Mezclar bien todos los ingredientes\nPASO 3: Servir\n\n⚠️ TEMPERATURA 3-5°C - Vaso frío\n⚠️ 150ml PANELA DERRETIDA - Medir con copa medidora'
+                },
+                {
+                    id: Date.now() + 5,
+                    codigo: 'REC-LIMO-PANE-JARRA-001',
+                    nombre: 'Jarra Limonada de Panela',
+                    rendimiento: '1 jarra (4 vasos de 600ml)',
+                    tiempo: '7 minutos',
+                    insumos: [
+                        {insumoId: 13, insumoNombre: 'Limón Fresco (Zumo)', cantidad: 100, unidad: 'ml'},
+                        {insumoId: 21, insumoNombre: 'Panela Derretida', cantidad: 350, unidad: 'ml'},
+                        {insumoId: 16, insumoNombre: 'Agua Purificada/Filtrada', cantidad: 250, unidad: 'ml'},
+                        {insumoId: 17, insumoNombre: 'Hielo Picado', cantidad: 100, unidad: 'gramos'}
+                    ],
+                    instrucciones: 'PASO 1: Verter en la jarra zumo de limón (100ml), panela derretida (350ml), agua (250ml) e hielo picado (100g)\nPASO 2: Mezclar bien todos los ingredientes\nPASO 3: Servir\n\n⚠️ TEMPERATURA 3-5°C\n⚠️ 350ml PANELA DERRETIDA - Medir con copa medidora\n⚠️ Rinde para 4 vasos'
+                }
+            ];
+
+            storage.recetas = recetasEjemplo;
+            localStorage.setItem('bar_recetas', JSON.stringify(storage.recetas));
+            
+            mostrarAlerta('✅ Se cargaron 5 recetas de ejemplo exitosamente', 'success');
+            cargarSelects();
+            cargarTablaRecetas();
+        }
+
+        // ==============================================
+        // GESTIÓN DE PROVEEDORES
+        // ==============================================
+        function abrirModalProveedor(id = null) {
+            const modal = document.getElementById('modal-proveedor');
+            const titulo = document.getElementById('modal-proveedor-titulo');
+            
+            if (id) {
+                titulo.textContent = 'Editar Proveedor';
+                const proveedor = storage.proveedores.find(p => p.id === id);
+                document.getElementById('proveedor-id').value = proveedor.id;
+                document.getElementById('proveedor-codigo').value = proveedor.codigo;
+                document.getElementById('proveedor-nombre').value = proveedor.nombre;
+                document.getElementById('proveedor-nit').value = proveedor.nit || '';
+                document.getElementById('proveedor-contacto').value = proveedor.contacto;
+                document.getElementById('proveedor-telefono').value = proveedor.telefono;
+                document.getElementById('proveedor-email').value = proveedor.email || '';
+                document.getElementById('proveedor-direccion').value = proveedor.direccion || '';
+                document.getElementById('proveedor-productos').value = proveedor.productos || '';
+                document.getElementById('proveedor-notas').value = proveedor.notas || '';
+            } else {
+                titulo.textContent = 'Nuevo Proveedor';
+                document.getElementById('form-proveedor').reset();
+                document.getElementById('proveedor-id').value = '';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function guardarProveedor(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('proveedor-id').value;
+            const proveedor = {
+                id: id ? parseInt(id) : Date.now(),
+                codigo: document.getElementById('proveedor-codigo').value,
+                nombre: document.getElementById('proveedor-nombre').value,
+                nit: document.getElementById('proveedor-nit').value,
+                contacto: document.getElementById('proveedor-contacto').value,
+                telefono: document.getElementById('proveedor-telefono').value,
+                email: document.getElementById('proveedor-email').value,
+                direccion: document.getElementById('proveedor-direccion').value,
+                productos: document.getElementById('proveedor-productos').value,
+                notas: document.getElementById('proveedor-notas').value
+            };
+
+            if (id) {
+                const index = storage.proveedores.findIndex(p => p.id === parseInt(id));
+                storage.proveedores[index] = proveedor;
+                mostrarAlerta('✅ Proveedor actualizado exitosamente', 'success');
+            } else {
+                storage.proveedores.push(proveedor);
+                mostrarAlerta('✅ Proveedor creado exitosamente', 'success');
+            }
+
+            localStorage.setItem('bar_proveedores', JSON.stringify(storage.proveedores));
+            
+            cerrarModal('proveedor');
+            cargarSelects();
+            cargarTablaProveedores();
+            actualizarEstadisticas();
+        }
+
+        function eliminarProveedor(id) {
+            if (!confirm('¿Está seguro de eliminar este proveedor?')) return;
+
+            storage.proveedores = storage.proveedores.filter(p => p.id !== id);
+            localStorage.setItem('bar_proveedores', JSON.stringify(storage.proveedores));
+            
+            mostrarAlerta('✅ Proveedor eliminado exitosamente', 'success');
+            cargarSelects();
+            cargarTablaProveedores();
+            actualizarEstadisticas();
+        }
+
+        // ==============================================
+        // ACTUALIZAR TABLAS
+        // ==============================================
+        function cargarTablaInsumos() {
+            const tbody = document.getElementById('tabla-insumos');
+            
+            if (storage.insumos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div>
+                                <h3>No hay insumos registrados</h3>
+                                <p>Presione "Nuevo Insumo" para comenzar</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            storage.insumos.forEach(insumo => {
+                const stock = storage.inventario[insumo.id] || 0;
+                let estadoStock = 'optimo';
+                let textoStock = 'Óptimo';
+                
+                if (insumo.stockMinimo && stock <= insumo.stockMinimo) {
+                    estadoStock = 'bajo';
+                    textoStock = '⚠️ Bajo';
+                } else if (stock === 0) {
+                    estadoStock = 'bajo';
+                    textoStock = '❌ Agotado';
+                }
+
+                const categoriaLabel = {
+                    'ingrediente': 'Ingrediente',
+                    'gaseosa': 'Gaseosa',
+                    'material': 'Material/Deco',
+                    'otro': 'Otro'
+                };
+
+                const row = `
+                    <tr>
+                        <td>${insumo.codigo}</td>
+                        <td><strong>${insumo.nombre}</strong></td>
+                        <td><span class="badge badge-${insumo.categoria}">${categoriaLabel[insumo.categoria]}</span></td>
+                        <td><strong>${stock}</strong></td>
+                        <td>${insumo.unidad}</td>
+                        <td><span class="status ${estadoStock}">${textoStock}</span></td>
+                        <td>
+                            <button class="action-btn edit" onclick="abrirModalInsumo(${insumo.id})">✏️</button>
+                            <button class="action-btn delete" onclick="eliminarInsumo(${insumo.id})">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function cargarTablaRecetas() {
+            const tbody = document.getElementById('tabla-recetas');
+            
+            if (storage.recetas.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <div>
+                                <h3>No hay recetas registradas</h3>
+                                <p>Presione "Nueva Receta" para comenzar</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            storage.recetas.forEach(receta => {
+                const insumosTexto = receta.insumos
+                    .map(i => `${i.insumoNombre} (${i.cantidad} ${i.unidad})`)
+                    .join(', ');
+
+                const row = `
+                    <tr>
+                        <td>${receta.codigo}</td>
+                        <td><strong>${receta.nombre}</strong></td>
+                        <td><small>${insumosTexto}</small></td>
+                        <td>${receta.rendimiento || '-'}</td>
+                        <td>
+                            <button class="action-btn edit" onclick="abrirModalReceta(${receta.id})">✏️</button>
+                            <button class="action-btn delete" onclick="eliminarReceta(${receta.id})">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function cargarTablaInventario() {
+            const tbody = document.getElementById('tabla-inventario');
+            
+            if (storage.insumos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <div>
+                                <h3>No hay inventario registrado</h3>
+                                <p>Registre entradas de insumos para ver el inventario</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            storage.insumos.forEach(insumo => {
+                const stock = storage.inventario[insumo.id] || 0;
+                let estadoStock = 'optimo';
+                let textoStock = 'Óptimo';
+                
+                if (stock === 0) {
+                    estadoStock = 'bajo';
+                    textoStock = '❌ Agotado';
+                } else if (insumo.stockMinimo && stock <= insumo.stockMinimo) {
+                    estadoStock = 'bajo';
+                    textoStock = '⚠️ Bajo';
+                }
+
+                const ultimosMovimientos = storage.movimientos
+                    .filter(m => m.insumoId === insumo.id)
+                    .sort((a, b) => new Date(b.fechaRegistro) - new Date(a.fechaRegistro));
+                
+                const ultimaActualizacion = ultimosMovimientos.length > 0 
+                    ? new Date(ultimosMovimientos[0].fechaRegistro).toLocaleString()
+                    : 'Sin movimientos';
+
+                const categoriaLabel = {
+                    'ingrediente': 'Ingrediente',
+                    'gaseosa': 'Gaseosa',
+                    'material': 'Material/Deco',
+                    'otro': 'Otro'
+                };
+
+                const row = `
+                    <tr>
+                        <td>${insumo.codigo}</td>
+                        <td><strong>${insumo.nombre}</strong></td>
+                        <td><span class="badge badge-${insumo.categoria}">${categoriaLabel[insumo.categoria]}</span></td>
+                        <td><strong>${stock}</strong></td>
+                        <td>${insumo.unidad}</td>
+                        <td>${insumo.stockMinimo || '-'}</td>
+                        <td><span class="status ${estadoStock}">${textoStock}</span></td>
+                        <td><small>${ultimaActualizacion}</small></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function cargarTablaProveedores() {
+            const tbody = document.getElementById('tabla-proveedores');
+            
+            if (storage.proveedores.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div>
+                                <h3>No hay proveedores registrados</h3>
+                                <p>Presione "Nuevo Proveedor" para comenzar</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            storage.proveedores.forEach(proveedor => {
+                const row = `
+                    <tr>
+                        <td>${proveedor.codigo}</td>
+                        <td><strong>${proveedor.nombre}</strong></td>
+                        <td>${proveedor.contacto}</td>
+                        <td>${proveedor.telefono}</td>
+                        <td>${proveedor.email || '-'}</td>
+                        <td><small>${proveedor.productos || '-'}</small></td>
+                        <td>
+                            <button class="action-btn edit" onclick="abrirModalProveedor(${proveedor.id})">✏️</button>
+                            <button class="action-btn delete" onclick="eliminarProveedor(${proveedor.id})">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function cargarReportes() {
+            const tbody = document.getElementById('tabla-reportes');
+            
+            if (storage.movimientos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <div>
+                                <h3>No hay movimientos registrados</h3>
+                                <p>Los movimientos de entrada y salida aparecerán aquí</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            const movimientosOrdenados = [...storage.movimientos].sort((a, b) => 
+                new Date(b.fecha) - new Date(a.fecha)
+            );
+
+            movimientosOrdenados.forEach(mov => {
+                const provMotivo = mov.tipo === 'entrada' 
+                    ? mov.proveedorNombre 
+                    : mov.recetaNombre || mov.motivo;
+
+                const row = `
+                    <tr>
+                        <td>${mov.fecha}</td>
+                        <td><span class="status ${mov.tipo}">${mov.tipo.toUpperCase()}</span></td>
+                        <td><strong>${mov.insumoNombre}</strong></td>
+                        <td>${mov.cantidad}</td>
+                        <td>${mov.unidad}</td>
+                        <td>${provMotivo}</td>
+                        <td>${mov.responsable}</td>
+                        <td><small>${mov.observaciones || '-'}</small></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // ==============================================
+        // ESTADÍSTICAS
+        // ==============================================
+        function actualizarEstadisticas() {
+            document.getElementById('stat-total-insumos').textContent = storage.insumos.length;
+            
+            const hoy = new Date();
+            const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            
+            const entradasMes = storage.movimientos.filter(m => 
+                m.tipo === 'entrada' && new Date(m.fecha) >= primerDiaMes
+            ).length;
+            
+            const salidasMes = storage.movimientos.filter(m => 
+                m.tipo === 'salida' && new Date(m.fecha) >= primerDiaMes
+            ).length;
+            
+            document.getElementById('stat-entradas-mes').textContent = entradasMes;
+            document.getElementById('stat-salidas-mes').textContent = salidasMes;
+            document.getElementById('stat-proveedores').textContent = storage.proveedores.length;
+        }
+
+        function actualizarTablas() {
+            cargarTablaInsumos();
+            cargarTablaRecetas();
+            cargarTablaInventario();
+            cargarTablaProveedores();
+            cargarReportes();
+        }
+
+        // ==============================================
+        // FILTROS Y BÚSQUEDAS
+        // ==============================================
+        function filtrarInsumos() {
+            const busqueda = document.getElementById('buscar-insumo').value.toLowerCase();
+            const categoria = document.getElementById('filtro-categoria-insumo').value;
+            
+            const tbody = document.getElementById('tabla-insumos');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            Array.from(rows).forEach(row => {
+                if (row.querySelector('.empty-state')) return;
+                
+                const nombre = row.cells[1]?.textContent.toLowerCase() || '';
+                const cat = row.cells[2]?.querySelector('.badge')?.className.includes(categoria) || categoria === '';
+                const matchBusqueda = nombre.includes(busqueda);
+                
+                if (matchBusqueda && (categoria === '' || cat)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function filtrarReportes() {
+            const fechaInicio = document.getElementById('filtro-fecha-inicio').value;
+            const fechaFin = document.getElementById('filtro-fecha-fin').value;
+            const tipo = document.getElementById('filtro-tipo').value;
+            const responsable = document.getElementById('filtro-responsable').value.toLowerCase();
+            
+            let movimientosFiltrados = [...storage.movimientos];
+            
+            if (fechaInicio) {
+                movimientosFiltrados = movimientosFiltrados.filter(m => m.fecha >= fechaInicio);
+            }
+            if (fechaFin) {
+                movimientosFiltrados = movimientosFiltrados.filter(m => m.fecha <= fechaFin);
+            }
+            if (tipo !== 'todos') {
+                movimientosFiltrados = movimientosFiltrados.filter(m => m.tipo === tipo);
+            }
+            if (responsable) {
+                movimientosFiltrados = movimientosFiltrados.filter(m => 
+                    m.responsable.toLowerCase().includes(responsable)
+                );
+            }
+            
+            const tbody = document.getElementById('tabla-reportes');
+            tbody.innerHTML = '';
+            
+            if (movimientosFiltrados.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <div>
+                                <h3>No se encontraron movimientos</h3>
+                                <p>Intente con otros filtros</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            movimientosFiltrados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            
+            movimientosFiltrados.forEach(mov => {
+                const provMotivo = mov.tipo === 'entrada' 
+                    ? mov.proveedorNombre 
+                    : mov.recetaNombre || mov.motivo;
+
+                const row = `
+                    <tr>
+                        <td>${mov.fecha}</td>
+                        <td><span class="status ${mov.tipo}">${mov.tipo.toUpperCase()}</span></td>
+                        <td><strong>${mov.insumoNombre}</strong></td>
+                        <td>${mov.cantidad}</td>
+                        <td>${mov.unidad}</td>
+                        <td>${provMotivo}</td>
+                        <td>${mov.responsable}</td>
+                        <td><small>${mov.observaciones || '-'}</small></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function limpiarFiltros() {
+            document.getElementById('filtro-fecha-inicio').value = new Date(new Date().setDate(1)).toISOString().split('T')[0];
+            document.getElementById('filtro-fecha-fin').value = new Date().toISOString().split('T')[0];
+            document.getElementById('filtro-tipo').value = 'todos';
+            document.getElementById('filtro-responsable').value = '';
+            cargarReportes();
+        }
+
+        // ==============================================
+        // CONTEO FÍSICO
+        // ==============================================
+
+        // Inicializar almacenamiento de conteos
+        if (!localStorage.getItem('bar_conteos')) {
+            localStorage.setItem('bar_conteos', JSON.stringify([]));
+        }
+
+        function cargarInsumosConteo() {
+            const select = document.getElementById('conteo-insumo');
+            if (!select) return;
+            
+            select.innerHTML = '<option value="">Seleccione un insumo...</option>';
+            
+            storage.insumos.forEach(insumo => {
+                const option = document.createElement('option');
+                option.value = insumo.id;
+                option.textContent = `${insumo.nombre} (${insumo.codigo})`;
+                select.appendChild(option);
+            });
+        }
+
+        // Cuando se selecciona un insumo, mostrar cantidad del sistema
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectInsumo = document.getElementById('conteo-insumo');
+            if (selectInsumo) {
+                selectInsumo.addEventListener('change', function() {
+                    const insumoId = parseInt(this.value);
+                    const cantidadFisicaInput = document.getElementById('conteo-cantidad-fisica');
+                    const cantidadSistemaInput = document.getElementById('conteo-cantidad-sistema');
+                    const diferenciaInput = document.getElementById('conteo-diferencia');
+                    
+                    if (insumoId) {
+                        const insumo = storage.insumos.find(i => i.id === insumoId);
+                        const cantidadSistema = storage.inventario[insumoId] || 0;
+                        
+                        cantidadSistemaInput.value = `${cantidadSistema} ${insumo.unidad}`;
+                        
+                        // Calcular diferencia cuando se ingrese cantidad física
+                        cantidadFisicaInput.addEventListener('input', function() {
+                            const cantidadFisica = parseFloat(this.value) || 0;
+                            const diferencia = cantidadFisica - cantidadSistema;
+                            diferenciaInput.value = `${diferencia > 0 ? '+' : ''}${diferencia.toFixed(2)} ${insumo.unidad}`;
+                            
+                            // Color según diferencia
+                            if (Math.abs(diferencia) < 0.1) {
+                                diferenciaInput.style.background = '#e8f5e9'; // Verde claro
+                            } else if (Math.abs(diferencia) > 5) {
+                                diferenciaInput.style.background = '#ffebee'; // Rojo claro
+                            } else {
+                                diferenciaInput.style.background = '#fff9c4'; // Amarillo
+                            }
+                        });
+                    } else {
+                        cantidadSistemaInput.value = '';
+                        diferenciaInput.value = '';
+                    }
+                });
+            }
+        });
+
+        function registrarConteoFisico(event) {
+            event.preventDefault();
+            
+            const insumoId = parseInt(document.getElementById('conteo-insumo').value);
+            const cantidadFisica = parseFloat(document.getElementById('conteo-cantidad-fisica').value);
+            const responsable = document.getElementById('conteo-responsable').value.trim();
+            const fecha = document.getElementById('conteo-fecha').value;
+            const observaciones = document.getElementById('conteo-observaciones').value;
+            
+            if (!insumoId || !cantidadFisica || !responsable || !fecha) {
+                mostrarAlerta('⚠️ Por favor complete todos los campos obligatorios', 'error');
+                return;
+            }
+            
+            const insumo = storage.insumos.find(i => i.id === insumoId);
+            const cantidadSistema = storage.inventario[insumoId] || 0;
+            const diferencia = cantidadFisica - cantidadSistema;
+            const porcentajeDif = cantidadSistema > 0 ? ((diferencia / cantidadSistema) * 100).toFixed(2) : 0;
+            
+            // Obtener conteos existentes
+            const conteos = JSON.parse(localStorage.getItem('bar_conteos') || '[]');
+            
+            const conteo = {
+                id: Date.now(),
+                fecha: fecha,
+                insumoId: insumoId,
+                insumoNombre: insumo.nombre,
+                insumoCodigo: insumo.codigo,
+                unidad: insumo.unidad,
+                cantidadSistema: cantidadSistema,
+                cantidadFisica: cantidadFisica,
+                diferencia: diferencia,
+                porcentajeDif: porcentajeDif,
+                responsable: responsable,
+                observaciones: observaciones,
+                fechaRegistro: new Date().toISOString()
+            };
+            
+            conteos.push(conteo);
+            localStorage.setItem('bar_conteos', JSON.stringify(conteos));
+            
+            mostrarAlerta('✅ Conteo físico registrado exitosamente', 'success');
+            
+            // Limpiar formulario
+            document.getElementById('form-conteo').reset();
+            document.getElementById('conteo-cantidad-sistema').value = '';
+            document.getElementById('conteo-diferencia').value = '';
+            document.getElementById('conteo-diferencia').style.background = '#fff9c4';
+            
+            // Recargar tabla
+            cargarTablaConteos();
+        }
+
+        function cargarTablaConteos() {
+            const tbody = document.getElementById('tabla-conteos');
+            if (!tbody) return;
+            
+            const conteos = JSON.parse(localStorage.getItem('bar_conteos') || '[]');
+            
+            if (conteos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align:center;padding:20px;color:#999;">
+                            No hay conteos registrados
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Ordenar por fecha descendente
+            conteos.sort((a, b) => new Date(b.fechaRegistro) - new Date(a.fechaRegistro));
+            
+            tbody.innerHTML = '';
+            conteos.forEach(conteo => {
+                const diferencia = conteo.diferencia;
+                let colorDif = '#fff9c4'; // Amarillo por defecto
+                
+                if (Math.abs(diferencia) < 0.1) {
+                    colorDif = '#e8f5e9'; // Verde
+                } else if (Math.abs(diferencia) > 5) {
+                    colorDif = '#ffebee'; // Rojo
+                }
+                
+                const row = `
+                    <tr>
+                        <td>${conteo.fecha}</td>
+                        <td><strong>${conteo.insumoNombre}</strong><br><small>${conteo.insumoCodigo}</small></td>
+                        <td>${conteo.cantidadSistema} ${conteo.unidad}</td>
+                        <td>${conteo.cantidadFisica} ${conteo.unidad}</td>
+                        <td style="background:${colorDif};font-weight:bold;">
+                            ${diferencia > 0 ? '+' : ''}${diferencia.toFixed(2)} ${conteo.unidad}
+                        </td>
+                        <td style="background:${colorDif};">${conteo.porcentajeDif}%</td>
+                        <td>${conteo.responsable}</td>
+                        <td>${conteo.observaciones || '-'}</td>
+                        <td>
+                            <button class="action-btn delete" onclick="eliminarConteo(${conteo.id})" title="Eliminar">
+                                🗑️
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function eliminarConteo(id) {
+            if (!confirm('¿Eliminar este conteo?')) return;
+            
+            let conteos = JSON.parse(localStorage.getItem('bar_conteos') || '[]');
+            conteos = conteos.filter(c => c.id !== id);
+            localStorage.setItem('bar_conteos', JSON.stringify(conteos));
+            
+            mostrarAlerta('✅ Conteo eliminado', 'success');
+            cargarTablaConteos();
+        }
+
+        function exportarConteoFisico() {
+            const conteos = JSON.parse(localStorage.getItem('bar_conteos') || '[]');
+            
+            if (conteos.length === 0) {
+                mostrarAlerta('⚠️ No hay conteos para exportar', 'warning');
+                return;
+            }
+            
+            const datos = [
+                ['CONTEO FÍSICO - BAR - EL RINCÓN DEL BARRIL'],
+                ['Fecha de Exportación:', new Date().toLocaleString('es-CO')],
+                [],
+                ['Fecha', 'Código', 'Insumo', 'Cant. Sistema', 'Cant. Física', 'Diferencia', '% Dif', 'Unidad', 'Responsable', 'Observaciones']
+            ];
+            
+            conteos.forEach(conteo => {
+                datos.push([
+                    conteo.fecha,
+                    conteo.insumoCodigo,
+                    conteo.insumoNombre,
+                    conteo.cantidadSistema,
+                    conteo.cantidadFisica,
+                    conteo.diferencia,
+                    conteo.porcentajeDif + '%',
+                    conteo.unidad,
+                    conteo.responsable,
+                    conteo.observaciones || ''
+                ]);
+            });
+            
+            // Crear libro de Excel
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(datos);
+            
+            // Ajustar ancho de columnas
+            const colWidths = datos[3].map((_, i) => {
+                const maxLength = Math.max(...datos.map(row => row[i] ? String(row[i]).length : 0));
+                return { wch: Math.min(Math.max(maxLength + 2, 10), 50) };
+            });
+            ws['!cols'] = colWidths;
+            
+            // Agregar hoja al libro
+            XLSX.utils.book_append_sheet(wb, ws, 'Conteo Físico');
+            
+            // Descargar archivo
+            const nombreArchivo = `Conteo_Fisico_Bar_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, nombreArchivo);
+            
+            mostrarAlerta('📥 Conteo físico exportado exitosamente', 'success');
+        }
+
+        // ==============================================
+        // EXPORTAR A EXCEL
+        // ==============================================
+        function exportarExcel(tipo) {
+            let datos = [];
+            let nombreArchivo = '';
+            let nombreHoja = '';
+            
+            if (tipo === 'completo' || tipo === 'filtrado') {
+                nombreArchivo = `Reporte_Movimientos_Bar_${new Date().toISOString().split('T')[0]}.xlsx`;
+                nombreHoja = 'Movimientos';
+                
+                let movimientos = [...storage.movimientos];
+                if (tipo === 'filtrado') {
+                    const fechaInicio = document.getElementById('filtro-fecha-inicio').value;
+                    const fechaFin = document.getElementById('filtro-fecha-fin').value;
+                    const tipoFiltro = document.getElementById('filtro-tipo').value;
+                    const responsable = document.getElementById('filtro-responsable').value.toLowerCase();
+                    
+                    if (fechaInicio) movimientos = movimientos.filter(m => m.fecha >= fechaInicio);
+                    if (fechaFin) movimientos = movimientos.filter(m => m.fecha <= fechaFin);
+                    if (tipoFiltro !== 'todos') movimientos = movimientos.filter(m => m.tipo === tipoFiltro);
+                    if (responsable) movimientos = movimientos.filter(m => m.responsable.toLowerCase().includes(responsable));
+                }
+                
+                datos = [
+                    ['REPORTE DE MOVIMIENTOS - BAR - EL RINCÓN DEL BARRIL'],
+                    ['Fecha de Generación:', new Date().toLocaleString('es-CO')],
+                    [],
+                    ['Fecha', 'Tipo', 'Insumo', 'Cantidad', 'Unidad', 'Proveedor/Motivo', 'Responsable', 'Costo Total', 'Observaciones']
+                ];
+                
+                movimientos.forEach(mov => {
+                    datos.push([
+                        mov.fecha,
+                        mov.tipo.toUpperCase(),
+                        mov.insumoNombre,
+                        mov.cantidad,
+                        mov.unidad,
+                        mov.tipo === 'entrada' ? mov.proveedorNombre : (mov.recetaNombre || mov.motivo),
+                        mov.responsable,
+                        mov.costoTotal || '',
+                        mov.observaciones || ''
+                    ]);
+                });
+            } else if (tipo === 'inventario') {
+                nombreArchivo = `Inventario_Bar_${new Date().toISOString().split('T')[0]}.xlsx`;
+                nombreHoja = 'Inventario';
+                
+                datos = [
+                    ['INVENTARIO ACTUAL - BAR - EL RINCÓN DEL BARRIL'],
+                    ['Fecha de Generación:', new Date().toLocaleString('es-CO')],
+                    [],
+                    ['Código', 'Insumo', 'Categoría', 'Stock Actual', 'Unidad', 'Stock Mínimo', 'Estado']
+                ];
+                
+                storage.insumos.forEach(insumo => {
+                    const stock = storage.inventario[insumo.id] || 0;
+                    let estado = 'Óptimo';
+                    if (stock === 0) estado = 'Agotado';
+                    else if (insumo.stockMinimo && stock <= insumo.stockMinimo) estado = 'Bajo';
+                    
+                    datos.push([
+                        insumo.codigo,
+                        insumo.nombre,
+                        insumo.categoria,
+                        stock,
+                        insumo.unidad,
+                        insumo.stockMinimo || '-',
+                        estado
+                    ]);
+                });
+            }
+            
+            // Crear libro de Excel
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(datos);
+            
+            // Ajustar ancho de columnas
+            const colWidths = datos[3].map((_, i) => {
+                const maxLength = Math.max(
+                    ...datos.map(row => row[i] ? String(row[i]).length : 0)
+                );
+                return { wch: Math.min(Math.max(maxLength + 2, 10), 50) };
+            });
+            ws['!cols'] = colWidths;
+            
+            // Agregar hoja al libro
+            XLSX.utils.book_append_sheet(wb, ws, nombreHoja);
+            
+            // Descargar archivo
+            XLSX.writeFile(wb, nombreArchivo);
+            
+            mostrarAlerta('📥 Archivo Excel exportado exitosamente', 'success');
+        }
+
+        // ==============================================
+        // ALERTAS DE STOCK
+        // ==============================================
+        function generarAlertasStock() {
+            const alertas = [];
+            
+            storage.insumos.forEach(insumo => {
+                const stock = storage.inventario[insumo.id] || 0;
+                
+                if (stock === 0) {
+                    alertas.push({
+                        tipo: 'agotado',
+                        insumo: insumo.nombre,
+                        stock: stock,
+                        unidad: insumo.unidad
+                    });
+                } else if (insumo.stockMinimo && stock <= insumo.stockMinimo) {
+                    alertas.push({
+                        tipo: 'bajo',
+                        insumo: insumo.nombre,
+                        stock: stock,
+                        unidad: insumo.unidad,
+                        minimo: insumo.stockMinimo
+                    });
+                }
+            });
+            
+            if (alertas.length === 0) {
+                mostrarAlerta('✅ No hay alertas de stock. Todo está en niveles óptimos.', 'success');
+                return;
+            }
+            
+            let mensaje = 'ALERTAS DE STOCK:\n\n';
+            alertas.forEach(alerta => {
+                if (alerta.tipo === 'agotado') {
+                    mensaje += `❌ ${alerta.insumo}: AGOTADO (0 ${alerta.unidad})\n`;
+                } else {
+                    mensaje += `⚠️ ${alerta.insumo}: ${alerta.stock} ${alerta.unidad} (Mínimo: ${alerta.minimo})\n`;
+                }
+            });
+            
+            alert(mensaje);
+        }
+
+        // ==============================================
+        // LIMPIAR TODO AHORA - VERSIÓN AGRESIVA
+        // ==============================================
+        function limpiarTodoAHORA() {
+            const confirmacion = prompt('⚠️ RESETEAR TODO EL SISTEMA BAR\n\nEsto borrará:\n• Todos los insumos actuales\n• Todos los movimientos\n• Todo el inventario\n• Todos los proveedores\n\nY cargará los 18 insumos nuevos.\n\n👉 Escribe "SI" para confirmar:');
+            
+            if (confirmacion === 'SI' || confirmacion === 'si' || confirmacion === 'Si') {
+                console.log('🗑️ LIMPIANDO TODO BAR...');
+                
+                // Limpiar TODO el localStorage relacionado con bar
+                const keys = Object.keys(localStorage);
+                keys.forEach(key => {
+                    if (key.includes('bar')) {
+                        localStorage.removeItem(key);
+                        console.log('Eliminado:', key);
+                    }
+                });
+                
+                // También limpiar específicamente estas claves
+                localStorage.removeItem('bar_insumos');
+                localStorage.removeItem('bar_movimientos');
+                localStorage.removeItem('bar_inventario');
+                localStorage.removeItem('bar_proveedores');
+                localStorage.removeItem('bar_recetas');
+                
+                console.log('✅ localStorage limpiado');
+                
+                // Forzar recarga completa (sin caché)
+                alert('✅ TODO BORRADO\n\nLa página se recargará y verás SOLO 18 insumos nuevos.\n\nSi sigues viendo más, cierra el navegador completamente y abre de nuevo.');
+                
+                // Recarga forzada
+                window.location.href = window.location.href + '?t=' + Date.now();
+            } else {
+                alert('❌ Cancelado. No escribiste "SI".');
+            }
+        }
+
+        // ==============================================
+        // MODO SALIDA POR RECETA
+        // ==============================================
+        let modoSalidaActual = 'individual';
+        let camposPersistentes = {
+            responsable: '',
+            fecha: ''
+        };
+
+        function cambiarModoSalida(modo) {
+            modoSalidaActual = modo;
+            
+            if (modo === 'individual') {
+                document.getElementById('form-salida').style.display = 'block';
+                document.getElementById('form-salida-receta').style.display = 'none';
+            } else {
+                document.getElementById('form-salida').style.display = 'none';
+                document.getElementById('form-salida-receta').style.display = 'block';
+                cargarRecetasEnSelect();
+                
+                // Restaurar campos persistentes si existen
+                if (camposPersistentes.responsable) {
+                    document.getElementById('salida-receta-responsable').value = camposPersistentes.responsable;
+                }
+                if (camposPersistentes.fecha) {
+                    document.getElementById('salida-receta-fecha').value = camposPersistentes.fecha;
+                }
+            }
+        }
+
+        function cargarRecetasEnSelect() {
+            const select = document.getElementById('salida-receta-bebida');
+            select.innerHTML = '<option value="">Seleccione una bebida...</option>';
+            
+            storage.recetas.forEach(receta => {
+                const option = document.createElement('option');
+                option.value = receta.id;
+                option.textContent = `${receta.nombre} (${receta.rendimiento})`;
+                select.appendChild(option);
+            });
+        }
+
+        function mostrarInsumosReceta(recetaId) {
+            if (!recetaId) {
+                document.getElementById('preview-insumos-receta').style.display = 'none';
+                return;
+            }
+
+            const cantidad = parseFloat(document.getElementById('salida-receta-cantidad').value) || 1;
+            calcularInsumosNecesarios();
+        }
+
+        function calcularInsumosNecesarios() {
+            const recetaId = document.getElementById('salida-receta-bebida').value;
+            const cantidad = parseFloat(document.getElementById('salida-receta-cantidad').value) || 1;
+
+            if (!recetaId) return;
+
+            const receta = storage.recetas.find(r => r.id == recetaId);
+            if (!receta) return;
+
+            const preview = document.getElementById('preview-insumos-receta');
+            const lista = document.getElementById('lista-insumos-consumo');
+            
+            let html = '<table style="width: 100%; font-size: 0.95em;">';
+            html += '<tr style="background: #f5f5f5; font-weight: 600;"><td>Insumo</td><td>Por Unidad</td><td>Total Necesario</td><td>Stock Actual</td><td>Estado</td></tr>';
+            
+            let hayProblemas = false;
+
+            receta.insumos.forEach(insumo => {
+                const totalNecesario = insumo.cantidad * cantidad;
+                const stockActual = storage.inventario[insumo.insumoId] || 0;
+                const suficiente = stockActual >= totalNecesario;
+                
+                if (!suficiente) hayProblemas = true;
+
+                html += `<tr style="border-bottom: 1px solid #e0e0e0;">
+                    <td style="padding: 8px;"><strong>${insumo.insumoNombre}</strong></td>
+                    <td style="padding: 8px;">${insumo.cantidad} ${insumo.unidad}</td>
+                    <td style="padding: 8px;"><strong>${totalNecesario} ${insumo.unidad}</strong></td>
+                    <td style="padding: 8px;">${stockActual} ${insumo.unidad}</td>
+                    <td style="padding: 8px;">${suficiente ? '<span style="color: #4caf50;">✅ OK</span>' : '<span style="color: #f44336;">❌ Insuficiente</span>'}</td>
+                </tr>`;
+            });
+            
+            html += '</table>';
+            
+            if (hayProblemas) {
+                html += '<div style="margin-top: 15px; padding: 10px; background: #ffebee; border-left: 4px solid #f44336; border-radius: 4px;">';
+                html += '⚠️ <strong>ADVERTENCIA:</strong> No hay stock suficiente de algunos insumos. El registro fallará.';
+                html += '</div>';
+            }
+
+            lista.innerHTML = html;
+            preview.style.display = 'block';
+        }
+
+        function registrarSalidaPorReceta(event) {
+            event.preventDefault();
+
+            const recetaId = parseInt(document.getElementById('salida-receta-bebida').value);
+            const cantidad = parseFloat(document.getElementById('salida-receta-cantidad').value);
+            const fecha = document.getElementById('salida-receta-fecha').value;
+            const responsable = document.getElementById('salida-receta-responsable').value.trim();
+            const observaciones = document.getElementById('salida-receta-observaciones').value;
+
+            if (!responsable) {
+                mostrarAlerta('Por favor ingrese el nombre del responsable', 'error');
+                return;
+            }
+
+            const receta = storage.recetas.find(r => r.id === recetaId);
+            if (!receta) {
+                mostrarAlerta('Error: Receta no encontrada', 'error');
+                return;
+            }
+
+            // Guardar campos persistentes
+            camposPersistentes.responsable = responsable;
+            camposPersistentes.fecha = fecha;
+
+            // Verificar stock de todos los insumos primero
+            let stockInsuficiente = [];
+            receta.insumos.forEach(insumo => {
+                const totalNecesario = insumo.cantidad * cantidad;
+                const stockActual = storage.inventario[insumo.insumoId] || 0;
+                
+                if (totalNecesario > stockActual) {
+                    stockInsuficiente.push({
+                        nombre: insumo.insumoNombre,
+                        necesario: totalNecesario,
+                        disponible: stockActual,
+                        unidad: insumo.unidad
+                    });
+                }
+            });
+
+            if (stockInsuficiente.length > 0) {
+                let mensaje = '❌ Stock insuficiente:\n\n';
+                stockInsuficiente.forEach(item => {
+                    mensaje += `${item.nombre}: Necesitas ${item.necesario} ${item.unidad}, solo tienes ${item.disponible} ${item.unidad}\n`;
+                });
+                alert(mensaje);
+                return;
+            }
+
+            // Registrar salida de cada insumo
+            let movimientosRegistrados = 0;
+            receta.insumos.forEach(insumo => {
+                const totalNecesario = insumo.cantidad * cantidad;
+                
+                const movimiento = {
+                    id: Date.now() + movimientosRegistrados, // Para IDs únicos
+                    tipo: 'salida',
+                    insumoId: insumo.insumoId,
+                    insumoNombre: insumo.insumoNombre,
+                    cantidad: totalNecesario,
+                    unidad: insumo.unidad,
+                    motivo: 'preparacion',
+                    recetaId: recetaId,
+                    recetaNombre: `${receta.nombre} (${cantidad} ${cantidad === 1 ? 'unidad' : 'unidades'})`,
+                    fecha: fecha,
+                    responsable: responsable,
+                    observaciones: observaciones,
+                    fechaRegistro: new Date().toISOString()
+                };
+
+                storage.movimientos.push(movimiento);
+                
+                // Actualizar inventario
+                const stockActual = storage.inventario[insumo.insumoId] || 0;
+                storage.inventario[insumo.insumoId] = stockActual - totalNecesario;
+                
+                movimientosRegistrados++;
+            });
+
+            localStorage.setItem('bar_movimientos', JSON.stringify(storage.movimientos));
+            localStorage.setItem('bar_inventario', JSON.stringify(storage.inventario));
+
+            mostrarAlerta(`✅ Salida registrada exitosamente: ${cantidad} ${receta.nombre} (${movimientosRegistrados} insumos consumidos)`, 'success');
+            actualizarEstadisticas();
+            
+            // NO limpiar el formulario automáticamente para permitir "registrar y continuar"
+            document.getElementById('salida-receta-cantidad').value = '';
+            document.getElementById('salida-receta-bebida').value = '';
+            document.getElementById('preview-insumos-receta').style.display = 'none';
+        }
+
+        function registrarYContinuar(tipoForm) {
+            if (tipoForm === 'salida') {
+                // Para salida individual, mantener responsable y fecha
+                const responsable = document.getElementById('salida-responsable').value;
+                const fecha = document.getElementById('salida-fecha').value;
+                
+                camposPersistentes.responsable = responsable;
+                camposPersistentes.fecha = fecha;
+                
+                // Simular submit del formulario
+                const form = document.getElementById('form-salida');
+                const submitEvent = new Event('submit', { cancelable: true });
+                form.dispatchEvent(submitEvent);
+                
+                // Si el submit fue exitoso, restaurar campos
+                setTimeout(() => {
+                    document.getElementById('salida-responsable').value = responsable;
+                    document.getElementById('salida-fecha').value = fecha;
+                }, 100);
+            } else if (tipoForm === 'salida-receta') {
+                // Simular submit del formulario de receta
+                const form = document.getElementById('form-salida-receta');
+                const submitEvent = new Event('submit', { cancelable: true });
+                form.dispatchEvent(submitEvent);
+                
+                // Los campos persistentes ya se mantienen en la función registrarSalidaPorReceta
+            }
+        }
+
+        // ==============================================
+        // UTILIDADES
+        // ==============================================
+        function limpiarFormulario(tipo) {
+            if (tipo === 'entrada') {
+                document.getElementById('form-entrada').reset();
+                establecerFechaHoy();
+            } else if (tipo === 'salida') {
+                const responsable = document.getElementById('salida-responsable').value;
+                const fecha = document.getElementById('salida-fecha').value;
+                
+                document.getElementById('form-salida').reset();
+                document.getElementById('salida-stock-disponible').value = '';
+                
+                // Restaurar campos persistentes
+                if (camposPersistentes.responsable) {
+                    document.getElementById('salida-responsable').value = camposPersistentes.responsable;
+                }
+                if (camposPersistentes.fecha) {
+                    document.getElementById('salida-fecha').value = camposPersistentes.fecha;
+                } else {
+                    establecerFechaHoy();
+                }
+            } else if (tipo === 'salida-receta') {
+                const responsable = document.getElementById('salida-receta-responsable').value;
+                const fecha = document.getElementById('salida-receta-fecha').value;
+                
+                document.getElementById('form-salida-receta').reset();
+                document.getElementById('preview-insumos-receta').style.display = 'none';
+                
+                // Restaurar campos persistentes
+                if (camposPersistentes.responsable) {
+                    document.getElementById('salida-receta-responsable').value = camposPersistentes.responsable;
+                }
+                if (camposPersistentes.fecha) {
+                    document.getElementById('salida-receta-fecha').value = camposPersistentes.fecha;
+                } else {
+                    establecerFechaHoy();
+                }
+            }
+        }
+
+        function cerrarModal(tipo) {
+            document.getElementById(`modal-${tipo}`).classList.remove('active');
+            document.getElementById(`form-${tipo}`).reset();
+        }
+
+        function mostrarAlerta(mensaje, tipo) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${tipo === 'success' ? 'success' : tipo === 'error' ? 'error' : 'warning'} show`;
+            alert.textContent = mensaje;
+            
+            container.innerHTML = '';
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        }
+
+        // Click fuera del modal para cerrar
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+    
+        // ==============================================
+        // CREACIÓN RÁPIDA (SIN SALIR DEL FORMULARIO)
+        // ==============================================
+
+        function abrirCreacionRapidaInsumo() {
+            document.getElementById('modal-rapido-insumo').classList.add('active');
+            document.getElementById('rapido-insumo-nombre').focus();
+        }
+
+        function abrirCreacionRapidaProveedor() {
+            document.getElementById('modal-rapido-proveedor').classList.add('active');
+            document.getElementById('rapido-proveedor-nombre').focus();
+        }
+
+        function cerrarModalRapido(tipo) {
+            document.getElementById(`modal-rapido-${tipo}`).classList.remove('active');
+            document.getElementById(`form-rapido-${tipo}`).reset();
+        }
+
+        function guardarInsumoRapido(event) {
+            event.preventDefault();
+
+            const codigo = 'INS-' + Date.now();
+            const nombre = document.getElementById('rapido-insumo-nombre').value;
+            const categoria = document.getElementById('rapido-insumo-categoria').value;
+            const unidad = document.getElementById('rapido-insumo-unidad').value;
+            const stockInicial = parseFloat(document.getElementById('rapido-insumo-stock').value) || 0;
+
+            const nuevoInsumo = {
+                id: Date.now(),
+                codigo: codigo,
+                nombre: nombre,
+                categoria: categoria,
+                unidad: unidad,
+                stock: stockInicial,
+                stockMinimo: null,
+                descripcion: 'Creado con creación rápida - Edite para agregar más detalles'
+            };
+
+            storage.insumos.push(nuevoInsumo);
+            localStorage.setItem('bar_insumos', JSON.stringify(storage.insumos));
+            storage.inventario[nuevoInsumo.id] = stockInicial;
+            localStorage.setItem('bar_inventario', JSON.stringify(storage.inventario));
+            
+            // Si hay stock inicial, registrar como entrada inicial
+            if (stockInicial > 0) {
+                const movimientoInicial = {
+                    id: Date.now() + 1,
+                    tipo: 'entrada',
+                    insumoId: nuevoInsumo.id,
+                    insumoNombre: nuevoInsumo.nombre,
+                    cantidad: stockInicial,
+                    unidad: unidad,
+                    proveedorId: null,
+                    proveedorNombre: 'Stock Inicial',
+                    costo: 0,
+                    costoTotal: 0,
+                    fecha: new Date().toISOString().split('T')[0],
+                    responsable: 'Sistema - Creación Inicial',
+                    observaciones: 'Stock inicial al crear el insumo',
+                    fechaRegistro: new Date().toISOString()
+                };
+                storage.movimientos.push(movimientoInicial);
+                localStorage.setItem('bar_movimientos', JSON.stringify(storage.movimientos));
+            }
+
+            cargarSelects();
+            document.getElementById('entrada-insumo').value = nuevoInsumo.id;
+
+            cerrarModalRapido('insumo');
+            mostrarAlerta(`✅ Insumo "${nombre}" creado y seleccionado`, 'success');
+        }
+
+        function guardarProveedorRapido(event) {
+            event.preventDefault();
+
+            const codigo = 'PROV-' + Date.now();
+            const nombre = document.getElementById('rapido-proveedor-nombre').value;
+            const contacto = document.getElementById('rapido-proveedor-contacto').value;
+            const telefono = document.getElementById('rapido-proveedor-telefono').value;
+
+            const nuevoProveedor = {
+                id: Date.now(),
+                codigo: codigo,
+                nombre: nombre,
+                nit: '',
+                contacto: contacto,
+                telefono: telefono,
+                email: '',
+                direccion: '',
+                productos: '',
+                notas: 'Creado con creación rápida - Edite para agregar más detalles'
+            };
+
+            storage.proveedores.push(nuevoProveedor);
+            localStorage.setItem('bar_proveedores', JSON.stringify(storage.proveedores));
+
+            cargarSelects();
+            document.getElementById('entrada-proveedor').value = nuevoProveedor.id;
+
+            cerrarModalRapido('proveedor');
+            mostrarAlerta(`✅ Proveedor "${nombre}" creado y seleccionado`, 'success');
+        }
+
+
+
+        // ============================================
+        // SINCRONIZACIÓN CON GOOGLE SHEETS - INVENTARIO BAR
+        // ============================================
+        
+        const GOOGLE_SCRIPT_URL = 'PEGAR_AQUI_LA_URL_DEL_GOOGLE_SCRIPT';
+        
+        async function sincronizarInventarioConGoogleSheets() {
+            if (GOOGLE_SCRIPT_URL === 'PEGAR_AQUI_LA_URL_DEL_GOOGLE_SCRIPT') {
+                alert('⚠️ Debes configurar la URL del Google Script en el código');
+                return;
+            }
+            
+            const btnSync = document.getElementById('btn-sync-sheets');
+            if (!btnSync) return;
+            
+            btnSync.disabled = true;
+            btnSync.textContent = '⏳ Sincronizando...';
+            btnSync.style.background = '#FFC107';
+            
+            try {
+                // Obtener inventario actual de bar_insumos
+                const insumos = JSON.parse(localStorage.getItem('bar_insumos')) || [];
+                const inventario = JSON.parse(localStorage.getItem('bar_inventario')) || {};
+                
+                if (insumos.length === 0) {
+                    alert('⚠️ No hay inventario para sincronizar');
+                    return;
+                }
+                
+                // Preparar datos con stock actual
+                const productos = insumos.map(insumo => ({
+                    codigo: insumo.id,
+                    nombre: insumo.nombre,
+                    categoria: insumo.categoria,
+                    stock: inventario[insumo.id] || 0,
+                    unidad: insumo.unidadMedida || 'unidades',
+                    stockMinimo: insumo.stockMinimo || 0
+                }));
+                
+                const datos = {
+                    accion: 'sync_inventario_bar',
+                    productos: productos,
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log('Enviando inventario bar:', productos.length, 'productos');
+                
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+                
+                localStorage.setItem('ultima_sync_inventario_bar', new Date().toISOString());
+                mostrarNotificacionSync('✅ Sincronización Exitosa', 'Inventario Bar enviado a Google Sheets', 'success');
+                actualizarInfoSyncBar();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacionSync('❌ Error al Sincronizar', error.message, 'error');
+            } finally {
+                btnSync.disabled = false;
+                btnSync.textContent = '☁️ Sincronizar Inventario';
+                btnSync.style.background = '#FF9800';
+            }
+        }
+        
+        function mostrarNotificacionSync(titulo, mensaje, tipo) {
+            const notif = document.createElement('div');
+            notif.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${tipo === 'success' ? '#4CAF50' : '#f44336'};
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                font-size: 16px;
+            `;
+            notif.innerHTML = `<strong>${titulo}</strong><br><span style="font-size: 14px;">${mensaje}</span>`;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
+        }
+        
+        function agregarBotonSyncBar() {
+            const headerRight = document.querySelector('.header-right');
+            if (!headerRight) return;
+            
+            const btnContainer = document.createElement('div');
+            btnContainer.style.cssText = 'margin-left: 15px;';
+            
+            const btn = document.createElement('button');
+            btn.id = 'btn-sync-sheets';
+            btn.textContent = '☁️ Sincronizar Inventario';
+            btn.style.cssText = `
+                background: #FF9800;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: bold;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            `;
+            btn.onclick = sincronizarInventarioConGoogleSheets;
+            
+            const info = document.createElement('div');
+            info.id = 'info-sync-bar';
+            info.style.cssText = 'font-size: 11px; color: white; margin-top: 5px; opacity: 0.8;';
+            actualizarInfoSyncBar();
+            
+            btnContainer.appendChild(btn);
+            btnContainer.appendChild(info);
+            headerRight.appendChild(btnContainer);
+        }
+        
+        function actualizarInfoSyncBar() {
+            const info = document.getElementById('info-sync-bar');
+            if (!info) return;
+            
+            const ultimaSync = localStorage.getItem('ultima_sync_inventario_bar');
+            if (ultimaSync) {
+                const fecha = new Date(ultimaSync);
+                info.textContent = `Sync: ${fecha.toLocaleDateString('es-CO')} ${fecha.toLocaleTimeString('es-CO')}`;
+            } else {
+                info.textContent = 'No sincronizado';
+            }
+        }
+        
+        window.addEventListener('load', () => {
+            setTimeout(agregarBotonSyncBar, 500);
+        });
+
+</script>
+
+    <!-- MODAL: CREACIÓN RÁPIDA DE INSUMO -->
+    <div id="modal-rapido-insumo" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>➕ Crear Insumo Rápido</h2>
+            </div>
+            <form id="form-rapido-insumo" onsubmit="guardarInsumoRapido(event)">
+                <div class="modal-body">
+                    <div class="info-box">
+                        <h4>ℹ️ Creación Rápida</h4>
+                        <p>Solo campos esenciales. Puedes editar detalles después en el tab "Gestión de Insumos".</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="required">Nombre del Insumo</label>
+                        <input type="text" id="rapido-insumo-nombre" required 
+                               placeholder="Ej: Limón Fresco">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Categoría</label>
+                        <select id="rapido-insumo-categoria" required>
+                            <option value="">Seleccione...</option>
+                            <option value="gaseosa">🥤 Gaseosa</option>
+                            <option value="ingrediente">🍋 Ingrediente</option>
+                            <option value="material">📦 Material</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Unidad de Medida</label>
+                        <select id="rapido-insumo-unidad" required>
+                            <option value="unidades">Unidades</option>
+                            <option value="kg">Kilogramos</option>
+                            <option value="gramos">Gramos</option>
+                            <option value="litros">Litros</option>
+                            <option value="ml">Mililitros</option>
+                            <option value="paquetes">Paquetes</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Stock Inicial (Opcional)</label>
+                        <input type="number" id="rapido-insumo-stock" min="0" step="0.01" 
+                               placeholder="0" value="0">
+                        <small style="color: #666; font-size: 0.85em; display: block; margin-top: 5px;">
+                            💡 Si ya tienes existencias, ingresa la cantidad. Déjalo en 0 si aún no tienes.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">✅ Crear y Usar</button>
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalRapido('insumo')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CREACIÓN RÁPIDA DE PROVEEDOR -->
+    <div id="modal-rapido-proveedor" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>➕ Crear Proveedor Rápido</h2>
+            </div>
+            <form id="form-rapido-proveedor" onsubmit="guardarProveedorRapido(event)">
+                <div class="modal-body">
+                    <div class="info-box">
+                        <h4>ℹ️ Creación Rápida</h4>
+                        <p>Solo campos esenciales. Puedes agregar más detalles después en el tab "Proveedores".</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="required">Nombre del Proveedor</label>
+                        <input type="text" id="rapido-proveedor-nombre" required 
+                               placeholder="Ej: Distribuidora La Económica">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Contacto</label>
+                        <input type="text" id="rapido-proveedor-contacto" required 
+                               placeholder="Nombre del contacto">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Teléfono</label>
+                        <input type="tel" id="rapido-proveedor-telefono" required 
+                               placeholder="Ej: 3001234567">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">✅ Crear y Usar</button>
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalRapido('proveedor')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</body>
+</html>
