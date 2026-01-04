@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistemas - El Rincón del Barril</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .systems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .system-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .system-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .system-card .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .system-card h2 {
+            color: #C41E3A;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .system-card p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .system-card.saneamiento { border-top: 4px solid #4CAF50; }
+        .system-card.bar { border-top: 4px solid #2196F3; }
+        .system-card.cocina { border-top: 4px solid #FF9800; }
+        .system-card.deposito { border-top: 4px solid #9C27B0; }
+        .system-card.equipos { border-top: 4px solid #F44336; }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+
+        footer p {
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .systems-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .system-card {
+                padding: 25px;
+            }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .status-active {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-beta {
+            background: #FF9800;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🔥</div>
+            <h1>El Rincón del Barril</h1>
+            <p>Sistema de Gestión Operativa</p>
+        </header>
+
+        <div class="systems-grid">
+            <!-- Saneamiento y Mantenimiento -->
+            <a href="rincon-del-barril-FINAL.html" class="system-card saneamiento">
+                <div class="icon">🧼</div>
+                <h2>Saneamiento y Mantenimiento</h2>
+                <p>Control de limpieza, sanitización y mantenimiento de utensilios</p>
+                <span class="status-badge status-active">ACTIVO</span>
+            </a>
+
+            <!-- Bar -->
+            <a href="SISTEMA_BAR.html" class="system-card bar">
+                <div class="icon">🍺</div>
+                <h2>Bar</h2>
+                <p>Gestión de inventario, entradas, salidas y conteo físico de bebidas</p>
+                <span class="status-badge status-active">ACTIVO</span>
+            </a>
+
+            <!-- Cocina -->
+            <a href="SISTEMA_COCINA_UNIFICADO.html" class="system-card cocina">
+                <div class="icon">🍳</div>
+                <h2>Cocina</h2>
+                <p>Control de entradas, salidas, inventario y producción al barril</p>
+                <span class="status-badge status-active">ACTIVO</span>
+            </a>
+
+            <!-- Recetario Digital -->
+            <a href="RECETARIO_MOVIL_COMPATIBLE.html" class="system-card cocina">
+                <div class="icon">📖</div>
+                <h2>Recetario Digital</h2>
+                <p>41 recetas completas con ingredientes, pasos y estándares de calidad</p>
+                <span class="status-badge status-active">ACTIVO</span>
+            </a>
+
+            <!-- Depósito -->
+            <a href="SISTEMA_DEPÓSITO.html" class="system-card deposito">
+                <div class="icon">📦</div>
+                <h2>Depósito</h2>
+                <p>Gestión de empaques, desechables, entradas, salidas y conteo físico</p>
+                <span class="status-badge status-active">ACTIVO</span>
+            </a>
+
+            <!-- Equipos -->
+            <a href="control-equipos.html" class="system-card equipos">
+                <div class="icon">⚙️</div>
+                <h2>Control de Equipos</h2>
+                <p>Registro y seguimiento de equipos, mantenimiento y hojas de vida</p>
+                <span class="status-badge status-active">ACTIVO</span>
+            </a>
+        </div>
+
+        <footer>
+            <p>© 2025 El Rincón del Barril - Sistema desarrollado por TodoPosibleMD</p>
+            <p>Versión 1.0 - Última actualización: Diciembre 2025</p>
+        </footer>
+    </div>
+</body>
+</html>
