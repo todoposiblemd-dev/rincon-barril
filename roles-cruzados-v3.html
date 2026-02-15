@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roles Cruzados — El Rincón del Barril</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Barlow:ital,wght@0,400;0,600;0,700;1,400&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rojo: #D01920;
+  --rojo-d: #8B0D12;
+  --negro: #0A0A0A;
+  --c1: #141414;
+  --c2: #1E1E1E;
+  --c3: #2C2C2C;
+  --c4: #3A3A3A;
+  --blanco: #F2EDE6;
+  --crema: #D8CEBC;
+  --am: #D4890A;
+  --am-bg: #1F1600;
+  --vd: #3A7A30;
+  --vd-bg: #0E1A0C;
+  --vd-t: #7EC86A;
+  --or: #B06020;
+  --or-bg: #1A0E06;
+  --or-t: #E8A050;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--negro);color:var(--blanco);font-family:'Barlow',sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
+
+/* ─── HEADER ─── */
+.hdr{background:var(--negro);border-bottom:3px solid var(--rojo);padding:24px 36px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;backdrop-filter:blur(8px)}
+.hdr::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-55deg,transparent,transparent 18px,rgba(208,25,32,.03) 18px,rgba(208,25,32,.03) 19px);pointer-events:none}
+.hdr-brand .name{font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--rojo);letter-spacing:3px;line-height:1}
+.hdr-brand .sub{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:var(--crema);opacity:.5;margin-top:1px}
+.hdr-right{text-align:right}
+.hdr-right .doc{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--blanco)}
+.hdr-right .ver{font-family:'DM Mono',monospace;font-size:10px;color:#555;margin-top:2px}
+.hdr-actions{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
+
+/* ─── BUTTONS ─── */
+.btn{padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;border-radius:2px;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-rojo{background:var(--rojo);color:#fff}.btn-rojo:hover{background:var(--rojo-d)}
+.btn-outline{background:transparent;color:var(--crema);border:1px solid var(--c4)}.btn-outline:hover{background:var(--c2);border-color:var(--c4)}
+.btn-verde{background:var(--vd);color:#fff}.btn-verde:hover{background:#2A6020}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-icono{padding:6px 8px;font-size:13px}
+
+/* ─── AVISO ─── */
+.aviso{margin:16px 36px;background:var(--am-bg);border:1px solid var(--am);border-left:4px solid var(--am);padding:12px 16px;border-radius:3px;display:flex;gap:12px;align-items:flex-start;font-size:13px;color:#C8A050}
+.aviso strong{color:var(--am);font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:3px}
+
+/* ─── LEYENDA ─── */
+.leyenda{display:flex;gap:16px;flex-wrap:wrap;margin:0 36px 16px;align-items:center}
+.leyenda-it{display:flex;align-items:center;gap:6px;font-size:11px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;text-transform:uppercase;color:#666}
+.ldot{width:10px;height:10px;border-radius:1px;flex-shrink:0}
+.ldot-v{background:var(--vd)}.ldot-o{background:var(--or)}.ldot-r{background:var(--rojo-d)}.ldot-e{background:var(--vd-bg);border:1px dashed var(--vd)}
+.sep-v{width:1px;height:16px;background:var(--c4)}
+
+/* ─── SISTEMAS LINK BAR ─── */
+.sistemas-bar{display:flex;gap:8px;flex-wrap:wrap;margin:0 36px 20px;padding:14px 16px;background:var(--c1);border:1px solid var(--c3);border-radius:3px}
+.sistemas-bar-title{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#555;white-space:nowrap;margin-right:4px;align-self:center}
+.sistema-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;transition:all .15s;border:1px solid}
+.chip-verde{background:#0A1A08;border-color:#2A5A20;color:#7EC86A}.chip-verde:hover{background:#0D2A0A}
+.chip-azul{background:#080E1A;border-color:#1A3A6A;color:#6A9AE8}.chip-azul:hover{background:#0A1020}
+.chip-naranja{background:#1A0E06;border-color:#6A3A10;color:#E8A050}.chip-naranja:hover{background:#200E08}
+.chip-morado{background:#120A1A;border-color:#4A1A7A;color:#A870E8}.chip-morado:hover{background:#180A22}
+.chip-gris{background:var(--c2);border-color:var(--c4);color:#888;cursor:default}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.7}
+
+/* ─── CONTENT ─── */
+.content{padding:0 36px 80px}
+
+/* ─── SECCION HEADER ─── */
+.sec-hdr{display:flex;align-items:center;gap:12px;margin:20px 0 10px}
+.sec-hdr-txt{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#444;white-space:nowrap}
+.sec-hdr-line{flex:1;height:1px;background:var(--c3)}
+
+/* ─── CARGO CARD ─── */
+.cargo-card{background:var(--c1);border:1px solid var(--c3);border-radius:4px;margin-bottom:10px;overflow:hidden;transition:border-color .2s}
+.cargo-card:hover{border-color:var(--c4)}
+
+.cargo-top{display:flex;align-items:center;gap:0;background:var(--c2);border-bottom:1px solid var(--c3)}
+.cargo-toggle{flex:1;padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;user-select:none;border:none;background:transparent;color:inherit;text-align:left}
+.cargo-toggle:hover{background:var(--c3)}
+.cargo-icono{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;background:var(--rojo-d)}
+.cargo-info{flex:1;min-width:0}
+.cargo-nombre{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;line-height:1;color:var(--blanco);display:flex;align-items:center;gap:8px}
+.cargo-desc{font-size:12px;color:#666;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:500px}
+.cargo-badges{display:flex;gap:6px;flex-shrink:0}
+.badge{padding:3px 9px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+.badge-crit{background:var(--rojo-d);color:#FFAAAA}
+.badge-parc{background:#3A1A00;color:var(--or-t)}
+.badge-flex{background:#0A1A0A;color:var(--vd-t)}
+.badge-dev{background:var(--c3);color:#555}
+.chevron{color:#555;font-size:10px;transition:transform .25s;margin-left:8px}
+.chevron.open{transform:rotate(180deg)}
+
+.cargo-edit-strip{display:none;padding:8px 14px;background:var(--c2);border-bottom:1px solid var(--c3);gap:8px;align-items:center;flex-wrap:wrap}
+.cargo-edit-strip.visible{display:flex}
+.edit-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#555}
+.edit-input{background:var(--c3);border:1px solid var(--c4);border-radius:2px;padding:5px 10px;color:var(--blanco);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.5px;outline:none;flex:1;min-width:120px}
+.edit-input:focus{border-color:var(--am);background:var(--c2)}
+.edit-input-sm{max-width:300px}
+.edit-select{background:var(--c3);border:1px solid var(--c4);border-radius:2px;padding:5px 8px;color:var(--blanco);font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.5px;outline:none}
+.edit-select:focus{border-color:var(--am)}
+
+/* ─── CARGO BODY ─── */
+.cargo-body{display:none}
+.cargo-body.open{display:block}
+
+.cols{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--c3)}
+.col{padding:14px 16px;border-right:1px solid var(--c3)}
+.col:last-child{border-right:none}
+.col-hdr{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;padding-bottom:7px;border-bottom:2px solid;display:flex;align-items:center;gap:7px}
+.col-v .col-hdr{color:var(--vd-t);border-color:var(--vd)}
+.col-o .col-hdr{color:var(--or-t);border-color:var(--or)}
+.col-r .col-hdr{color:#FF9090;border-color:var(--rojo-d)}
+
+.item{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12.5px;color:#A8A0A0;line-height:1.4}
+.item:last-of-type{border-bottom:none}
+.bul{flex-shrink:0;font-size:8px;margin-top:4px}
+.col-v .bul{color:var(--vd-t)}.col-o .bul{color:var(--or-t)}.col-r .bul{color:#FF9090}
+.quien{font-size:10.5px;font-family:'DM Mono',monospace;color:#555;margin-top:2px;display:block}
+.menu-tag{background:var(--rojo-d);color:#FFB0B0;font-family:'DM Mono',monospace;font-size:10px;padding:1px 5px;border-radius:2px;margin-right:3px;white-space:nowrap}
+
+/* ─── EDITABLE ITEMS ─── */
+.items-list{min-height:20px}
+.item-editable{position:relative}
+.item-editable .del-item{display:none;position:absolute;right:0;top:4px;background:var(--rojo-d);color:#FFB0B0;border:none;border-radius:2px;padding:1px 5px;font-size:10px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px}
+.item-editable:hover .del-item{display:block}
+.add-item-btn{display:flex;align-items:center;gap:5px;padding:5px 0;color:#444;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;background:none;width:100%;transition:color .15s}
+.add-item-btn:hover{color:var(--vd-t)}
+.item-text[contenteditable="true"]{outline:none;background:rgba(255,255,255,.03);border-radius:2px;padding:1px 3px}
+.item-text[contenteditable="true"]:focus{background:rgba(255,255,255,.06)}
+
+/* ─── CAMPO EDITABLE ─── */
+.campo{display:block;background:var(--vd-bg);border:1px dashed var(--vd);border-radius:2px;padding:6px 9px;color:var(--vd-t);font-size:12px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;outline:none;width:100%;margin-top:5px;min-height:30px;transition:border-color .15s}
+.campo:focus{border-color:#5AAA40;background:#112010}
+.campo:empty::before{content:attr(data-ph);color:#3A6030;font-style:italic;font-size:11px;pointer-events:none}
+.campo-lbl{font-size:9px;font-family:'Barlow Condensed',sans-serif;letter-spacing:2px;text-transform:uppercase;color:#3A6030;margin-top:10px;display:flex;align-items:center;gap:4px}
+.campo-lbl::before{content:'✎'}
+
+/* ─── PROTOCOLO ─── */
+.protocolo{background:linear-gradient(135deg,#140606,#1A0808);border-top:1px solid #2A1010;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.prot-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--rojo);white-space:nowrap}
+.prot-pasos{display:flex;gap:12px;flex-wrap:wrap}
+.prot-paso{display:flex;align-items:center;gap:5px;font-size:12px;color:#907070}
+.pn{background:var(--rojo-d);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:11px;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.prot-edit{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;color:#907070;outline:none;background:transparent;border:none;border-bottom:1px dashed #3A2020;padding:1px 0;min-width:60px}
+.prot-edit:focus{border-color:var(--rojo);color:var(--blanco)}
+
+/* ─── SISTEMA LINK ─── */
+.sistema-link{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--c2);border-top:1px solid var(--c3);font-size:12px;color:#555;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px}
+.sistema-link a{color:var(--am);text-decoration:none;display:flex;align-items:center;gap:5px}.sistema-link a:hover{color:#F0A030;text-decoration:underline}
+.sistema-link .no-link{color:#3A3A3A;font-style:italic}
+
+/* ─── CARD ACTIONS ─── */
+.cargo-actions{display:flex;gap:6px;padding:6px 12px;align-items:center;border-top:1px solid var(--c3)}
+.cargo-del-btn{background:transparent;border:1px solid #2A1010;color:#662020;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:5px 10px;border-radius:2px;cursor:pointer;transition:all .15s;margin-left:auto}
+.cargo-del-btn:hover{background:var(--rojo-d);border-color:var(--rojo);color:#FFAAAA}
+.cargo-edit-btn{background:transparent;border:1px solid var(--c4);color:#666;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:5px 10px;border-radius:2px;cursor:pointer;transition:all .15s}
+.cargo-edit-btn:hover{background:var(--c3);color:var(--blanco)}
+.cargo-edit-btn.active{background:var(--am-bg);border-color:var(--am);color:var(--am)}
+
+/* ─── AGREGAR CARGO ─── */
+.add-cargo-zone{margin-top:20px;border:2px dashed var(--c3);border-radius:4px;padding:20px;text-align:center}
+.add-cargo-btn{background:transparent;border:none;color:#444;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:10px;padding:12px 24px;border:1px solid var(--c4);border-radius:2px;transition:all .2s}
+.add-cargo-btn:hover{background:var(--c2);color:var(--blanco);border-color:var(--c3)}
+.add-form{display:none;margin-top:16px;text-align:left}
+.add-form.visible{display:block}
+.add-form-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-bottom:10px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:2px;text-transform:uppercase;color:#555}
+.form-input{background:var(--c2);border:1px solid var(--c4);border-radius:2px;padding:8px 12px;color:var(--blanco);font-family:'Barlow Condensed',sans-serif;font-size:13px;outline:none}
+.form-input:focus{border-color:var(--am)}
+.form-select{background:var(--c2);border:1px solid var(--c4);border-radius:2px;padding:8px 12px;color:var(--blanco);font-family:'Barlow Condensed',sans-serif;font-size:13px;outline:none}
+
+/* ─── NOTA FINAL ─── */
+.nota-final{background:linear-gradient(135deg,#0A0E14,#0A1208);border:1px solid #1A2A1A;border-left:4px solid var(--am);border-radius:3px;padding:14px 18px;margin-top:20px}
+.nota-final-t{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--am);margin-bottom:6px}
+.nota-final p{font-size:13px;color:#708090;line-height:1.6}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;top:20px;right:24px;background:#0E1A0C;border:1px solid var(--vd);color:var(--vd-t);padding:9px 16px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:1px;opacity:0;transform:translateY(-8px);transition:all .3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ─── FAB ─── */
+.fab{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:100}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .cols{grid-template-columns:1fr}
+  .col{border-right:none;border-bottom:1px solid var(--c3)}
+  .col:last-child{border-bottom:none}
+  .hdr,.aviso,.leyenda,.sistemas-bar,.content{margin-left:0;padding-left:16px;padding-right:16px}
+  .add-form-grid{grid-template-columns:1fr;gap:8px}
+  .fab{bottom:16px;right:16px}
+}
+@media print{
+  .fab,.cargo-actions,.cargo-edit-strip,.add-cargo-zone,.hdr-actions{display:none!important}
+  .cargo-body{display:block!important}
+  body{background:white;color:black}
+  .cargo-card{border:1px solid #ccc}
+  .col-hdr{border-bottom-width:1px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-brand">
+    <div class="name">El Rincón del Barril</div>
+    <div class="sub">Asados · Cúcuta</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;margin-right:20px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase"><a href="index.html" style="color:#555;text-decoration:none">🏠 Inicio</a> <a href="manual-funciones-perfiles.html" style="color:#B080E8;text-decoration:none">📋 Manual</a></div><div class="hdr-right">
+    <div class="doc">Tabla de Roles Cruzados</div>
+    <div class="ver">v2.0 · Sistema anti-dependencia</div>
+    <div class="hdr-actions">
+      <button class="btn btn-outline btn-sm" onclick="window.print()">🖨 Imprimir</button>
+      <button class="btn btn-rojo btn-sm" onclick="guardar()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- AVISO -->
+<div class="aviso">
+  <span style="font-size:18px;flex-shrink:0">⚠️</span>
+  <div>
+    <strong>Cómo usar este documento</strong>
+    Si falta alguien hoy, busca su cargo, revisa qué se cubre, qué activa protocolo especial y a quién avisar. Los campos con borde verde los completa el administrador. Puedes editar cualquier cargo, agregar nuevos o eliminar los que no apliquen.
+  </div>
+</div>
+
+<!-- LEYENDA -->
+<div class="leyenda">
+  <div class="leyenda-it"><div class="ldot ldot-v"></div> Se puede cubrir</div>
+  <div class="leyenda-it"><div class="ldot ldot-o"></div> Cobertura parcial</div>
+  <div class="leyenda-it"><div class="ldot ldot-r"></div> No se puede cubrir</div>
+  <div class="sep-v"></div>
+  <div class="leyenda-it"><div class="ldot ldot-e"></div> Campo editable</div>
+  <div class="leyenda-it"><span style="color:#D01920;font-size:10px">■</span> Plato del menú afectado</div>
+</div>
+
+<!-- SISTEMAS -->
+<div class="sistemas-bar">
+  <div class="sistemas-bar-title">Sistemas activos →</div>
+  <a href="rincon-del-barril-FINAL.html" class="sistema-chip chip-verde"><span class="chip-dot"></span>🧼 Saneamiento</a>
+  <a href="SISTEMA_BAR.html" class="sistema-chip chip-azul"><span class="chip-dot"></span>🍺 Bar</a>
+  <a href="SISTEMA_COCINA_UNIFICADO.html" class="sistema-chip chip-naranja"><span class="chip-dot"></span>🍳 Cocina v3.0</a>
+  <a href="SISTEMA_DEPOSITO.html" class="sistema-chip chip-morado"><span class="chip-dot"></span>📦 Depósito</a>
+  <span class="sistema-chip chip-gris">💳 Caja · en desarrollo</span>
+  <span class="sistema-chip chip-gris">🛎 Sala · en desarrollo</span>
+</div>
+
+<!-- CONTENIDO -->
+<div class="content" id="cargos-container">
+
+  <!-- ══════════ COCINA ══════════ -->
+  <div class="sec-hdr"><div class="sec-hdr-txt">Cocina</div><div class="sec-hdr-line"></div></div>
+
+  <!-- COCINERO PRINCIPAL -->
+  <div class="cargo-card" data-id="c1">
+    <div class="cargo-top">
+      <button class="cargo-toggle" onclick="toggleCard(this)">
+        <div class="cargo-icono">🔥</div>
+        <div class="cargo-info">
+          <div class="cargo-nombre" data-nombre="Cocinero Principal">Cocinero Principal <span class="chevron">▼</span></div>
+          <div class="cargo-desc" data-desc="Parrilla al carbón, producción, liderazgo cocina">Parrilla al carbón, producción, liderazgo cocina</div>
+        </div>
+        <div class="cargo-badges"><span class="badge badge-crit">Crítico</span></div>
+      </button>
+    </div>
+    <div class="cargo-edit-strip" id="edit-c1">
+      <span class="edit-label">Cargo:</span>
+      <input class="edit-input edit-input-sm" placeholder="Nombre del cargo" value="Cocinero Principal" onchange="actualizarNombre(this,'c1')">
+      <span class="edit-label">Descripción:</span>
+      <input class="edit-input" placeholder="Descripción breve" value="Parrilla al carbón, producción, liderazgo cocina" onchange="actualizarDesc(this,'c1')">
+      <span class="edit-label">Criticidad:</span>
+      <select class="edit-select" onchange="actualizarBadge(this,'c1')">
+        <option value="crit" selected>Crítico</option>
+        <option value="parc">Parcial</option>
+        <option value="flex">Flexible</option>
+      </select>
+    </div>
+    <div class="cargo-body" id="body-c1">
+      <div class="cols">
+        <div class="col col-v">
+          <div class="col-hdr">✓ Se puede cubrir</div>
+          <div class="items-list" id="items-c1-v">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Preparar tártara y piña — ficha técnica documentada, cualquier auxiliar puede hacerlo.</span><span class="quien">→ Auxiliar cocina disponible</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Porcionar y empacar lomo y punta de anca — tarea de preparación, no requiere criterio de parrilla.</span><span class="quien">→ Auxiliar cocina con instrucción previa</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Registros en sistema Cocina v3.0 y Saneamiento.</span><span class="quien">→ Cualquier auxiliar</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c1-v','col-v')">+ agregar tarea</button>
+        </div>
+        <div class="col col-o">
+          <div class="col-hdr">⚡ Cobertura parcial</div>
+          <div class="items-list" id="items-c1-o">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Montar carne al barril — solo si el auxiliar ha recibido entrenamiento previo certificado. Si no, se activa menú reducido.</span><span class="quien">→ Solo auxiliar entrenado</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Mise en place de parrilla — puede hacerlo auxiliar con checklist en mano, pero la verificación final la hace el auxiliar más antiguo.</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c1-o','col-o')">+ agregar tarea</button>
+        </div>
+        <div class="col col-r">
+          <div class="col-hdr">✗ No se puede cubrir</div>
+          <div class="items-list" id="items-c1-r">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Decisiones de calidad en parrilla — temperatura visual, punto de cocción exacto. Nadie lo reemplaza sin entrenamiento formal.</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Liderazgo de cocina en pico — sin él, el auxiliar más antiguo coordina con autoridad limitada.</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c1-r','col-r')">+ agregar tarea</button>
+          <div class="campo-lbl">Platos que se suspenden si falta este cargo</div>
+          <div class="campo" contenteditable="true" data-ph="Ej: Costilla BBQ, punta de anca completa — platos que requieren criterio experto de parrilla..."></div>
+        </div>
+      </div>
+      <div class="protocolo">
+        <span class="prot-label">Si falta →</span>
+        <div class="prot-pasos">
+          <div class="prot-paso"><div class="pn">1</div><span class="prot-edit" contenteditable="true">Auxiliar más antiguo coordina cocina</span></div>
+          <div class="prot-paso"><div class="pn">2</div><span class="prot-edit" contenteditable="true">Activar menú reducido — suspender platos de parrilla que no se garantizan</span></div>
+          <div class="prot-paso"><div class="pn">3</div><span class="prot-edit" contenteditable="true">Informar al cajero para no tomar esas comandas</span></div>
+          <div class="prot-paso"><div class="pn">4</div><span class="prot-edit" contenteditable="true">Notificar al administrador</span></div>
+        </div>
+      </div>
+      <div class="sistema-link">🔗 Sistema: <a href="SISTEMA_COCINA_UNIFICADO.html">Cocina v3.0</a> &nbsp;|&nbsp; <a href="manual-funciones-perfiles.html" style="color:#B080E8">📋 Manual y perfil →</a></div>
+      <div class="cargo-actions">
+        <button class="cargo-edit-btn" onclick="toggleEdit('c1',this)">✏️ Editar cargo</button>
+        <button class="cargo-del-btn" onclick="deleteCargo('c1')">🗑 Eliminar cargo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUXILIAR DE COCINA -->
+  <div class="cargo-card" data-id="c2">
+    <div class="cargo-top">
+      <button class="cargo-toggle" onclick="toggleCard(this)">
+        <div class="cargo-icono">🍳</div>
+        <div class="cargo-info">
+          <div class="cargo-nombre" data-nombre="Auxiliar de Cocina">Auxiliar de Cocina <span class="chevron">▼</span></div>
+          <div class="cargo-desc" data-desc="Producción, croquetas, guarniciones, recepción de pedidos">Producción, croquetas, guarniciones, recepción de pedidos</div>
+        </div>
+        <div class="cargo-badges"><span class="badge badge-parc">Parcial</span></div>
+      </button>
+    </div>
+    <div class="cargo-edit-strip" id="edit-c2">
+      <span class="edit-label">Cargo:</span>
+      <input class="edit-input edit-input-sm" placeholder="Nombre del cargo" value="Auxiliar de Cocina" onchange="actualizarNombre(this,'c2')">
+      <span class="edit-label">Descripción:</span>
+      <input class="edit-input" placeholder="Descripción breve" value="Producción, croquetas, guarniciones, recepción de pedidos" onchange="actualizarDesc(this,'c2')">
+      <span class="edit-label">Criticidad:</span>
+      <select class="edit-select" onchange="actualizarBadge(this,'c2')">
+        <option value="crit">Crítico</option>
+        <option value="parc" selected>Parcial</option>
+        <option value="flex">Flexible</option>
+      </select>
+    </div>
+    <div class="cargo-body" id="body-c2">
+      <div class="cols">
+        <div class="col col-v">
+          <div class="col-hdr">✓ Se puede cubrir</div>
+          <div class="items-list" id="items-c2-v">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Recepción de pedidos (Atlantic, MC Pollo, Mccormick) — verificación y registro con checklist.</span><span class="quien">→ Otro auxiliar disponible</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Papas al vapor/fritas, cebolla grille, mise en place de barra.</span><span class="quien">→ Auxiliar disponible ese turno</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Lavar platos, aseo cocina, sacar basura.</span><span class="quien">→ Cualquier auxiliar</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Alistamiento de insumos para sala y registros en sistema.</span><span class="quien">→ Cualquier auxiliar</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c2-v','col-v')">+ agregar tarea</button>
+        </div>
+        <div class="col col-o">
+          <div class="col-hdr">⚡ Cobertura parcial</div>
+          <div class="items-list" id="items-c2-o">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Croquetas de hamburguesa — si falta un auxiliar, el otro las produce pero en menor cantidad. Puede no alcanzar para el servicio completo.<br><span class="menu-tag">≥130 unidades/día</span> Si hay menos de 80 al abrir, se avisa.</span><span class="quien">→ Producción reducida ese día</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Mise en place de parrilla — puede hacerse con checklist pero tarda más y hay riesgo de errores de organización.</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c2-o','col-o')">+ agregar tarea</button>
+        </div>
+        <div class="col col-r">
+          <div class="col-hdr">✗ No se puede cubrir</div>
+          <div class="items-list" id="items-c2-r">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Si faltan TODOS los auxiliares el mismo día — el cocinero principal no puede sostener toda la producción solo. Se activa menú reducido inmediato.</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c2-r','col-r')">+ agregar tarea</button>
+          <div class="campo-lbl">Stock mínimo de croquetas para operar sin riesgo</div>
+          <div class="campo" contenteditable="true" data-ph="Ej: Mínimo 80 croquetas al abrir. Si hay menos y falta auxiliar, avisar al cocinero principal antes de las 2:00 PM..."></div>
+        </div>
+      </div>
+      <div class="protocolo">
+        <span class="prot-label">Si falta →</span>
+        <div class="prot-pasos">
+          <div class="prot-paso"><div class="pn">1</div><span class="prot-edit" contenteditable="true">Cocinero principal redistribuye tareas entre auxiliares presentes</span></div>
+          <div class="prot-paso"><div class="pn">2</div><span class="prot-edit" contenteditable="true">Verificar stock de croquetas — si insuficiente, limitar hamburguesas</span></div>
+          <div class="prot-paso"><div class="pn">3</div><span class="prot-edit" contenteditable="true">Informar al cajero sobre disponibilidad reducida</span></div>
+        </div>
+      </div>
+      <div class="sistema-link">🔗 Sistema: <a href="SISTEMA_COCINA_UNIFICADO.html">Cocina v3.0</a> &nbsp;|&nbsp; <a href="manual-funciones-perfiles.html" style="color:#B080E8">📋 Manual y perfil →</a></div>
+      <div class="cargo-actions">
+        <button class="cargo-edit-btn" onclick="toggleEdit('c2',this)">✏️ Editar cargo</button>
+        <button class="cargo-del-btn" onclick="deleteCargo('c2')">🗑 Eliminar cargo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SALA Y CAJA ══════════ -->
+  <div class="sec-hdr"><div class="sec-hdr-txt">Sala y Caja</div><div class="sec-hdr-line"></div></div>
+
+  <!-- CAJERO -->
+  <div class="cargo-card" data-id="c3">
+    <div class="cargo-top">
+      <button class="cargo-toggle" onclick="toggleCard(this)">
+        <div class="cargo-icono">💳</div>
+        <div class="cargo-info">
+          <div class="cargo-nombre" data-nombre="Cajero / Responsable de Sala">Cajero / Responsable de Sala <span class="chevron">▼</span></div>
+          <div class="cargo-desc" data-desc="Caja Wahio, supervisión sala, comandas, cuadre diario">Caja Wahio, supervisión sala, comandas, cuadre diario</div>
+        </div>
+        <div class="cargo-badges"><span class="badge badge-crit">Crítico</span></div>
+      </button>
+    </div>
+    <div class="cargo-edit-strip" id="edit-c3">
+      <span class="edit-label">Cargo:</span>
+      <input class="edit-input edit-input-sm" placeholder="Nombre del cargo" value="Cajero / Responsable de Sala" onchange="actualizarNombre(this,'c3')">
+      <span class="edit-label">Descripción:</span>
+      <input class="edit-input" placeholder="Descripción breve" value="Caja Wahio, supervisión sala, comandas, cuadre diario" onchange="actualizarDesc(this,'c3')">
+      <span class="edit-label">Criticidad:</span>
+      <select class="edit-select" onchange="actualizarBadge(this,'c3')">
+        <option value="crit" selected>Crítico</option>
+        <option value="parc">Parcial</option>
+        <option value="flex">Flexible</option>
+      </select>
+    </div>
+    <div class="cargo-body" id="body-c3">
+      <div class="cols">
+        <div class="col col-v">
+          <div class="col-hdr">✓ Se puede cubrir</div>
+          <div class="items-list" id="items-c3-v">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Recibir cliente, tomar orden, escribir comanda y llevar a cocina — el mesero hace esto como parte de su rol normal.</span><span class="quien">→ Mesero</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Limpieza del área de caja y sala.</span><span class="quien">→ Mesero disponible</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c3-v','col-v')">+ agregar tarea</button>
+        </div>
+        <div class="col col-o">
+          <div class="col-hdr">⚡ Cobertura parcial</div>
+          <div class="items-list" id="items-c3-o">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Cobros y registro en Wahio — solo si hay otra persona entrenada en el sistema. Sin entrenamiento: cobros en efectivo con recibo manual, se registra al cierre.</span><span class="quien">→ Solo personal con acceso a Wahio</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Supervisión básica de sala — el mesero coordina, pero sin autoridad para cierre ni manejo de diferencias.</span><span class="quien">→ Mesero con funciones limitadas</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c3-o','col-o')">+ agregar tarea</button>
+        </div>
+        <div class="col col-r">
+          <div class="col-hdr">✗ No se puede cubrir</div>
+          <div class="items-list" id="items-c3-r">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Cuadre de caja y arqueo al cierre — sin acceso ni entrenamiento, el cierre lo hace el administrador ese día. Obligatorio.</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Registro de compras y movimientos en Wahio — requiere acceso de supervisor.</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c3-r','col-r')">+ agregar tarea</button>
+          <div class="campo-lbl">¿Quién tiene acceso secundario a Wahio?</div>
+          <div class="campo" contenteditable="true" data-ph="Ej: Solo el administrador tiene el PIN de supervisor. Si falta el cajero, el administrador hace el cierre..."></div>
+        </div>
+      </div>
+      <div class="protocolo">
+        <span class="prot-label">Si falta →</span>
+        <div class="prot-pasos">
+          <div class="prot-paso"><div class="pn">1</div><span class="prot-edit" contenteditable="true">Mesero asume sala completa</span></div>
+          <div class="prot-paso"><div class="pn">2</div><span class="prot-edit" contenteditable="true">Si hay alguien con acceso a Wahio: opera caja</span></div>
+          <div class="prot-paso"><div class="pn">3</div><span class="prot-edit" contenteditable="true">Si no: cobros en efectivo con recibo manual</span></div>
+          <div class="prot-paso"><div class="pn">4</div><span class="prot-edit" contenteditable="true">Administrador hace el arqueo al cierre — obligatorio</span></div>
+        </div>
+      </div>
+      <div class="sistema-link">🔗 Sistema: <span class="no-link">Caja · en desarrollo</span> &nbsp;|&nbsp; <a href="manual-funciones-perfiles.html" style="color:#B080E8">📋 Manual y perfil →</a></div>
+      <div class="cargo-actions">
+        <button class="cargo-edit-btn" onclick="toggleEdit('c3',this)">✏️ Editar cargo</button>
+        <button class="cargo-del-btn" onclick="deleteCargo('c3')">🗑 Eliminar cargo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MESERO -->
+  <div class="cargo-card" data-id="c4">
+    <div class="cargo-top">
+      <button class="cargo-toggle" onclick="toggleCard(this)">
+        <div class="cargo-icono">🛎️</div>
+        <div class="cargo-info">
+          <div class="cargo-nombre" data-nombre="Mesero">Mesero <span class="chevron">▼</span></div>
+          <div class="cargo-desc" data-desc="Atención al cliente, servicio en sala, aseo, comandas">Atención al cliente, servicio en sala, aseo, comandas</div>
+        </div>
+        <div class="cargo-badges"><span class="badge badge-flex">Flexible</span></div>
+      </button>
+    </div>
+    <div class="cargo-edit-strip" id="edit-c4">
+      <span class="edit-label">Cargo:</span>
+      <input class="edit-input edit-input-sm" placeholder="Nombre del cargo" value="Mesero" onchange="actualizarNombre(this,'c4')">
+      <span class="edit-label">Descripción:</span>
+      <input class="edit-input" placeholder="Descripción breve" value="Atención al cliente, servicio en sala, aseo, comandas" onchange="actualizarDesc(this,'c4')">
+      <span class="edit-label">Criticidad:</span>
+      <select class="edit-select" onchange="actualizarBadge(this,'c4')">
+        <option value="crit">Crítico</option>
+        <option value="parc">Parcial</option>
+        <option value="flex" selected>Flexible</option>
+      </select>
+    </div>
+    <div class="cargo-body" id="body-c4">
+      <div class="cols">
+        <div class="col col-v">
+          <div class="col-hdr">✓ Se puede cubrir</div>
+          <div class="items-list" id="items-c4-v">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Recibir cliente, tomar orden, servir comida, retirar platos — otro mesero o personal de apoyo lo cubre.</span><span class="quien">→ Personal de apoyo disponible</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Aseo de mesas, pisos, baños y zonas comunes.</span><span class="quien">→ Cualquier personal disponible</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Sacar/entrar mesas y sillas, llenar salseros.</span><span class="quien">→ Cualquier personal disponible</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c4-v','col-v')">+ agregar tarea</button>
+        </div>
+        <div class="col col-o">
+          <div class="col-hdr">⚡ Cobertura parcial</div>
+          <div class="items-list" id="items-c4-o">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Verificar satisfacción del cliente — disminuye la calidad del seguimiento con una sola persona para toda la sala.</span><span class="quien">→ Cajero desde su posición si hay calma</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c4-o','col-o')">+ agregar tarea</button>
+        </div>
+        <div class="col col-r">
+          <div class="col-hdr">✗ No se puede cubrir</div>
+          <div class="items-list" id="items-c4-r">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Si no hay ningún mesero ni apoyo — no hay quién atienda sala. Se limitan las mesas abiertas ese día.</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c4-r','col-r')">+ agregar tarea</button>
+          <div class="campo-lbl">Mínimo de personas para abrir sala</div>
+          <div class="campo" contenteditable="true" data-ph="Ej: Mínimo 2 personas en sala para abrir. Con 1 sola, máximo 8 mesas activas..."></div>
+        </div>
+      </div>
+      <div class="protocolo">
+        <span class="prot-label">Si falta →</span>
+        <div class="prot-pasos">
+          <div class="prot-paso"><div class="pn">1</div><span class="prot-edit" contenteditable="true">Personal de apoyo disponible asume sala completa</span></div>
+          <div class="prot-paso"><div class="pn">2</div><span class="prot-edit" contenteditable="true">Si solo queda 1 persona, reducir mesas abiertas</span></div>
+          <div class="prot-paso"><div class="pn">3</div><span class="prot-edit" contenteditable="true">Notificar al cajero para coordinar tiempos con cocina</span></div>
+        </div>
+      </div>
+      <div class="sistema-link">🔗 Sistema: <span class="no-link">Sala · en desarrollo</span> &nbsp;|&nbsp; <a href="manual-funciones-perfiles.html" style="color:#B080E8">📋 Manual y perfil →</a></div>
+      <div class="cargo-actions">
+        <button class="cargo-edit-btn" onclick="toggleEdit('c4',this)">✏️ Editar cargo</button>
+        <button class="cargo-del-btn" onclick="deleteCargo('c4')">🗑 Eliminar cargo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ BAR ══════════ -->
+  <div class="sec-hdr"><div class="sec-hdr-txt">Bar</div><div class="sec-hdr-line"></div></div>
+
+  <div class="cargo-card" data-id="c5">
+    <div class="cargo-top">
+      <button class="cargo-toggle" onclick="toggleCard(this)">
+        <div class="cargo-icono">🥤</div>
+        <div class="cargo-info">
+          <div class="cargo-nombre" data-nombre="Bartender / Encargado de Bar">Bartender / Encargado de Bar <span class="chevron">▼</span></div>
+          <div class="cargo-desc" data-desc="Bebidas preparadas, limonadas, control stock bar">Bebidas preparadas, limonadas, control stock bar</div>
+        </div>
+        <div class="cargo-badges"><span class="badge badge-parc">Parcial</span></div>
+      </button>
+    </div>
+    <div class="cargo-edit-strip" id="edit-c5">
+      <span class="edit-label">Cargo:</span>
+      <input class="edit-input edit-input-sm" placeholder="Nombre del cargo" value="Bartender / Encargado de Bar" onchange="actualizarNombre(this,'c5')">
+      <span class="edit-label">Descripción:</span>
+      <input class="edit-input" placeholder="Descripción breve" value="Bebidas preparadas, limonadas, control stock bar" onchange="actualizarDesc(this,'c5')">
+      <span class="edit-label">Criticidad:</span>
+      <select class="edit-select" onchange="actualizarBadge(this,'c5')">
+        <option value="crit">Crítico</option>
+        <option value="parc" selected>Parcial</option>
+        <option value="flex">Flexible</option>
+      </select>
+    </div>
+    <div class="cargo-body" id="body-c5">
+      <div class="cols">
+        <div class="col col-v">
+          <div class="col-hdr">✓ Se puede cubrir</div>
+          <div class="items-list" id="items-c5-v">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Limonadas (coco $8k, cereza $8k, aguacate $10k, panela $3.5k) — fichas técnicas documentadas, auxiliar de cocina puede hacerlas.</span><span class="quien">→ Auxiliar cocina + ficha técnica</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Cargar nevera de gaseosas y bebidas embotelladas.</span><span class="quien">→ Cualquier personal disponible</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Limpieza de barra, copas y vasos.</span><span class="quien">→ Personal de sala o apoyo</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c5-v','col-v')">+ agregar tarea</button>
+        </div>
+        <div class="col col-o">
+          <div class="col-hdr">⚡ Cobertura parcial</div>
+          <div class="items-list" id="items-c5-o">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Sodas (sunrise, blue curaçao, frutos rojos $8k, frutos amarillos $8k) y jugos naturales (mora $8k, maracuyá $8k) — se cubren con ficha técnica pero la calidad puede variar.</span><span class="quien">→ Auxiliar cocina + ficha visible</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Control de stock de bebidas — encargado de bodega puede apoyar con el registro, pero la verificación física la hace el cajero.</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c5-o','col-o')">+ agregar tarea</button>
+        </div>
+        <div class="col col-r">
+          <div class="col-hdr">✗ No se puede cubrir</div>
+          <div class="items-list" id="items-c5-r">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Barra completa en pico alto — manejar múltiples pedidos simultáneos con calidad y velocidad requiere experiencia. En pico, la calidad y velocidad se ven afectadas.</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c5-r','col-r')">+ agregar tarea</button>
+          <div class="campo-lbl">Bebidas que se suspenden si falta este cargo</div>
+          <div class="campo" contenteditable="true" data-ph="Ej: Sodas especiales, cócteles. Las limonadas sí se mantienen con las fichas técnicas..."></div>
+        </div>
+      </div>
+      <div class="protocolo">
+        <span class="prot-label">Si falta →</span>
+        <div class="prot-pasos">
+          <div class="prot-paso"><div class="pn">1</div><span class="prot-edit" contenteditable="true">Auxiliar cocina asume limonadas con ficha técnica</span></div>
+          <div class="prot-paso"><div class="pn">2</div><span class="prot-edit" contenteditable="true">Suspender bebidas complejas si no hay personal entrenado</span></div>
+          <div class="prot-paso"><div class="pn">3</div><span class="prot-edit" contenteditable="true">Notificar al cajero para ajustar menú de bebidas disponibles</span></div>
+        </div>
+      </div>
+      <div class="sistema-link">🔗 Sistema: <a href="SISTEMA_BAR.html">Bar</a> &nbsp;|&nbsp; <a href="manual-funciones-perfiles.html" style="color:#B080E8">📋 Manual y perfil →</a></div>
+      <div class="cargo-actions">
+        <button class="cargo-edit-btn" onclick="toggleEdit('c5',this)">✏️ Editar cargo</button>
+        <button class="cargo-del-btn" onclick="deleteCargo('c5')">🗑 Eliminar cargo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ BODEGA / DEPÓSITO ══════════ -->
+  <div class="sec-hdr"><div class="sec-hdr-txt">Bodega y Depósito</div><div class="sec-hdr-line"></div></div>
+
+  <div class="cargo-card" data-id="c6">
+    <div class="cargo-top">
+      <button class="cargo-toggle" onclick="toggleCard(this)">
+        <div class="cargo-icono">📦</div>
+        <div class="cargo-info">
+          <div class="cargo-nombre" data-nombre="Encargado de Bodega / Depósito">Encargado de Bodega / Depósito <span class="chevron">▼</span></div>
+          <div class="cargo-desc" data-desc="Recepción, almacenamiento, despacho a cocina, control inventario y empaques">Recepción, almacenamiento, despacho a cocina, control inventario y empaques</div>
+        </div>
+        <div class="cargo-badges"><span class="badge badge-parc">Parcial</span></div>
+      </button>
+    </div>
+    <div class="cargo-edit-strip" id="edit-c6">
+      <span class="edit-label">Cargo:</span>
+      <input class="edit-input edit-input-sm" placeholder="Nombre del cargo" value="Encargado de Bodega / Depósito" onchange="actualizarNombre(this,'c6')">
+      <span class="edit-label">Descripción:</span>
+      <input class="edit-input" placeholder="Descripción breve" value="Recepción, almacenamiento, despacho a cocina, control inventario y empaques" onchange="actualizarDesc(this,'c6')">
+      <span class="edit-label">Criticidad:</span>
+      <select class="edit-select" onchange="actualizarBadge(this,'c6')">
+        <option value="crit">Crítico</option>
+        <option value="parc" selected>Parcial</option>
+        <option value="flex">Flexible</option>
+      </select>
+    </div>
+    <div class="cargo-body" id="body-c6">
+      <div class="cols">
+        <div class="col col-v">
+          <div class="col-hdr">✓ Se puede cubrir</div>
+          <div class="items-list" id="items-c6-v">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Recibir compras de plásticos, cajas y empaques — verificar contra factura.</span><span class="quien">→ Auxiliar cocina o cocinero principal</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Despachar insumos a cocina según solicitud con lista en mano.</span><span class="quien">→ Cualquier auxiliar disponible</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Limpieza de bodega y depósito.</span><span class="quien">→ Personal de apoyo</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c6-v','col-v')">+ agregar tarea</button>
+        </div>
+        <div class="col col-o">
+          <div class="col-hdr">⚡ Cobertura parcial</div>
+          <div class="items-list" id="items-c6-o">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Registrar entradas y salidas en sistema Depósito — se puede hacer pero hay más riesgo de errores. El cajero o cocinero principal verifican al cierre.</span><span class="quien">→ Cajero o cocinero con doble verificación</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c6-o','col-o')">+ agregar tarea</button>
+        </div>
+        <div class="col col-r">
+          <div class="col-hdr">✗ No se puede cubrir</div>
+          <div class="items-list" id="items-c6-r">
+            <div class="item item-editable"><span class="bul">◆</span><div><span class="item-text">Control de inventario preciso sin doble verificación — si falta más de 1 día, el inventario acumula inconsistencias. Requiere ajuste al volver.</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-c6-r','col-r')">+ agregar tarea</button>
+          <div class="campo-lbl">¿Quién verifica inventario si falta más de 1 día?</div>
+          <div class="campo" contenteditable="true" data-ph="Ej: Cocinero principal hace conteo básico al cierre, administrador lo revisa al día siguiente..."></div>
+        </div>
+      </div>
+      <div class="protocolo">
+        <span class="prot-label">Si falta →</span>
+        <div class="prot-pasos">
+          <div class="prot-paso"><div class="pn">1</div><span class="prot-edit" contenteditable="true">Auxiliar cocina recibe pedidos con factura en mano</span></div>
+          <div class="prot-paso"><div class="pn">2</div><span class="prot-edit" contenteditable="true">Cajero registra movimientos en el sistema si puede</span></div>
+          <div class="prot-paso"><div class="pn">3</div><span class="prot-edit" contenteditable="true">Si falta más de 1 día, administrador revisa inventario al regreso</span></div>
+        </div>
+      </div>
+      <div class="sistema-link">🔗 <a href="SISTEMA_DEPOSITO.html">Depósito</a> &nbsp;|&nbsp; <a href="SISTEMA_COCINA_UNIFICADO.html">Cocina v3.0</a> &nbsp;|&nbsp; <a href="manual-funciones-perfiles.html" style="color:#B080E8">📋 Manual y perfil →</a></div>
+      <div class="cargo-actions">
+        <button class="cargo-edit-btn" onclick="toggleEdit('c6',this)">✏️ Editar cargo</button>
+        <button class="cargo-del-btn" onclick="deleteCargo('c6')">🗑 Eliminar cargo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ AGREGAR CARGO ══════════ -->
+  <div class="add-cargo-zone">
+    <button class="add-cargo-btn" onclick="document.getElementById('add-form').classList.toggle('visible')">
+      <span>+</span> Agregar nuevo cargo
+    </button>
+    <div class="add-form" id="add-form">
+      <div class="add-form-grid">
+        <div class="form-group">
+          <label class="form-label">Nombre del cargo</label>
+          <input class="form-input" id="new-nombre" placeholder="Ej: Encargado de Saneamiento">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descripción breve</label>
+          <input class="form-input" id="new-desc" placeholder="Ej: Limpieza, sanitización, registros">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icono</label>
+          <input class="form-input" id="new-icono" placeholder="Ej: 🧼" style="max-width:80px;text-align:center">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <div class="form-group" style="flex:0 0 auto">
+          <label class="form-label">Criticidad</label>
+          <select class="form-select" id="new-badge">
+            <option value="crit">Crítico</option>
+            <option value="parc" selected>Parcial</option>
+            <option value="flex">Flexible</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label class="form-label">Link al sistema (opcional)</label>
+          <input class="form-input" id="new-link" placeholder="Ej: SISTEMA_SANEAMIENTO.html">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-verde" onclick="agregarCargo()">✓ Crear cargo</button>
+        <button class="btn btn-outline" onclick="document.getElementById('add-form').classList.remove('visible')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTA FINAL -->
+  <div class="nota-final">
+    <div class="nota-final-t">⚠️ Regla de oro del sistema</div>
+    <p>Esta tabla no es para que todo el mundo haga de todo. Es para que el restaurante no cierre cuando falta alguien. La diferencia entre una operación que se sostiene y una que entra en crisis depende de si el equipo sabe exactamente qué hacer antes de llamar al administrador.</p>
+    <div class="campo-lbl">Protocolo general de ausencias — regla que aplica a todos</div>
+    <div class="campo" contenteditable="true" data-ph="Ej: Toda ausencia imprevista se reporta por WhatsApp al grupo del equipo mínimo 2 horas antes de la apertura. Sin aviso = descuento según reglamento..."></div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- FAB -->
+<div class="fab">
+  <button class="btn btn-rojo btn-sm" onclick="guardar()">💾 Guardar</button>
+  <button class="btn btn-outline btn-sm" onclick="window.print()">🖨</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── TOGGLE CARD ───
+function toggleCard(btn){
+  const id = btn.closest('.cargo-card').dataset.id;
+  const body = document.getElementById('body-'+id);
+  const chev = btn.querySelector('.chevron');
+  body.classList.toggle('open');
+  if(chev) chev.classList.toggle('open');
+}
+
+// ─── TOGGLE EDIT STRIP ───
+function toggleEdit(id, btn){
+  const strip = document.getElementById('edit-'+id);
+  strip.classList.toggle('visible');
+  btn.classList.toggle('active');
+  btn.textContent = strip.classList.contains('visible') ? '✓ Listo' : '✏️ Editar cargo';
+}
+
+// ─── UPDATE NAME ───
+function actualizarNombre(input, id){
+  const card = document.querySelector(`[data-id="${id}"]`);
+  const nombreEl = card.querySelector('.cargo-nombre');
+  const chevron = nombreEl.querySelector('.chevron');
+  nombreEl.setAttribute('data-nombre', input.value);
+  nombreEl.textContent = input.value + ' ';
+  if(chevron) nombreEl.appendChild(chevron);
+  else{const c=document.createElement('span');c.className='chevron';c.textContent='▼';nombreEl.appendChild(c);}
+  guardar();
+}
+
+// ─── UPDATE DESC ───
+function actualizarDesc(input, id){
+  const card = document.querySelector(`[data-id="${id}"]`);
+  const descEl = card.querySelector('.cargo-desc');
+  descEl.setAttribute('data-desc', input.value);
+  descEl.textContent = input.value;
+  guardar();
+}
+
+// ─── UPDATE BADGE ───
+function actualizarBadge(select, id){
+  const card = document.querySelector(`[data-id="${id}"]`);
+  const badge = card.querySelector('.badge');
+  badge.className = 'badge';
+  const map = {crit:['badge-crit','Crítico'],parc:['badge-parc','Parcial'],flex:['badge-flex','Flexible']};
+  badge.classList.add(map[select.value][0]);
+  badge.textContent = map[select.value][1];
+  guardar();
+}
+
+// ─── ADD ITEM ───
+function addItem(btn, listId, colClass){
+  const list = document.getElementById(listId);
+  const div = document.createElement('div');
+  div.className = 'item item-editable';
+  const bulColor = colClass==='col-v'?'col-v':colClass==='col-o'?'col-o':'col-r';
+  div.innerHTML = `<span class="bul" style="color:${colClass==='col-v'?'var(--vd-t)':colClass==='col-o'?'var(--or-t)':'#FF9090'}">◆</span><div><span class="item-text" contenteditable="true">Escribe la tarea aquí...</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button>`;
+  list.appendChild(div);
+  div.querySelector('.item-text').focus();
+  guardar();
+}
+
+// ─── DEL ITEM ───
+function delItem(btn){
+  if(confirm('¿Eliminar esta tarea?')) btn.closest('.item').remove(), guardar();
+}
+
+// ─── DELETE CARGO ───
+function deleteCargo(id){
+  const card = document.querySelector(`[data-id="${id}"]`);
+  const nombre = card.querySelector('.cargo-nombre').dataset.nombre || 'este cargo';
+  if(confirm(`¿Eliminar el cargo "${nombre}" completamente?`)){
+    card.remove();
+    guardar();
+    toast('Cargo eliminado');
+  }
+}
+
+// ─── AGREGAR CARGO ───
+let cargoCounter = 20;
+function agregarCargo(){
+  const nombre = document.getElementById('new-nombre').value.trim();
+  if(!nombre){alert('Escribe el nombre del cargo');return;}
+  const desc = document.getElementById('new-desc').value.trim() || 'Sin descripción';
+  const icono = document.getElementById('new-icono').value.trim() || '👤';
+  const badgeVal = document.getElementById('new-badge').value;
+  const link = document.getElementById('new-link').value.trim();
+  const badgeMap = {crit:['badge-crit','Crítico'],parc:['badge-parc','Parcial'],flex:['badge-flex','Flexible']};
+  const id = 'c'+cargoCounter++;
+
+  const sysLink = link
+    ? `<div class="sistema-link">🔗 Sistema: <a href="${link}">${link}</a></div>`
+    : `<div class="sistema-link">🔗 Sistema: <span class="no-link">Sin sistema asignado aún</span></div>`;
+
+  const html = `
+  <div class="cargo-card" data-id="${id}">
+    <div class="cargo-top">
+      <button class="cargo-toggle" onclick="toggleCard(this)">
+        <div class="cargo-icono">${icono}</div>
+        <div class="cargo-info">
+          <div class="cargo-nombre" data-nombre="${nombre}">${nombre} <span class="chevron">▼</span></div>
+          <div class="cargo-desc" data-desc="${desc}">${desc}</div>
+        </div>
+        <div class="cargo-badges"><span class="badge ${badgeMap[badgeVal][0]}">${badgeMap[badgeVal][1]}</span></div>
+      </button>
+    </div>
+    <div class="cargo-edit-strip" id="edit-${id}">
+      <span class="edit-label">Cargo:</span>
+      <input class="edit-input edit-input-sm" placeholder="Nombre del cargo" value="${nombre}" onchange="actualizarNombre(this,'${id}')">
+      <span class="edit-label">Descripción:</span>
+      <input class="edit-input" placeholder="Descripción breve" value="${desc}" onchange="actualizarDesc(this,'${id}')">
+      <span class="edit-label">Criticidad:</span>
+      <select class="edit-select" onchange="actualizarBadge(this,'${id}')">
+        <option value="crit"${badgeVal==='crit'?' selected':''}>Crítico</option>
+        <option value="parc"${badgeVal==='parc'?' selected':''}>Parcial</option>
+        <option value="flex"${badgeVal==='flex'?' selected':''}>Flexible</option>
+      </select>
+    </div>
+    <div class="cargo-body open" id="body-${id}">
+      <div class="cols">
+        <div class="col col-v">
+          <div class="col-hdr">✓ Se puede cubrir</div>
+          <div class="items-list" id="items-${id}-v">
+            <div class="item item-editable"><span class="bul" style="color:var(--vd-t)">◆</span><div><span class="item-text" contenteditable="true">Escribe las tareas que se pueden cubrir...</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-${id}-v','col-v')">+ agregar tarea</button>
+        </div>
+        <div class="col col-o">
+          <div class="col-hdr">⚡ Cobertura parcial</div>
+          <div class="items-list" id="items-${id}-o">
+            <div class="item item-editable"><span class="bul" style="color:var(--or-t)">◆</span><div><span class="item-text" contenteditable="true">Escribe las tareas con cobertura parcial...</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-${id}-o','col-o')">+ agregar tarea</button>
+        </div>
+        <div class="col col-r">
+          <div class="col-hdr">✗ No se puede cubrir</div>
+          <div class="items-list" id="items-${id}-r">
+            <div class="item item-editable"><span class="bul" style="color:#FF9090">◆</span><div><span class="item-text" contenteditable="true">Escribe lo que no puede cubrirse...</span></div><button class="del-item btn-sm" onclick="delItem(this)">✕</button></div>
+          </div>
+          <button class="add-item-btn" onclick="addItem(this,'items-${id}-r','col-r')">+ agregar tarea</button>
+          <div class="campo-lbl">Notas específicas del administrador</div>
+          <div class="campo" contenteditable="true" data-ph="Completa con información específica del restaurante..."></div>
+        </div>
+      </div>
+      <div class="protocolo">
+        <span class="prot-label">Si falta →</span>
+        <div class="prot-pasos">
+          <div class="prot-paso"><div class="pn">1</div><span class="prot-edit" contenteditable="true">Define el paso 1...</span></div>
+          <div class="prot-paso"><div class="pn">2</div><span class="prot-edit" contenteditable="true">Define el paso 2...</span></div>
+          <div class="prot-paso"><div class="pn">3</div><span class="prot-edit" contenteditable="true">Define el paso 3...</span></div>
+        </div>
+      </div>
+      ${sysLink}
+      <div class="cargo-actions">
+        <button class="cargo-edit-btn" onclick="toggleEdit('${id}',this)">✏️ Editar cargo</button>
+        <button class="cargo-del-btn" onclick="deleteCargo('${id}')">🗑 Eliminar cargo</button>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('add-form').insertAdjacentHTML('beforebegin', html);
+  ['new-nombre','new-desc','new-icono','new-link'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('add-form').classList.remove('visible');
+  guardar();
+  toast('Cargo agregado ✓');
+}
+
+// ─── GUARDAR / CARGAR ───
+function guardar(){
+  try{
+    const html = document.getElementById('cargos-container').innerHTML;
+    localStorage.setItem('rc_barril_v2', html);
+    toast('✓ Guardado');
+  }catch(e){toast('⚠️ No se pudo guardar');}
+}
+
+function cargar(){
+  try{
+    const saved = localStorage.getItem('rc_barril_v2');
+    if(saved) document.getElementById('cargos-container').innerHTML = saved;
+  }catch(e){}
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._t);
+  window._t = setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// Auto-guardar al editar
+document.addEventListener('input', e=>{
+  if(e.target.matches('.campo, .item-text, .prot-edit')){
+    clearTimeout(window._ag);
+    window._ag = setTimeout(guardar, 1200);
+  }
+});
+
+cargar();
+</script>
+</body>
+</html>
