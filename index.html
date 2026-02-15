@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistemas - El Rincón del Barril</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .systems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .system-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+        }
+
+        .system-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .system-card .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .system-card h2 {
+            color: #C41E3A;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .system-card p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .system-card .features {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+
+        .system-card.saneamiento { border-top: 4px solid #4CAF50; }
+        .system-card.bar { border-top: 4px solid #2196F3; }
+        .system-card.cocina { border-top: 4px solid #FF9800; }
+        .system-card.deposito { border-top: 4px solid #9C27B0; }
+        .system-card.personal { border-top: 4px solid #8B0D12; }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+
+        footer p {
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .systems-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .system-card {
+                padding: 25px;
+            }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .status-active {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-updated {
+            background: #2196F3;
+            color: white;
+        }
+
+        .version-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .new-badge {
+            background: #ff9800;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🔥</div>
+            <h1>El Rincón del Barril</h1>
+            <p>Sistema de Gestión Operativa</p>
+        </header>
+
+        <div class="systems-grid">
+            <!-- Saneamiento y Mantenimiento -->
+            <a href="rincon-del-barril-FINAL.html" class="system-card saneamiento">
+                <div class="icon">🧼</div>
+                <h2>Saneamiento y Mantenimiento</h2>
+                <p>Control de limpieza, sanitización y mantenimiento de utensilios</p>
+                <span class="status-badge status-active">ACTIVO</span>
+            </a>
+
+            <!-- Bar -->
+            <a href="SISTEMA_BAR.html" class="system-card bar">
+                <div class="icon">🍺</div>
+                <h2>Bar</h2>
+                <p>Gestión de inventario, entradas, salidas y conteo físico de bebidas</p>
+                <span class="status-badge status-active">ACTIVO</span>
+            </a>
+
+            <!-- Cocina - ACTUALIZADO -->
+            <a href="SISTEMA_COCINA_UNIFICADO.html" class="system-card cocina">
+                <span class="version-badge">V3.0</span>
+                <div class="icon">🍳</div>
+                <h2>Cocina <span class="new-badge">NUEVO</span></h2>
+                <p>Control de entradas, salidas, inventario y producción al barril</p>
+                <div class="features">
+                    ✨ 38 productos | ⚠️ Alertas inteligentes<br>
+                    ⚙️ Configuración editable | 🏪 Múltiples proveedores<br>
+                    📋 Orden de compra automática | 🔍 Conteo rápido diario
+                </div>
+                <span class="status-badge status-updated">ACTUALIZADO</span>
+            </a>
+
+            <!-- Depósito -->
+            <a href="SISTEMA_DEPOSITO.html" class="system-card deposito">
+                <div class="icon">📦</div>
+                <h2>Depósito</h2>
+                <p>Gestión de empaques, desechables, entradas, salidas y conteo físico</p>
+                <span class="status-badge status-active">ACTIVO</span>
+            </a>
+
+            <!-- Central de Personal -->
+            <a href="central-personal-rb.html" class="system-card personal">
+                <span class="version-badge">V1.1</span>
+                <div class="icon">👥</div>
+                <h2>Central de Personal <span class="new-badge">NUEVO</span></h2>
+                <p>Gestión integral del equipo humano del restaurante</p>
+                <div class="features">
+                    📋 Manual de funciones | 👤 Perfiles de cargo<br>
+                    📊 Matriz RACI | 🗂 Expediente por empleado<br>
+                    💰 Registro de pagos | 📚 Capacitaciones<br>
+                    🖨 Desprendibles de nómina imprimibles
+                </div>
+                <span class="status-badge status-updated">NUEVO</span>
+            </a>
+            <!-- Inducción -->
+            <a href="induccion-rincon-barril.html" class="system-card" style="border-top: 4px solid #E8A020;">
+                <span class="version-badge" style="background:#E8A020">V2.0</span>
+                <div class="icon">🎯</div>
+                <h2>Inducción <span class="new-badge">COMPLETO</span></h2>
+                <p>Guía de inducción por cargo para todo el personal operativo</p>
+                <div class="features">
+                    🍳 Cocina · 💳 Caja · 🛎 Mesero<br>
+                    🍹 Bartender · 📦 Bodega · 👨‍🍳 Cocinero Principal<br>
+                    📋 12 módulos alineados con capacitación general
+                </div>
+                <span class="status-badge status-active">ACTIVO</span>
+            </a>
+
+        </div>
+
+        <!-- Novedades -->
+        <div style="background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; margin-bottom: 20px; color: white;">
+            <h3 style="margin-bottom: 10px; font-size: 1.2rem;">🎉 Sistema completo — El Rincón del Barril</h3>
+            <ul style="list-style: none; padding-left: 0; line-height: 1.8;">
+                <li>✅ <strong>Expediente digital por empleado</strong> — datos, contrato, estado</li>
+                <li>✅ <strong>Documentos y checklist</strong> — contrato, reglamento, autorización datos, ARL, EPS</li>
+                <li>✅ <strong>Dotación</strong> — 3 entregas anuales con acta imprimible (Art. 230 CST)</li>
+                <li>✅ <strong>Inducción</strong> — 6 roles · 12 módulos · editable con PIN (agregar, editar, eliminar módulos y roles)</li>
+                <li>✅ <strong>Capacitaciones</strong> — historial con firma de asistencia</li>
+                <li>✅ <strong>Pagos</strong> — registro detallado + desprendible de nómina imprimible</li>
+                <li>✅ <strong>Evaluaciones de desempeño</strong> — calificación por área cada período</li>
+                <li>✅ <strong>Manual de funciones y perfiles</strong> — editables por Sergio con PIN</li>
+            </ul>
+        </div>
+
+        <footer>
+            <p>© 2026 El Rincón del Barril - Sistema desarrollado por TodoPosibleMD</p>
+            <p>Sistema completo v2.0 - Última actualización: 15 de febrero de 2026</p>
+        </footer>
+    </div>
+</body>
+</html>
