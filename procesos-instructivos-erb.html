@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Procesos e Instructivos – El Rincón del Barril</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap');
+:root{--rojo:#C41E3A;--rojo-d:#9B1530;--rojo-s:#FCE8EB;--carbon:#2C2B28;--gris:#6B6B6B;--gris-s:#F5F4F1;--crema:#FFFDF8;--borde:#E8E4DB;--verde:#2D7A4F;--verde-s:#EAF6EE;--azul:#1A4A8A;--azul-s:#EBF1FA;--naranja:#D4640A;--naranja-s:#FEF3EA;--morado:#6B3FA0;--morado-s:#F3EDFB;--amarillo:#B8860B;--amarillo-s:#FEFAE8;--sh:0 2px 12px rgba(44,43,40,.08);--shm:0 6px 28px rgba(44,43,40,.13);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--crema);color:var(--carbon);min-height:100vh;}
+.topbar{background:var(--rojo);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:13px 22px;position:sticky;top:0;z-index:200;box-shadow:0 2px 14px rgba(196,30,58,.35);}
+.topbar-l{display:flex;align-items:center;gap:11px;}
+.tb-logo{font-size:1.5rem;}
+.tb-title{font-family:'DM Serif Display',serif;font-size:1.1rem;line-height:1.2;}
+.tb-sub{font-size:.72rem;font-family:'DM Sans',sans-serif;font-weight:300;opacity:.85;display:block;}
+.topbar-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.tb-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;border:2px solid rgba(255,255,255,.55);background:transparent;color:#fff;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap;}
+.tb-btn:hover{background:rgba(255,255,255,.18);}
+.tb-btn.active{background:#fff;color:var(--rojo);border-color:#fff;}
+.tb-btn.cat-on{background:rgba(255,255,255,.22);border-color:#fff;}
+.main{max-width:1100px;margin:0 auto;padding:28px 18px;}
+.banner{border-radius:12px;padding:13px 18px;margin-bottom:22px;display:none;align-items:center;gap:12px;font-size:.88rem;font-weight:500;}
+.banner.on{display:flex;}
+.banner-edit{background:#FFF8E0;border:2px solid #F5C842;color:#7A5500;}
+.banner-edit button{margin-left:auto;background:none;border:none;cursor:pointer;font-size:1rem;color:#7A5500;}
+.area-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
+.area-tab{padding:8px 16px;border-radius:22px;border:2px solid var(--borde);background:#fff;font-size:.83rem;font-weight:600;cursor:pointer;transition:.18s;color:var(--gris);display:flex;align-items:center;gap:6px;}
+.area-tab:hover{border-color:var(--rojo);color:var(--rojo);}
+.area-tab.active{background:var(--rojo);border-color:var(--rojo);color:#fff;}
+.area-tab .cnt{background:rgba(0,0,0,.12);border-radius:9px;padding:1px 6px;font-size:.7rem;}
+.area-tab.active .cnt{background:rgba(255,255,255,.25);}
+.btn-add-area{padding:8px 16px;border-radius:22px;border:2px dashed var(--borde);background:transparent;color:var(--gris);font-size:.83rem;font-weight:600;cursor:pointer;transition:.18s;display:none;}
+.btn-add-area:hover{border-color:var(--rojo);color:var(--rojo);}
+body.edit-mode .btn-add-area{display:block;}
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.sec-title{font-family:'DM Serif Display',serif;font-size:1.45rem;display:flex;align-items:center;gap:9px;}
+.btn-add-proc{display:none;align-items:center;gap:5px;padding:8px 16px;border-radius:18px;background:var(--rojo);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;transition:.18s;}
+.btn-add-proc:hover{background:var(--rojo-d);}
+body.edit-mode .btn-add-proc{display:flex;}
+.proc-list{display:flex;flex-direction:column;gap:14px;}
+.proc-card{background:#fff;border-radius:15px;box-shadow:var(--sh);border:1.5px solid var(--borde);overflow:hidden;transition:.22s;}
+.proc-card:hover{box-shadow:var(--shm);}
+.proc-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;user-select:none;gap:10px;}
+.proc-head-l{display:flex;align-items:center;gap:12px;flex:1;min-width:0;}
+.proc-bar{width:5px;height:40px;border-radius:3px;flex-shrink:0;}
+.proc-info{flex:1;min-width:0;}
+.proc-name{font-weight:700;font-size:.97rem;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.proc-meta{margin-top:3px;font-size:.79rem;color:var(--gris);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.badge{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:9px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;}
+.b-apertura{background:var(--azul-s);color:var(--azul);}
+.b-cierre{background:var(--verde-s);color:var(--verde);}
+.b-diario{background:var(--naranja-s);color:var(--naranja);}
+.b-semanal{background:var(--morado-s);color:var(--morado);}
+.b-obligatorio{background:var(--rojo-s);color:var(--rojo);}
+.b-aprobado{background:var(--verde-s);color:var(--verde);}
+.b-borrador{background:var(--amarillo-s);color:var(--amarillo);}
+.b-pendiente{background:#FFF0D4;color:#C47A00;animation:pblink 2s infinite;}
+@keyframes pblink{0%,100%{opacity:1;}50%{opacity:.6;}}
+.proc-version{font-size:.72rem;color:var(--gris);font-style:italic;}
+.proc-head-r{display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.proc-chevron{color:var(--gris);transition:.22s;font-size:.9rem;}
+.proc-card.open .proc-chevron{transform:rotate(180deg);}
+.proc-actions{display:none;align-items:center;gap:5px;}
+body.edit-mode .proc-actions{display:flex;}
+.bi{width:30px;height:30px;border-radius:7px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:.14s;}
+.bi-edit{background:var(--azul-s);color:var(--azul);}
+.bi-del{background:var(--rojo-s);color:var(--rojo);}
+.bi-ok{background:var(--verde-s);color:var(--verde);}
+.bi-edit:hover{background:var(--azul);color:#fff;}
+.bi-del:hover{background:var(--rojo);color:#fff;}
+.bi-ok:hover{background:var(--verde);color:#fff;}
+.proc-body{display:none;padding:0 20px 20px;border-top:1.5px solid var(--borde);}
+.proc-card.open .proc-body{display:block;}
+.proc-desc{font-size:.86rem;color:var(--gris);margin:13px 0;line-height:1.6;padding:11px 14px;background:var(--gris-s);border-radius:8px;border-left:3px solid var(--borde);}
+.pending-block{margin:14px 0;padding:14px 16px;background:#FFF8E0;border:2px dashed #F5C842;border-radius:10px;font-size:.85rem;color:#7A5500;line-height:1.6;}
+.pending-block strong{display:block;margin-bottom:4px;}
+.pasos-hdr{font-size:.77rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gris);margin:16px 0 10px;display:flex;align-items:center;justify-content:space-between;}
+.btn-add-paso{display:none;align-items:center;gap:4px;padding:5px 11px;border-radius:13px;background:var(--gris-s);border:1.5px dashed var(--borde);font-size:.76rem;font-weight:600;color:var(--gris);cursor:pointer;transition:.14s;}
+.btn-add-paso:hover{border-color:var(--rojo);color:var(--rojo);}
+body.edit-mode .btn-add-paso{display:flex;}
+.paso-item{display:flex;align-items:flex-start;gap:11px;padding:11px 13px;background:var(--gris-s);border-radius:10px;border:1px solid transparent;transition:.14s;margin-bottom:7px;}
+.paso-item:hover{border-color:var(--borde);background:#fff;}
+.paso-num{width:25px;height:25px;border-radius:50%;background:var(--rojo);color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.paso-content{flex:1;}
+.paso-text{font-size:.88rem;line-height:1.55;font-weight:500;}
+.paso-nota{margin-top:4px;font-size:.78rem;color:var(--gris);font-style:italic;line-height:1.4;}
+.paso-alert{margin-top:5px;display:inline-flex;align-items:center;gap:4px;font-size:.76rem;font-weight:700;color:var(--naranja);background:var(--naranja-s);padding:3px 8px;border-radius:7px;}
+.paso-item-actions{display:none;gap:4px;flex-shrink:0;}
+body.edit-mode .paso-item-actions{display:flex;}
+.proc-footer{margin-top:14px;padding-top:12px;border-top:1px solid var(--borde);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.proc-footer-meta{font-size:.75rem;color:var(--gris);line-height:1.8;}
+.btn-print-p{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:13px;background:var(--gris-s);border:1.5px solid var(--borde);color:var(--gris);font-size:.78rem;font-weight:600;cursor:pointer;transition:.14s;}
+.btn-print-p:hover{background:var(--carbon);color:#fff;border-color:var(--carbon);}
+/* CATALOG */
+#catalogView{display:none;}
+.cat-hdr{margin-bottom:20px;}
+.cat-hdr h2{font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:3px;}
+.cat-hdr p{font-size:.87rem;color:var(--gris);}
+.cat-stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
+.cat-stat{background:#fff;border:1.5px solid var(--borde);border-radius:11px;padding:12px 18px;text-align:center;box-shadow:var(--sh);}
+.cat-stat .num{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--rojo);}
+.cat-stat .lbl{font-size:.76rem;color:var(--gris);margin-top:2px;}
+.cat-controls{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.cat-sel{padding:8px 14px;border:2px solid var(--borde);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.83rem;color:var(--carbon);background:#fff;cursor:pointer;outline:none;}
+.cat-sel:focus{border-color:var(--rojo);}
+.cat-srch{padding:8px 14px;border:2px solid var(--borde);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.83rem;color:var(--carbon);background:#fff;outline:none;flex:1;min-width:160px;}
+.cat-srch:focus{border-color:var(--rojo);}
+.btn-print-cat{display:flex;align-items:center;gap:5px;padding:8px 16px;border-radius:10px;background:var(--carbon);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;margin-left:auto;}
+.btn-print-cat:hover{background:#111;}
+.cat-wrap{background:#fff;border-radius:14px;box-shadow:var(--sh);overflow:auto;border:1.5px solid var(--borde);}
+.cat-tbl{width:100%;border-collapse:collapse;font-size:.84rem;min-width:700px;}
+.cat-tbl thead tr{background:var(--rojo);color:#fff;}
+.cat-tbl th{padding:12px 14px;text-align:left;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.4px;}
+.cat-tbl td{padding:11px 14px;border-bottom:1px solid var(--borde);vertical-align:middle;}
+.cat-tbl tr:last-child td{border-bottom:none;}
+.cat-tbl tr:hover td{background:var(--gris-s);}
+.cat-tbl .td-n{font-weight:600;cursor:pointer;}
+.cat-tbl .td-n:hover{color:var(--rojo);}
+.cat-tbl .td-sm{font-size:.78rem;color:var(--gris);}
+/* EMPTY */
+.empty{text-align:center;padding:55px 20px;color:var(--gris);}
+.empty .ico{font-size:2.8rem;margin-bottom:10px;opacity:.38;}
+/* MODALS */
+.overlay{position:fixed;inset:0;background:rgba(44,43,40,.42);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:18px;}
+.overlay.active{display:flex;}
+.modal{background:#fff;border-radius:18px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal h3{font-family:'DM Serif Display',serif;font-size:1.25rem;margin-bottom:18px;}
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:.79rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gris);margin-bottom:5px;}
+.fg input,.fg textarea,.fg select{width:100%;padding:10px 13px;border:2px solid var(--borde);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--carbon);background:var(--gris-s);outline:none;transition:.18s;}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--rojo);background:#fff;}
+.fg textarea{resize:vertical;min-height:76px;}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.m-acts{display:flex;gap:9px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;}
+.btn-c{padding:9px 20px;border-radius:9px;border:2px solid var(--borde);background:#fff;color:var(--gris);font-family:'DM Sans',sans-serif;font-size:.87rem;font-weight:600;cursor:pointer;transition:.14s;}
+.btn-c:hover{border-color:var(--gris);}
+.btn-s{padding:9px 20px;border-radius:9px;background:var(--rojo);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:.87rem;font-weight:700;cursor:pointer;transition:.14s;}
+.btn-s:hover{background:var(--rojo-d);}
+/* PIN */
+.pin-dots{display:flex;justify-content:center;gap:13px;margin:20px 0;}
+.pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--borde);background:#fff;transition:.18s;}
+.pin-dot.filled{background:var(--rojo);border-color:var(--rojo);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:230px;margin:0 auto;}
+.pin-k{padding:13px;border-radius:11px;border:2px solid var(--borde);background:var(--gris-s);font-family:'DM Sans',sans-serif;font-size:1.15rem;font-weight:700;cursor:pointer;transition:.14s;color:var(--carbon);}
+.pin-k:hover{background:var(--rojo);color:#fff;border-color:var(--rojo);}
+.pin-err{color:var(--rojo);text-align:center;font-size:.83rem;font-weight:600;margin-top:10px;display:none;}
+@media(max-width:640px){.tb-title .tb-sub{display:none;}.main{padding:16px 12px;}.fg-row{grid-template-columns:1fr;}}
+@media print{.topbar,.area-tabs,.sec-header,.proc-actions,.paso-item-actions,.btn-add-paso,.btn-print-p,.btn-print-cat,.cat-controls,.banner{display:none!important;}.proc-card{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid;}.proc-body{display:block!important;}body{background:#fff;}.cat-wrap{box-shadow:none;border:1px solid #ccc;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-l">
+    <span class="tb-logo">🔥</span>
+    <div class="tb-title">El Rincón del Barril <span class="tb-sub">Procesos, Procedimientos e Instructivos</span></div>
+  </div>
+  <div class="topbar-r">
+    <a href="index.html" class="tb-btn">← Sistemas</a>
+    <button class="tb-btn" id="btnCat" onclick="toggleCatalog()">📋 Catálogo</button>
+    <button class="tb-btn" onclick="exportJSON()">⬇ Exportar</button>
+    <button class="tb-btn" onclick="triggerImport()">⬆ Importar</button>
+    <input type="file" id="fileIn" accept=".json" style="display:none" onchange="importJSON(event)">
+    <button class="tb-btn" id="btnEdit" onclick="toggleEdit()">🔒 Editar</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="banner banner-edit" id="editBanner">
+    <span>✏️</span><span>Modo edición activo — Puedes agregar, modificar y eliminar procesos, pasos y áreas.</span>
+    <button onclick="salirEdit()">✕</button>
+  </div>
+
+  <!-- CATALOG -->
+  <div id="catalogView">
+    <div class="cat-hdr"><h2>📋 Índice Maestro de Documentos</h2><p>Todos los procesos, procedimientos e instructivos del restaurante</p></div>
+    <div class="cat-stats" id="catStats"></div>
+    <div class="cat-controls">
+      <select class="cat-sel" id="cfArea" onchange="renderCat()"><option value="">Todas las áreas</option></select>
+      <select class="cat-sel" id="cfStatus" onchange="renderCat()">
+        <option value="">Todos los estados</option>
+        <option value="aprobado">✅ Aprobado</option>
+        <option value="borrador">📝 Borrador</option>
+        <option value="pendiente">⚠️ Pendiente</option>
+      </select>
+      <input type="text" class="cat-srch" id="cfSearch" placeholder="🔍 Buscar..." oninput="renderCat()">
+      <button class="btn-print-cat" onclick="window.print()">🖨 Imprimir catálogo</button>
+    </div>
+    <div class="cat-wrap">
+      <table class="cat-tbl">
+        <thead><tr><th>#</th><th>Proceso / Instructivo</th><th>Área</th><th>Responsable</th><th>Frecuencia</th><th>Versión</th><th>Estado</th><th>Actualizado</th></tr></thead>
+        <tbody id="catBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PROCESSES -->
+  <div id="processView">
+    <div class="area-tabs" id="areaTabs"></div>
+    <div class="sec-header">
+      <div class="sec-title"><span id="aIco">🍳</span><span id="aNom">Cocina</span></div>
+      <button class="btn-add-proc" onclick="openProcModal()">+ Proceso</button>
+    </div>
+    <div class="proc-list" id="procList"></div>
+  </div>
+</div>
+
+<!-- PIN EDIT -->
+<div class="overlay" id="pinModal">
+  <div class="modal" style="max-width:340px;text-align:center;">
+    <h3 style="text-align:center;">🔐 Acceso Administrador</h3>
+    <p style="font-size:.86rem;color:var(--gris);">Ingresa el PIN para activar el modo edición</p>
+    <div class="pin-dots"><div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div><div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div></div>
+    <div class="pin-pad">
+      <button class="pin-k" onclick="pk(1)">1</button><button class="pin-k" onclick="pk(2)">2</button><button class="pin-k" onclick="pk(3)">3</button>
+      <button class="pin-k" onclick="pk(4)">4</button><button class="pin-k" onclick="pk(5)">5</button><button class="pin-k" onclick="pk(6)">6</button>
+      <button class="pin-k" onclick="pk(7)">7</button><button class="pin-k" onclick="pk(8)">8</button><button class="pin-k" onclick="pk(9)">9</button>
+      <button class="pin-k" onclick="pk(0)" style="grid-column:2">0</button><button class="pin-k" onclick="pdel()">⌫</button>
+    </div>
+    <p class="pin-err" id="pinErr">PIN incorrecto</p>
+    <div class="m-acts" style="justify-content:center;margin-top:16px;"><button class="btn-c" onclick="cm('pinModal')">Cancelar</button></div>
+  </div>
+</div>
+
+<!-- PIN APPROVE -->
+<div class="overlay" id="pinApprModal">
+  <div class="modal" style="max-width:340px;text-align:center;">
+    <h3 style="text-align:center;">✅ Aprobar Documento</h3>
+    <p style="font-size:.86rem;color:var(--gris);">PIN para marcar como <strong>Aprobado</strong></p>
+    <div class="pin-dots"><div class="pin-dot" id="a0"></div><div class="pin-dot" id="a1"></div><div class="pin-dot" id="a2"></div><div class="pin-dot" id="a3"></div></div>
+    <div class="pin-pad">
+      <button class="pin-k" onclick="apk(1)">1</button><button class="pin-k" onclick="apk(2)">2</button><button class="pin-k" onclick="apk(3)">3</button>
+      <button class="pin-k" onclick="apk(4)">4</button><button class="pin-k" onclick="apk(5)">5</button><button class="pin-k" onclick="apk(6)">6</button>
+      <button class="pin-k" onclick="apk(7)">7</button><button class="pin-k" onclick="apk(8)">8</button><button class="pin-k" onclick="apk(9)">9</button>
+      <button class="pin-k" onclick="apk(0)" style="grid-column:2">0</button><button class="pin-k" onclick="apdel()">⌫</button>
+    </div>
+    <p class="pin-err" id="apErr">PIN incorrecto</p>
+    <div class="m-acts" style="justify-content:center;margin-top:16px;"><button class="btn-c" onclick="cm('pinApprModal')">Cancelar</button></div>
+  </div>
+</div>
+
+<!-- PROCESO MODAL -->
+<div class="overlay" id="procModal">
+  <div class="modal">
+    <h3 id="pmTitle">Nuevo Proceso</h3>
+    <div class="fg"><label>Nombre *</label><input type="text" id="pNom" placeholder="Ej: Apertura de cocina"></div>
+    <div class="fg"><label>Descripción / Objetivo</label><textarea id="pDesc" placeholder="Para qué sirve y cuándo se realiza..."></textarea></div>
+    <div class="fg-row">
+      <div class="fg"><label>Responsable</label><input type="text" id="pResp" placeholder="Ej: Cocinero Principal"></div>
+      <div class="fg"><label>Tiempo estimado</label><input type="text" id="pTiempo" placeholder="Ej: 20 min"></div>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Frecuencia</label>
+        <select id="pFrec"><option value="">— Seleccionar —</option><option value="apertura">Apertura</option><option value="cierre">Cierre</option><option value="diario">Diario</option><option value="semanal">Semanal</option><option value="obligatorio">Obligatorio</option></select>
+      </div>
+      <div class="fg"><label>Estado</label>
+        <select id="pStatus" onchange="togglePending()"><option value="borrador">📝 Borrador</option><option value="pendiente">⚠️ Pendiente completar</option><option value="aprobado">✅ Aprobado</option></select>
+      </div>
+    </div>
+    <div class="fg" id="pendGrp" style="display:none;"><label>Mensaje "Pendiente completar"</label><textarea id="pPend" placeholder="Sergio: describe aquí qué falta completar en este proceso..."></textarea></div>
+    <div class="m-acts"><button class="btn-c" onclick="cm('procModal')">Cancelar</button><button class="btn-s" onclick="saveProc()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- PASO MODAL -->
+<div class="overlay" id="pasoModal">
+  <div class="modal">
+    <h3 id="stTitle">Nuevo Paso</h3>
+    <div class="fg"><label>Instrucción *</label><textarea id="stT" placeholder="Describe qué se debe hacer de forma clara y concreta..."></textarea></div>
+    <div class="fg"><label>Nota / Detalle adicional</label><input type="text" id="stN" placeholder="Ej: Verificar con termómetro de cocina"></div>
+    <div class="fg"><label>⚠️ Alerta / Punto crítico</label><input type="text" id="stA" placeholder="Ej: NUNCA dejar brasas sin supervisión"></div>
+    <div class="m-acts"><button class="btn-c" onclick="cm('pasoModal')">Cancelar</button><button class="btn-s" onclick="savePaso()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- AREA MODAL -->
+<div class="overlay" id="areaModal">
+  <div class="modal" style="max-width:400px;">
+    <h3>Nueva Área</h3>
+    <div class="fg"><label>Nombre *</label><input type="text" id="arNom" placeholder="Ej: Domicilios"></div>
+    <div class="fg"><label>Ícono (emoji)</label><input type="text" id="arIco" placeholder="🚗" maxlength="4" style="font-size:1.3rem;text-align:center;"></div>
+    <div class="m-acts"><button class="btn-c" onclick="cm('areaModal')">Cancelar</button><button class="btn-s" onclick="saveArea()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="overlay" id="confirmModal">
+  <div class="modal" style="max-width:360px;text-align:center;">
+    <div style="font-size:2.4rem;margin-bottom:10px;">⚠️</div>
+    <h3 id="confTitle">¿Eliminar?</h3>
+    <p id="confText" style="color:var(--gris);font-size:.88rem;margin-top:7px;line-height:1.5;"></p>
+    <div class="m-acts" style="justify-content:center;margin-top:20px;">
+      <button class="btn-c" onclick="cm('confirmModal')">Cancelar</button>
+      <button class="btn-s" id="confOk">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PIN="2580",APPROVED_BY="Sergio Barrera";
+const DEFAULT={
+areas:[{id:"cocina",nombre:"Cocina",icono:"🍳"},{id:"bar",nombre:"Bar",icono:"🍺"},{id:"caja",nombre:"Caja",icono:"💰"},{id:"servicio",nombre:"Servicio",icono:"🛎️"},{id:"bodega",nombre:"Bodega",icono:"📦"}],
+procesos:[
+{id:"coc01",areaId:"cocina",nombre:"Apertura de Cocina",desc:"Activar y preparar la cocina antes de iniciar operaciones. Garantiza que todo esté listo antes del primer pedido.",resp:"Cocinero Principal",frec:"apertura",tiempo:"25 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"s001",t:"Verificar que la cocina esté limpia desde el cierre anterior. Si hay suciedad, reportar antes de arrancar.",n:"",a:""},
+{id:"s002",t:"Encender el carbón del barril con mínimo 45 min de anticipación. El carbón debe llegar a brasa blanca antes de cocinar.",n:"Calcular el tiempo según la hora de apertura del restaurante.",a:"⚠️ NUNCA usar gasolina, thinner ni líquidos inflamables para encender el carbón."},
+{id:"s003",t:"Verificar temperatura del cuarto frío y neveras (entre 0°C y 4°C). Registrar en el control de temperatura.",n:"Si la temperatura está fuera de rango, avisar a Sergio antes de usar los ingredientes.",a:""},
+{id:"s004",t:"Revisar inventario de ingredientes críticos: carnes, queso, panes, salsas, guarniciones.",n:"Si falta algo para el servicio, avisar antes de abrir. No esperar a que se agote en operación.",a:""},
+{id:"s005",t:"Preparar mise en place: porcionar carnes según fichas técnicas, preparar guarniciones, alistar salsas.",n:"Las carnes se porcionan según los gramajes exactos del recetario.",a:""},
+{id:"s006",t:"Confirmar disponibilidad de utensilios limpios: cuchillos, tablas, pinzas, espátulas, termómetros.",n:"Cada utensilio tiene su color según el tipo de alimento. Respetar la codificación.",a:""}]},
+{id:"coc02",areaId:"cocina",nombre:"Cierre de Cocina",desc:"Dejar la cocina en perfectas condiciones al finalizar el turno. Es la base para una apertura exitosa al día siguiente.",resp:"Cocinero Principal",frec:"cierre",tiempo:"40 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"s011",t:"Apagar el barril y gestionar el carbón de forma segura.",n:"",a:"⚠️ Verificar que el carbón esté completamente apagado antes de salir."},
+{id:"s012",t:"Guardar todos los alimentos con etiqueta (nombre + fecha) en nevera o cuarto frío en recipientes herméticos.",n:"",a:""},
+{id:"s013",t:"Lavar y sanitizar todas las superficies de trabajo. Especial atención a parrillas y zona de carnes.",n:"",a:""},
+{id:"s014",t:"Lavar y guardar todos los utensilios. Los cuchillos van en el bloque, NUNCA sueltos en el fregadero.",n:"",a:""},
+{id:"s015",t:"Registrar en el Sistema de Cocina los movimientos del turno: entradas, salidas y mermas.",n:"Sin registro, el inventario queda descuadrado. Hacerlo antes de salir.",a:""},
+{id:"s016",t:"Reportar a Sergio cualquier novedad del turno: fallas de equipo, falta de producto, incidentes.",n:"",a:""}]},
+{id:"coc03",areaId:"cocina",nombre:"Preparación de Carnes al Barril",desc:"Protocolo estándar de cocción. Garantiza consistencia en sabor, punto de cocción y presentación en todos los turnos.",resp:"Cocinero Principal",frec:"diario",tiempo:"Variable",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"s021",t:"Sacar la carne de la nevera 15-20 min antes de cocinar para que llegue a temperatura ambiente.",n:"Las carnes frías no sellan bien y generan vapor.",a:""},
+{id:"s022",t:"Verificar el punto del barril: brasa blanca, temperatura uniforme, sin llamas activas (200-220°C).",n:"",a:"⚠️ Con brasa viva naranja la carne se quema por fuera y queda cruda por dentro."},
+{id:"s023",t:"Sazonar según la ficha técnica del plato. No improvisar condimentos ni cantidades.",n:"Las fichas están en el Recetario Digital.",a:""},
+{id:"s024",t:"Colocar la carne y NO mover durante los primeros 3-4 min para lograr el sello.",n:"El sello retiene los jugos y genera la costra característica.",a:""},
+{id:"s025",t:"Girar y completar cocción según peso y punto solicitado. Consultar tabla de tiempos del recetario.",n:"",a:""},
+{id:"s026",t:"Verificar temperatura interna antes de platar: cerdo/pollo mín. 70°C, res bien 71°C, res medio 60-65°C.",n:"",a:"⚠️ Nunca servir cerdo o pollo sin verificar temperatura interna mínima."}]},
+{id:"coc04",areaId:"cocina",nombre:"Registrar Entrada en Sistema Cocina",desc:"Cómo registrar el ingreso de ingredientes al inventario. Se usa cada vez que llega mercancía o se hace traslado desde bodega.",resp:"Cocinero Principal",frec:"diario",tiempo:"5 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"s031",t:"Abrir el Sistema de Cocina en el dispositivo disponible.",n:"",a:""},
+{id:"s032",t:"Ir a la sección 'Entradas' en el menú principal.",n:"",a:""},
+{id:"s033",t:"Seleccionar el producto de la lista y si no está, reportar a Sergio para que lo agregue.",n:"",a:""},
+{id:"s034",t:"Ingresar cantidad recibida, proveedor y fecha. Usar la unidad de medida del sistema (kg, unidades, litros).",n:"",a:""},
+{id:"s035",t:"Verificar que el stock se actualice correctamente y guardar.",n:"",a:"⚠️ Un registro incorrecto descuadra el inventario y genera alertas falsas de compra."}]},
+{id:"coc05",areaId:"cocina",nombre:"Registrar Salida o Merma en Sistema Cocina",desc:"Cómo registrar el consumo de ingredientes durante el servicio y las mermas (producto dañado, mal porcionado o descartado).",resp:"Cocinero Principal",frec:"diario",tiempo:"5 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"s041",t:"Al finalizar el turno, ir a la sección 'Salidas' del Sistema de Cocina.",n:"Las salidas se registran al cierre, no producto por producto durante el servicio.",a:""},
+{id:"s042",t:"Registrar cada ingrediente usado con la cantidad consumida. Guiarse por los platos vendidos y gramajes.",n:"",a:""},
+{id:"s043",t:"Si hubo mermas, registrarlas en el campo 'Merma' con el motivo (dañado, venció, se derramó, etc.).",n:"",a:"⚠️ Ocultar mermas afecta el control de costos. Siempre registrar con honestidad."},
+{id:"s044",t:"Guardar y verificar que el stock final tenga sentido. Si queda en negativo, hay un error. Revisar.",n:"",a:""}]},
+{id:"coc06",areaId:"cocina",nombre:"Conteo Rápido Diario",desc:"Conteo físico de ingredientes críticos para verificar que el inventario del sistema coincide con la realidad.",resp:"Cocinero Principal",frec:"diario",tiempo:"10 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"s051",t:"Ir a la sección 'Conteo Rápido' del Sistema de Cocina.",n:"",a:""},
+{id:"s052",t:"Contar físicamente cada producto de la lista: pesar carnes, contar unidades, medir líquidos.",n:"",a:""},
+{id:"s053",t:"Ingresar la cantidad física real — no la que 'debería' haber. Lo que realmente está.",n:"",a:""},
+{id:"s054",t:"Revisar las diferencias que muestra el sistema entre teórico y físico.",n:"Diferencias pequeñas (±2%) son normales. Diferencias grandes indican problema.",a:""},
+{id:"s055",t:"Si hay diferencias significativas, investigar antes de guardar. Reportar a Sergio diferencias >5%.",n:"",a:""},
+{id:"s056",t:"Guardar. El sistema registra quién hizo el conteo y a qué hora.",n:"",a:""}]},
+{id:"coc07",areaId:"cocina",nombre:"Generar Orden de Compra",desc:"Cómo generar una orden de compra desde el sistema cuando un producto llega al punto de re-orden.",resp:"Cocinero Principal / Sergio",frec:"semanal",tiempo:"10 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"s061",t:"Revisar el dashboard del Sistema de Cocina: los productos en rojo o amarillo están en alerta de compra.",n:"Las alertas están configuradas con los niveles mínimos definidos por Sergio.",a:""},
+{id:"s062",t:"Ir a la sección 'Orden de Compra' del sistema.",n:"",a:""},
+{id:"s063",t:"Revisar las cantidades sugeridas y ajustar si hay eventos especiales o temporada.",n:"",a:""},
+{id:"s064",t:"Verificar el proveedor asignado a cada producto y seleccionar uno alternativo si aplica.",n:"",a:""},
+{id:"s065",t:"Compartir la orden con Sergio para aprobación antes de enviarla al proveedor.",n:"",a:"⚠️ No enviar órdenes al proveedor sin aprobación de Sergio."}]},
+{id:"coc08",areaId:"cocina",nombre:"Registrar Producción al Barril",desc:"Registro de producción de carnes al barril para controlar rendimiento y mermas de cocción.",resp:"Cocinero Principal",frec:"diario",tiempo:"5 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"s071",t:"Pesar la carne cruda antes de entrar al barril y anotar el peso inicial.",n:"Este peso es el que se descuenta del inventario de materia prima.",a:""},
+{id:"s072",t:"Después de la cocción, pesar la carne cocida. La diferencia es la merma (normal: 20-35% según el corte).",n:"",a:""},
+{id:"s073",t:"En el Sistema de Cocina ir a 'Producción al Barril'. Registrar tipo de carne, peso crudo, peso cocido, fecha.",n:"",a:""},
+{id:"s074",t:"Guardar y verificar que el sistema descuente la materia prima del inventario automáticamente.",n:"Si no descuenta, reportar a Sergio.",a:""}]},
+{id:"bar01",areaId:"bar",nombre:"Apertura del Bar",desc:"Alistar el bar para recibir clientes. Verificar inventario, equipos y estación de bebidas.",resp:"Bartender",frec:"apertura",tiempo:"20 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"b001",t:"Verificar que el inventario físico coincide con el último conteo en el Sistema Bar. Reportar diferencias antes de abrir.",n:"",a:""},
+{id:"b002",t:"Verificar temperatura de nevera de bebidas (2-6°C) y registrar.",n:"",a:""},
+{id:"b003",t:"Preparar estación de limonadas: limpiar licuadora, alistar limones, leche de coco, azúcar, hielo.",n:"Verificar que la leche de coco abierta no tenga más de 2 días.",a:""},
+{id:"b004",t:"Revisar que haya suficiente hielo, vasos limpios y elementos de servicio para las primeras 2 horas.",n:"",a:""},
+{id:"b005",t:"Registrar apertura en el Sistema Bar con el inventario inicial del turno.",n:"Sin este registro el conteo de cierre no tiene punto de comparación.",a:""}]},
+{id:"bar02",areaId:"bar",nombre:"Limonada de Coco — Instructivo",desc:"Ficha técnica operativa. Código: REC-LIMO-COCO-001. Rendimiento: 1 litro (4 vasos). Tiempo total: 22 min.",resp:"Bartender",frec:"diario",tiempo:"22 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"b011",t:"Lavar 5 limones medianos con cepillo bajo agua fría.",n:"Solo frutas en buen estado.",a:""},
+{id:"b012",t:"Exprimir los 5 limones y colar sin semillas. Meta: 150 ml exactos de zumo.",n:"Usar colador fino.",a:""},
+{id:"b013",t:"Calentar 700 ml de agua purificada a 70°C EXACTO. NO hervir.",n:"Usar termómetro. Si hierve, esperar que baje.",a:"⚠️ Agua demasiado caliente altera el sabor y la textura de la leche de coco."},
+{id:"b014",t:"Disolver 60 g de azúcar + 0.5 g de sal. Sin grumos. (MENOS azúcar que la cerezada: 60g vs 80g)",n:"",a:""},
+{id:"b015",t:"Agregar 150 ml de leche de coco fresca. Revolver bien hasta integrar completamente.",n:"🔑 Este paso es el diferenciador. Sin leche de coco no es esta bebida.",a:"⚠️ Leche de coco abierta: máximo 2 días en nevera. Verificar fecha."},
+{id:"b016",t:"Enfriar en jarra con hielo hasta alcanzar 3-5°C. No servir tibia.",n:"La cremosidad depende del frío.",a:""},
+{id:"b017",t:"Mezclar el zumo con la base de coco. Probar sabor. El color debe ser blanco cremoso.",n:"Si sale rosado o marrón hay un error en los ingredientes.",a:""},
+{id:"b018",t:"Servir en vaso frío: 120 ml hielo + 130 ml limonada + 8-10 g coco rallado como decoración.",n:"",a:""}]},
+{id:"bar03",areaId:"bar",nombre:"Registrar Entrada y Conteo en Sistema Bar",desc:"Cómo registrar el ingreso de bebidas y hacer el conteo físico de cierre de turno.",resp:"Bartender",frec:"diario",tiempo:"10 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"b021",t:"Al recibir bebidas, contar físicamente y comparar con la factura del proveedor antes de registrar.",n:"",a:""},
+{id:"b022",t:"Abrir Sistema Bar → sección 'Entradas'. Seleccionar producto, cantidad, proveedor, fecha. Guardar.",n:"Si la bebida no está en la lista, reportar a Sergio.",a:"⚠️ No crear bebidas sin autorización ya que afectan los reportes."},
+{id:"b023",t:"Al cierre del turno ir a 'Salidas' y registrar lo consumido. Guiarse por las comandas si están disponibles.",n:"",a:""},
+{id:"b024",t:"Hacer conteo físico: contar unidad por unidad en nevera y estante. Ingresar en 'Conteo Físico' del sistema.",n:"Contar sin ver el número del sistema primero. Contar y luego comparar.",a:""},
+{id:"b025",t:"Revisar las diferencias. Diferencias grandes que no se explican con consumo deben reportarse a Sergio.",n:"",a:"⚠️ Faltantes inexplicables deben reportarse inmediatamente."}]},
+{id:"bar04",areaId:"bar",nombre:"Cierre del Bar",desc:"Dejar el bar limpio, inventario registrado y bebidas correctamente almacenadas.",resp:"Bartender",frec:"cierre",tiempo:"20 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"b031",t:"Realizar el conteo físico de cierre (ver proceso 'Registrar Entrada y Conteo').",n:"",a:""},
+{id:"b032",t:"Guardar bebidas abiertas selladas y fechadas. Las gaseosas abiertas no se guardan.",n:"",a:""},
+{id:"b033",t:"Lavar y sanitizar estación de limonadas: licuadora, coladores, jarras, superficie.",n:"",a:""},
+{id:"b034",t:"Registrar novedades del turno y reportar a Sergio si hay inconsistencias.",n:"",a:""}]},
+{id:"caj01",areaId:"caja",nombre:"Apertura de Caja con Wahio",desc:"Activar el turno en Wahio y preparar la caja para operar.",resp:"Cajero/a",frec:"apertura",tiempo:"10 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"c001",t:"Recibir y contar la base de caja con el encargado. Firmar el recibo de entrega de base.",n:"Nunca iniciar el turno sin contar y firmar.",a:"⚠️ Si el monto no coincide, reportar ANTES de empezar."},
+{id:"c002",t:"Iniciar sesión en Wahio con el usuario y contraseña asignados personalmente.",n:"No compartir contraseñas. Cada cajero tiene su propio acceso.",a:""},
+{id:"c003",t:"Abrir el turno en Wahio: ingresar el monto de la base de caja cuando el sistema lo solicite.",n:"Este paso es obligatorio para que el cierre cuadre correctamente.",a:""},
+{id:"c004",t:"Verificar que la impresora de tiquetes tenga papel y esté conectada. Hacer una prueba de impresión.",n:"Si no imprime, revisar conexión antes de abrir.",a:""},
+{id:"c005",t:"Revisar en Wahio productos agotados o cambios de precio. Confirmar con cocina antes de abrir.",n:"El cliente no debe enterarse del agotado cuando ya lo pidió.",a:""}]},
+{id:"caj02",areaId:"caja",nombre:"Cierre de Caja con Wahio",desc:"Cuadre y cierre del turno en Wahio. Momento crítico para el control financiero.",resp:"Cajero/a",frec:"cierre",tiempo:"20 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"c011",t:"Esperar a que no haya clientes presentes ni transacciones pendientes.",n:"",a:"⚠️ NUNCA hacer el cuadre con clientes en el local o en espera."},
+{id:"c012",t:"En Wahio ir a 'Cerrar turno' o 'Cierre de caja'.",n:"",a:""},
+{id:"c013",t:"Contar el efectivo real: separar por denominaciones, contar dos veces.",n:"Orden: $100K / $50K / $20K / $10K / $5K / $2K / $1K / monedas.",a:""},
+{id:"c014",t:"Ingresar en Wahio el monto contado. El sistema calcula la diferencia. Diferencia aceptable: ± $2.000.",n:"",a:""},
+{id:"c015",t:"Revisar totales por método de pago: efectivo, tarjeta, transferencia. Verificar vouchers del datáfono.",n:"",a:""},
+{id:"c016",t:"Entregar el efectivo y el reporte de Wahio a Sergio. Firmar el acta. No dejar efectivo en caja de noche.",n:"",a:""},
+{id:"c017",t:"Registrar en el archivo de novedades: inconsistencias, devoluciones, pedidos cancelados, anulaciones.",n:"",a:""}]},
+{id:"caj03",areaId:"caja",nombre:"Recepción de Pedidos por WhatsApp",desc:"Cómo recibir, registrar y coordinar pedidos que llegan por WhatsApp al canal oficial del restaurante.",resp:"Cajero/a",frec:"diario",tiempo:"Variable",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"c021",t:"Revisar el WhatsApp oficial cada 15 minutos durante el turno. Activar notificaciones de sonido.",n:"",a:""},
+{id:"c022",t:"Al recibir pedido, confirmar: nombre del cliente, pedido completo con adiciones, dirección si es domicilio, forma de pago.",n:"No procesar pedidos incompletos. Mejor preguntar antes.",a:""},
+{id:"c023",t:"Registrar el pedido en el archivo de pedidos WhatsApp: fecha, hora, cliente, pedido, valor, estado.",n:"Este archivo sirve para control de pedidos y detectar picos de demanda.",a:""},
+{id:"c024",t:"Ingresar el pedido en Wahio como venta normal. Si es domicilio, marcarlo como tal.",n:"",a:"⚠️ Pedidos por WhatsApp que no entran a Wahio no cuentan en el cuadre de caja."},
+{id:"c025",t:"Confirmar al cliente con tiempo estimado: 'Hola [nombre], tu pedido fue recibido. Tiempo estimado: XX min.'",n:"",a:""},
+{id:"c026",t:"Coordinar con cocina la prioridad del pedido según el tiempo prometido al cliente.",n:"",a:""}]},
+{id:"caj04",areaId:"caja",nombre:"Apoyo en Salón en Hora Pico",desc:"Cuando el restaurante está lleno, caja apoya en salón para mantener la calidad de atención.",resp:"Cajero/a",frec:"diario",tiempo:"Variable",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"c031",t:"El apoyo solo se activa cuando el encargado o Sergio lo indica. No abandonar caja por iniciativa propia.",n:"",a:""},
+{id:"c032",t:"Dejar la caja solo cuando no haya clientes en fila ni transacciones pendientes.",n:"",a:"⚠️ NUNCA dejar la caja abierta o con efectivo expuesto sin un responsable."},
+{id:"c033",t:"En salón: priorizar llevar pedidos servidos desde cocina a las mesas correctas. Confirmar mesa o nombre.",n:"",a:""},
+{id:"c034",t:"Si un cliente solicita la cuenta, tomar el número de mesa y procesar desde caja. No manejar efectivo fuera de caja.",n:"",a:""},
+{id:"c035",t:"Volver a la caja tan pronto baje el flujo. El apoyo es momentáneo — la caja es la responsabilidad principal.",n:"",a:""}]},
+{id:"ser01",areaId:"servicio",nombre:"Protocolo de Atención al Cliente",desc:"Estándar de servicio que refleja los valores del Rincón del Barril: familia, calidez y buena energía en cada mesa.",resp:"Mesero",frec:"diario",tiempo:"Por turno",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"v001",t:"Saludar cálidamente al llegar: '¡Bienvenido/a al Rincón del Barril! ¿Cómo le podemos atender?'",n:"El saludo es la primera impresión. Con energía positiva y contacto visual.",a:""},
+{id:"v002",t:"Guiar a la mesa, entregar el menú y dar 2-3 minutos. Mencionar especialidades del día.",n:"",a:""},
+{id:"v003",t:"Tomar el pedido repitiendo en voz alta para confirmar. Para hamburguesas: pan y queso. Para carnes: punto.",n:"",a:""},
+{id:"v004",t:"Transmitir el pedido a cocina y/o bar de forma completa. Remarcar adiciones o cambios especiales.",n:"",a:""},
+{id:"v005",t:"Hacer seguimiento a los 5 min de servir: preguntar cómo está. Sin ser invasivo.",n:"",a:""},
+{id:"v006",t:"Al cobrar: '¡Gracias por visitarnos, fue un placer atenderles! Los esperamos pronto.'",n:"Si el cliente hace comentarios positivos, transmitirlos al equipo.",a:""}]},
+{id:"ser02",areaId:"servicio",nombre:"Manejo de Domicilios",desc:"Procedimiento para coordinar y entregar pedidos a domicilio con la calidad del restaurante.",resp:"Mesero / Cajero",frec:"diario",tiempo:"Variable",status:"pendiente",version:"1.0",updatedAt:"2026-02-15",approvedAt:"",approvedBy:"",pendingMsg:"Sergio: completar con el proceso actual de domicilios — ¿quién hace la entrega? ¿hasta qué zona? ¿tiempo máximo? ¿qué platos no van a domicilio? ¿cómo se empaca cada producto?",pasos:[
+{id:"v011",t:"Recibir el pedido siguiendo el proceso 'Recepción de Pedidos por WhatsApp'.",n:"",a:""},
+{id:"v012",t:"Verificar que el pedido sea entregable: zona de cobertura y productos disponibles para domicilio.",n:"",a:"⚠️ Pendiente definir con Sergio: qué productos NO van a domicilio."},
+{id:"v013",t:"Confirmar tiempo estimado con cocina antes de informar al cliente.",n:"",a:""},
+{id:"v014",t:"Empacar el pedido según el protocolo de empaque (definir con Sergio).",n:"",a:""},
+{id:"v015",t:"Registrar la entrega y confirmar con el cliente cuando haya recibido.",n:"",a:""}]},
+{id:"ser03",areaId:"servicio",nombre:"Manejo de Quejas y Situaciones Difíciles",desc:"Protocolo para atender quejas con calma, empatía y enfoque en la solución. La queja bien manejada fideliza más que un servicio sin errores.",resp:"Mesero / Encargado",frec:"obligatorio",tiempo:"Variable",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"v021",t:"Escuchar al cliente sin interrumpir. Dejar que exprese su inconformidad completamente.",n:"La actitud de escucha activa ya calma el 50% de la situación.",a:""},
+{id:"v022",t:"Agradecer que lo diga: 'Gracias por contarnos, eso nos ayuda a mejorar.'",n:"Un cliente que se queja es mejor que uno que se va callado y no vuelve.",a:""},
+{id:"v023",t:"Disculparse sinceramente: 'Lamentamos mucho eso, no es la experiencia que queremos para usted.'",n:"No buscar culpables frente al cliente.",a:""},
+{id:"v024",t:"Ofrecer una solución inmediata: rehacer el plato, descuento, complemento. Para descuentos >20% consultar a Sergio.",n:"",a:"⚠️ No prometer lo que no se puede cumplir."},
+{id:"v025",t:"Volver a la mesa 5 min después para confirmar que el cliente quedó satisfecho.",n:"",a:""},
+{id:"v026",t:"Registrar la queja en el formato de novedades: qué pasó, cómo se resolvió, qué mejorar.",n:"Este registro identifica problemas recurrentes.",a:""}]},
+{id:"bod01",areaId:"bodega",nombre:"Recepción de Mercancía",desc:"Protocolo para recibir pedidos de proveedores. Garantiza que lo que entra cumple estándares de calidad y cantidad.",resp:"Encargado de Bodega",frec:"diario",tiempo:"15-30 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"d001",t:"Verificar que el pedido recibido coincide con la orden de compra emitida.",n:"Nunca recibir productos que no estaban en la orden sin autorización de Sergio.",a:""},
+{id:"d002",t:"Revisar fecha de vencimiento de cada producto. Mínimo 30 días para no perecederos.",n:"",a:"⚠️ NUNCA recibir producto vencido, con envase dañado o signos de contaminación."},
+{id:"d003",t:"Verificar cantidades contra la factura. Cualquier diferencia se reporta al proveedor en el momento.",n:"",a:""},
+{id:"d004",t:"Registrar la entrada en el sistema correspondiente: Depósito, Cocina o Bar según el tipo de producto.",n:"",a:""},
+{id:"d005",t:"Ubicar con método PEPS: lo nuevo atrás, lo viejo adelante (Primero en Entrar, Primero en Salir).",n:"",a:""}]},
+{id:"bod02",areaId:"bodega",nombre:"Registrar Entradas y Salidas en Sistema Depósito",desc:"Cómo registrar empaques, desechables y materiales que entran y salen del depósito.",resp:"Encargado de Bodega",frec:"diario",tiempo:"5 min",status:"aprobado",version:"1.0",updatedAt:"2026-02-15",approvedAt:"2026-02-15",approvedBy:"Sergio Barrera",pendingMsg:"",pasos:[
+{id:"d011",t:"Para entradas: Sistema Depósito → 'Entradas' → seleccionar producto, ingresar cantidad y proveedor. Guardar.",n:"Si el producto no está en la lista, reportar a Sergio.",a:""},
+{id:"d012",t:"Para salidas: registrar en el momento de la entrega a cocina, bar o caja. No al final del día.",n:"",a:""},
+{id:"d013",t:"Sistema Depósito → 'Salidas' → seleccionar producto, cantidad y destino (cocina/bar/caja). Guardar.",n:"",a:"⚠️ Salidas no registradas generan descuadres de inventario."},
+{id:"d014",t:"Para conteo físico: ir a 'Conteo Físico'. Contar sin ver el número del sistema. Comparar después.",n:"Reportar a Sergio diferencias significativas.",a:""}]}
+]};
+let D=loadD(),areaId=D.areas[0]?.id||"cocina",editMode=false,showCat=false,pinBuf="",apBuf="",approvingId=null,editProcId=null,pasoForProc=null,editPasoId=null;
+function loadD(){try{const s=localStorage.getItem("erb_procs_v3");if(s)return JSON.parse(s);}catch(e){}return JSON.parse(JSON.stringify(DEFAULT));}
+function save(){localStorage.setItem("erb_procs_v3",JSON.stringify(D));}
+function uid(){return"_"+Math.random().toString(36).substr(2,9);}
+function now(){return new Date().toISOString().slice(0,10);}
+function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):"";}
+function esc(s){return s?(s+"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"):""; }
+function fmt(d){if(!d)return"—";try{const[y,m,di]=d.split("-");return`${di}/${m}/${y}`;}catch(e){return d;}}
+const FC={apertura:"#1A4A8A",cierre:"#2D7A4F",diario:"#D4640A",semanal:"#6B3FA0",obligatorio:"#C41E3A"};
+
+function render(){if(showCat){renderCat();return;}renderTabs();renderProcs();}
+
+function renderTabs(){
+  const a=D.areas.find(x=>x.id===areaId);
+  document.getElementById("aIco").textContent=a?.icono||"";
+  document.getElementById("aNom").textContent=a?.nombre||"";
+  let h=D.areas.map(x=>{
+    const cnt=D.procesos.filter(p=>p.areaId===x.id).length;
+    const del=editMode?`<button style="margin-left:4px;background:none;border:none;cursor:pointer;color:inherit;font-size:.7rem;opacity:.7;" onclick="event.stopPropagation();confDel('area','${x.id}','el área ${x.nombre}')" title="Eliminar">✕</button>`:"";
+    return`<button class="area-tab${x.id===areaId?" active":""}" onclick="setArea('${x.id}')">${x.icono} ${x.nombre} <span class="cnt">${cnt}</span>${del}</button>`;
+  }).join("");
+  if(editMode)h+=`<button class="btn-add-area" onclick="openAreaModal()">+ Área</button>`;
+  document.getElementById("areaTabs").innerHTML=h;
+}
+
+function renderProcs(){
+  const list=D.procesos.filter(p=>p.areaId===areaId);
+  if(!list.length){document.getElementById("procList").innerHTML=`<div class="empty"><div class="ico">📋</div><p>No hay procesos en esta área todavía.</p></div>`;return;}
+  document.getElementById("procList").innerHTML=list.map(proc=>{
+    const col=FC[proc.frec]||"#999";
+    const fb=proc.frec?`<span class="badge b-${proc.frec}">${cap(proc.frec)}</span>`:"";
+    const sb=proc.status==="aprobado"?`<span class="badge b-aprobado">✅ Aprobado</span>`:proc.status==="pendiente"?`<span class="badge b-pendiente">⚠️ Pendiente completar</span>`:`<span class="badge b-borrador">📝 Borrador</span>`;
+    const pasos=(proc.pasos||[]).map((s,i)=>`<div class="paso-item"><div class="paso-num">${i+1}</div><div class="paso-content"><div class="paso-text">${esc(s.t)}</div>${s.n?`<div class="paso-nota">ℹ️ ${esc(s.n)}</div>`:""} ${s.a?`<div class="paso-alert">${esc(s.a)}</div>`:""}</div><div class="paso-item-actions"><button class="bi bi-edit" onclick="openPasoModal('${proc.id}','${s.id}')" title="Editar">✏️</button><button class="bi bi-del" onclick="confDel('paso','${proc.id}|${s.id}','el paso ${i+1}')" title="Eliminar">🗑</button></div></div>`).join("");
+    const pb=proc.status==="pendiente"&&proc.pendingMsg?`<div class="pending-block"><strong>⚠️ Pendiente completar</strong>${esc(proc.pendingMsg)}</div>`:"";
+    const apMeta=proc.status==="aprobado"&&proc.approvedAt?`<br>✅ Aprobado por ${esc(proc.approvedBy||APPROVED_BY)} — ${fmt(proc.approvedAt)}`:"";
+    const apBtn=editMode&&proc.status!=="aprobado"?`<button class="bi bi-ok" onclick="triggerApprove('${proc.id}')" style="width:auto;padding:0 10px;font-size:.75rem;font-weight:700;" title="Aprobar documento">✅ Aprobar</button>`:"";
+    return`<div class="proc-card" id="card_${proc.id}"><div class="proc-head" onclick="toggleCard('${proc.id}')"><div class="proc-head-l"><div class="proc-bar" style="background:${col}"></div><div class="proc-info"><div class="proc-name">${esc(proc.nombre)} ${fb} ${sb}</div><div class="proc-meta">${proc.resp?`<span>👤 ${esc(proc.resp)}</span>`:""}${proc.tiempo?`<span>⏱ ${esc(proc.tiempo)}</span>`:""}<span>📋 ${(proc.pasos||[]).length} paso(s)</span><span class="proc-version">v${proc.version} · ${fmt(proc.updatedAt)}</span></div></div></div><div class="proc-head-r"><div class="proc-actions" onclick="event.stopPropagation()">${apBtn}<button class="bi bi-edit" onclick="openProcModal('${proc.id}')" title="Editar">✏️</button><button class="bi bi-del" onclick="confDel('proc','${proc.id}','el proceso')" title="Eliminar">🗑</button></div><span class="proc-chevron">▼</span></div></div><div class="proc-body">${proc.desc?`<div class="proc-desc">${esc(proc.desc)}</div>`:""}${pb}<div class="pasos-hdr">Pasos del proceso<button class="btn-add-paso" onclick="openPasoModal('${proc.id}')">+ Paso</button></div><div>${pasos||`<div style="color:var(--gris);font-size:.86rem;padding:11px;background:var(--gris-s);border-radius:8px;">Sin pasos registrados aún.</div>`}</div><div class="proc-footer"><div class="proc-footer-meta">Versión ${proc.version} · Modificado: ${fmt(proc.updatedAt)}${apMeta}</div><button class="btn-print-p" onclick="printProc('${proc.id}')">🖨 Imprimir</button></div></div></div>`;
+  }).join("");
+}
+
+function toggleCatalog(){
+  showCat=!showCat;
+  document.getElementById("catalogView").style.display=showCat?"block":"none";
+  document.getElementById("processView").style.display=showCat?"none":"block";
+  const b=document.getElementById("btnCat");
+  b.classList.toggle("cat-on",showCat);
+  b.textContent=showCat?"← Procesos":"📋 Catálogo";
+  if(showCat)renderCat();
+}
+
+function renderCat(){
+  const sel=document.getElementById("cfArea");
+  if(sel.children.length<=1) D.areas.forEach(a=>{const o=document.createElement("option");o.value=a.id;o.textContent=a.icono+" "+a.nombre;sel.appendChild(o);});
+  const fA=sel.value,fS=document.getElementById("cfStatus").value,fQ=(document.getElementById("cfSearch").value||"").toLowerCase();
+  let procs=D.procesos.filter(p=>{if(fA&&p.areaId!==fA)return false;if(fS&&p.status!==fS)return false;if(fQ&&!p.nombre.toLowerCase().includes(fQ)&&!(p.resp||"").toLowerCase().includes(fQ))return false;return true;});
+  const tot=D.procesos.length,ap=D.procesos.filter(p=>p.status==="aprobado").length,pe=D.procesos.filter(p=>p.status==="pendiente").length,bo=D.procesos.filter(p=>p.status==="borrador").length;
+  document.getElementById("catStats").innerHTML=`<div class="cat-stat"><div class="num">${tot}</div><div class="lbl">Total documentos</div></div><div class="cat-stat"><div class="num" style="color:var(--verde)">${ap}</div><div class="lbl">✅ Aprobados</div></div><div class="cat-stat"><div class="num" style="color:var(--amarillo)">${bo}</div><div class="lbl">📝 Borradores</div></div><div class="cat-stat"><div class="num" style="color:var(--naranja)">${pe}</div><div class="lbl">⚠️ Pendientes</div></div>`;
+  document.getElementById("catBody").innerHTML=procs.map((p,i)=>{
+    const area=D.areas.find(a=>a.id===p.areaId);
+    const sb=p.status==="aprobado"?`<span class="badge b-aprobado">✅ Aprobado</span>`:p.status==="pendiente"?`<span class="badge b-pendiente">⚠️ Pendiente</span>`:`<span class="badge b-borrador">📝 Borrador</span>`;
+    return`<tr><td>${i+1}</td><td class="td-n" onclick="goToProc('${p.id}')">${esc(p.nombre)}</td><td class="td-sm">${area?.icono||""} ${area?.nombre||""}</td><td class="td-sm">${esc(p.resp||"—")}</td><td><span class="badge b-${p.frec||""}">${cap(p.frec||"—")}</span></td><td class="td-sm">v${p.version}</td><td>${sb}</td><td class="td-sm">${fmt(p.updatedAt)}</td></tr>`;
+  }).join("")||`<tr><td colspan="8" style="text-align:center;color:var(--gris);padding:30px;">Sin resultados</td></tr>`;
+}
+
+function goToProc(id){
+  const p=D.procesos.find(x=>x.id===id);if(!p)return;
+  showCat=false;document.getElementById("catalogView").style.display="none";document.getElementById("processView").style.display="block";
+  document.getElementById("btnCat").classList.remove("cat-on");document.getElementById("btnCat").textContent="📋 Catálogo";
+  areaId=p.areaId;render();
+  setTimeout(()=>{const c=document.getElementById("card_"+id);if(c){c.classList.add("open");c.scrollIntoView({behavior:"smooth",block:"center"});}},80);
+}
+
+function toggleCard(id){document.getElementById("card_"+id)?.classList.toggle("open");}
+function setArea(id){areaId=id;render();}
+
+function toggleEdit(){if(editMode){salirEdit();return;}pinBuf="";updDots("d",pinBuf);document.getElementById("pinErr").style.display="none";om("pinModal");}
+function pk(n){if(pinBuf.length>=4)return;pinBuf+=String(n);updDots("d",pinBuf);if(pinBuf.length===4)setTimeout(chkPin,200);}
+function pdel(){pinBuf=pinBuf.slice(0,-1);updDots("d",pinBuf);}
+function chkPin(){if(pinBuf===PIN){cm("pinModal");enableEdit();}else{document.getElementById("pinErr").style.display="block";pinBuf="";updDots("d",pinBuf);}}
+function enableEdit(){editMode=true;document.body.classList.add("edit-mode");document.getElementById("editBanner").classList.add("on");document.getElementById("btnEdit").classList.add("active");document.getElementById("btnEdit").textContent="✏️ Editando";render();}
+function salirEdit(){editMode=false;document.body.classList.remove("edit-mode");document.getElementById("editBanner").classList.remove("on");document.getElementById("btnEdit").classList.remove("active");document.getElementById("btnEdit").textContent="🔒 Editar";render();}
+function triggerApprove(id){approvingId=id;apBuf="";updDots("a",apBuf);document.getElementById("apErr").style.display="none";om("pinApprModal");}
+function apk(n){if(apBuf.length>=4)return;apBuf+=String(n);updDots("a",apBuf);if(apBuf.length===4)setTimeout(chkAppr,200);}
+function apdel(){apBuf=apBuf.slice(0,-1);updDots("a",apBuf);}
+function chkAppr(){if(apBuf===PIN){cm("pinApprModal");const p=D.procesos.find(x=>x.id===approvingId);if(p){p.status="aprobado";p.approvedAt=now();p.approvedBy=APPROVED_BY;bumpVer(p);p.updatedAt=now();}save();render();}else{document.getElementById("apErr").style.display="block";apBuf="";updDots("a",apBuf);}}
+function updDots(pfx,buf){for(let i=0;i<4;i++)document.getElementById(pfx+i)?.classList.toggle("filled",i<buf.length);}
+function bumpVer(p){const pts=p.version.split(".");pts[1]=String((parseInt(pts[1]||0)+1));p.version=pts.join(".");}
+
+function openProcModal(id){
+  editProcId=id||null;const p=id?D.procesos.find(x=>x.id===id):null;
+  document.getElementById("pmTitle").textContent=p?"Editar Proceso":"Nuevo Proceso";
+  document.getElementById("pNom").value=p?.nombre||"";document.getElementById("pDesc").value=p?.desc||"";
+  document.getElementById("pResp").value=p?.resp||"";document.getElementById("pTiempo").value=p?.tiempo||"";
+  document.getElementById("pFrec").value=p?.frec||"";document.getElementById("pStatus").value=p?.status||"borrador";
+  document.getElementById("pPend").value=p?.pendingMsg||"";togglePending();om("procModal");
+}
+function togglePending(){document.getElementById("pendGrp").style.display=document.getElementById("pStatus").value==="pendiente"?"block":"none";}
+document.getElementById("pStatus").addEventListener("change",togglePending);
+function saveProc(){
+  const nom=document.getElementById("pNom").value.trim();if(!nom){alert("El nombre es obligatorio.");return;}
+  if(editProcId){
+    const p=D.procesos.find(x=>x.id===editProcId);
+    if(p){const ps=document.getElementById("pStatus").value;p.nombre=nom;p.desc=document.getElementById("pDesc").value.trim();p.resp=document.getElementById("pResp").value.trim();p.tiempo=document.getElementById("pTiempo").value.trim();p.frec=document.getElementById("pFrec").value;p.pendingMsg=document.getElementById("pPend").value.trim();if(ps!==p.status){p.status=ps;if(ps==="aprobado"){p.approvedAt=now();p.approvedBy=APPROVED_BY;}else{p.approvedAt="";p.approvedBy="";}}bumpVer(p);p.updatedAt=now();}
+  }else{
+    const ps=document.getElementById("pStatus").value;
+    D.procesos.push({id:uid(),areaId,nombre:nom,desc:document.getElementById("pDesc").value.trim(),resp:document.getElementById("pResp").value.trim(),frec:document.getElementById("pFrec").value,tiempo:document.getElementById("pTiempo").value.trim(),status:ps,pendingMsg:document.getElementById("pPend").value.trim(),version:"1.0",updatedAt:now(),approvedAt:ps==="aprobado"?now():"",approvedBy:ps==="aprobado"?APPROVED_BY:"",pasos:[]});
+  }
+  save();cm("procModal");render();
+}
+
+function openPasoModal(pid,sid){
+  pasoForProc=pid;editPasoId=sid||null;const proc=D.procesos.find(p=>p.id===pid);const s=sid?proc?.pasos?.find(x=>x.id===sid):null;
+  document.getElementById("stTitle").textContent=s?"Editar Paso":"Nuevo Paso";
+  document.getElementById("stT").value=s?.t||"";document.getElementById("stN").value=s?.n||"";document.getElementById("stA").value=s?.a||"";om("pasoModal");
+}
+function savePaso(){
+  const t=document.getElementById("stT").value.trim();if(!t){alert("La instrucción es obligatoria.");return;}
+  const proc=D.procesos.find(p=>p.id===pasoForProc);if(!proc)return;
+  proc.pasos=proc.pasos||[];
+  if(editPasoId){const s=proc.pasos.find(x=>x.id===editPasoId);if(s){s.t=t;s.n=document.getElementById("stN").value.trim();s.a=document.getElementById("stA").value.trim();}}
+  else proc.pasos.push({id:uid(),t,n:document.getElementById("stN").value.trim(),a:document.getElementById("stA").value.trim()});
+  if(proc.status==="aprobado"){proc.status="borrador";proc.approvedAt="";proc.approvedBy="";}
+  bumpVer(proc);proc.updatedAt=now();save();cm("pasoModal");render();
+  setTimeout(()=>{document.getElementById("card_"+pasoForProc)?.classList.add("open");},60);
+}
+
+function openAreaModal(){document.getElementById("arNom").value="";document.getElementById("arIco").value="";om("areaModal");}
+function saveArea(){const n=document.getElementById("arNom").value.trim();if(!n){alert("Nombre obligatorio.");return;}const ico=document.getElementById("arIco").value.trim()||"📋";const id=n.toLowerCase().replace(/\s+/g,"_").replace(/[^a-z0-9_]/g,"")+Date.now().toString(36);D.areas.push({id,nombre:n,icono:ico});save();cm("areaModal");areaId=id;render();}
+
+function confDel(type,id,label){
+  document.getElementById("confTitle").textContent=`¿Eliminar ${label}?`;
+  document.getElementById("confText").textContent=type==="area"?"Se eliminará el área y todos sus procesos.":type==="proc"?"Se eliminarán el proceso y todos sus pasos.":"Este paso se eliminará permanentemente.";
+  document.getElementById("confOk").onclick=()=>{
+    if(type==="area"){D.areas=D.areas.filter(a=>a.id!==id);D.procesos=D.procesos.filter(p=>p.areaId!==id);areaId=D.areas[0]?.id||"";}
+    else if(type==="proc")D.procesos=D.procesos.filter(p=>p.id!==id);
+    else if(type==="paso"){const[pid,sid]=id.split("|");const proc=D.procesos.find(p=>p.id===pid);if(proc)proc.pasos=proc.pasos.filter(s=>s.id!==sid);}
+    save();cm("confirmModal");render();
+    if(type==="paso")setTimeout(()=>{document.getElementById("card_"+id.split("|")[0])?.classList.add("open");},60);
+  };om("confirmModal");
+}
+
+function exportJSON(){
+  const d=new Date().toISOString().slice(0,10);
+  const blob=new Blob([JSON.stringify(D,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`erb_procesos_${d}.json`;a.click();
+}
+function triggerImport(){if(!editMode){alert("Activa el modo edición con tu PIN para importar.");return;}document.getElementById("fileIn").click();}
+function importJSON(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();r.onload=ev=>{try{const p=JSON.parse(ev.target.result);if(!p.areas||!p.procesos)throw new Error("Formato inválido");if(!confirm(`¿Importar este archivo?\nÁreas: ${p.areas.length} | Procesos: ${p.procesos.length}\n\nSe reemplazarán todos los datos actuales.`))return;D=p;save();areaId=D.areas[0]?.id||"";render();alert("✅ Datos importados correctamente.");}catch(err){alert("❌ Error al importar: "+err.message);}};r.readAsText(file);e.target.value="";
+}
+
+function printProc(id){
+  const proc=D.procesos.find(p=>p.id===id);if(!proc)return;
+  const area=D.areas.find(a=>a.id===proc.areaId);
+  const sl=proc.status==="aprobado"?"✅ APROBADO":proc.status==="pendiente"?"⚠️ PENDIENTE COMPLETAR":"📝 BORRADOR";
+  const pasos=(proc.pasos||[]).map((s,i)=>`<div style="display:flex;gap:12px;margin-bottom:12px;page-break-inside:avoid;"><div style="width:26px;height:26px;min-width:26px;border-radius:50%;background:#C41E3A;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">${i+1}</div><div><div style="font-size:13px;font-weight:600;">${esc(s.t)}</div>${s.n?`<div style="font-size:11px;color:#666;font-style:italic;margin-top:3px;">ℹ️ ${esc(s.n)}</div>`:""}${s.a?`<div style="font-size:11px;color:#D4640A;font-weight:700;margin-top:4px;">${esc(s.a)}</div>`:""}</div></div>`).join("");
+  const w=window.open("","_blank");
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proc.nombre}</title><style>body{font-family:sans-serif;max-width:680px;margin:28px auto;color:#2C2B28;}.hd{border-bottom:3px solid #C41E3A;padding-bottom:12px;margin-bottom:14px;}.meta{font-size:11px;color:#666;margin-bottom:12px;line-height:1.8;}.desc{background:#F5F4F1;border-left:3px solid #C41E3A;padding:9px 12px;border-radius:4px;font-size:12px;margin-bottom:14px;}.lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#666;margin-bottom:12px;}.ft{margin-top:28px;border-top:1px solid #ddd;padding-top:10px;font-size:10px;color:#aaa;}@media print{body{margin:16px;}}</style></head><body>
+  <div class="hd"><div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;">${area?.icono||""} ${area?.nombre||""} — El Rincón del Barril</div><div style="font-size:20px;font-weight:700;color:#C41E3A;margin:4px 0;">${esc(proc.nombre)}</div><div style="font-size:11px;font-weight:600;">${sl}</div></div>
+  <div class="meta">${proc.resp?`👤 ${esc(proc.resp)}&nbsp;&nbsp;`:""} ${proc.tiempo?`⏱ ${esc(proc.tiempo)}&nbsp;&nbsp;`:""} ${proc.frec?`📌 ${cap(proc.frec)}&nbsp;&nbsp;`:""}<br>📄 Versión ${proc.version} &nbsp;·&nbsp; Modificado: ${fmt(proc.updatedAt)}${proc.approvedAt?` &nbsp;·&nbsp; ✅ Aprobado por ${esc(proc.approvedBy)} el ${fmt(proc.approvedAt)}`:""}</div>
+  ${proc.desc?`<div class="desc">${esc(proc.desc)}</div>`:""}
+  <div class="lbl">Pasos del proceso</div>${pasos||"<p style='color:#999;font-style:italic;'>Sin pasos registrados.</p>"}
+  ${proc.pendingMsg?`<div style="background:#FFF8E0;border:2px dashed #F5C842;border-radius:8px;padding:10px 14px;margin-top:14px;font-size:11px;color:#7A5500;"><strong>⚠️ Pendiente: </strong>${esc(proc.pendingMsg)}</div>`:""}
+  <div class="ft">El Rincón del Barril · TodoPosibleMD · Código: ${proc.id} · Impreso: ${new Date().toLocaleDateString("es-CO")}</div>
+  </body></html>`);w.document.close();w.print();
+}
+
+function om(id){document.getElementById(id).classList.add("active");document.body.style.overflow="hidden";}
+function cm(id){document.getElementById(id).classList.remove("active");document.body.style.overflow="";}
+document.addEventListener("click",e=>{if(e.target.classList.contains("overlay")){e.target.classList.remove("active");document.body.style.overflow="";}});
+document.addEventListener("keydown",e=>{
+  if(document.getElementById("pinModal").classList.contains("active")){if(e.key>="0"&&e.key<="9")pk(+e.key);if(e.key==="Backspace")pdel();if(e.key==="Escape")cm("pinModal");}
+  if(document.getElementById("pinApprModal").classList.contains("active")){if(e.key>="0"&&e.key<="9")apk(+e.key);if(e.key==="Backspace")apdel();if(e.key==="Escape")cm("pinApprModal");}
+  if(e.key==="Escape")["procModal","pasoModal","areaModal","confirmModal"].forEach(cm);
+});
+render();
+</script></body></html>
