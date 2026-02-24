@@ -1,0 +1,3785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Cocina - El Rincón del Barril</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 0;
+            font-size: 16px;
+        }
+        
+        /* PANTALLA DE SELECCIÓN DE ROL */
+        .role-selector {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .role-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 100%;
+        }
+        .role-title {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .role-subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .role-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .role-btn {
+            background: white;
+            border: 3px solid #ddd;
+            padding: 30px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .role-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .role-btn.eloy {
+            border-color: #4CAF50;
+        }
+        .role-btn.eloy:hover {
+            background: #e8f5e9;
+            border-color: #4CAF50;
+        }
+        .role-btn.oscar {
+            border-color: #2196F3;
+        }
+        .role-btn.oscar:hover {
+            background: #e3f2fd;
+            border-color: #2196F3;
+        }
+        .role-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        .role-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .role-description {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        /* HEADER PRINCIPAL */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-title { font-size: 20px; font-weight: bold; }
+        .header-user {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .header-subtitle { font-size: 12px; opacity: 0.9; margin-top: 5px; }
+        
+        /* TABS/PESTAÑAS */
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid #ddd;
+            position: sticky;
+            top: 75px;
+            z-index: 99;
+        }
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: bold;
+            color: #666;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: #f9f9f9;
+        }
+        .tab.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .tab-icon { font-size: 24px; display: block; margin-bottom: 5px; }
+        .tab-name { font-size: 13px; }
+        
+        /* CONTENIDO */
+        .content {
+            padding: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* TARJETAS */
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* FORMULARIOS */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .input-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 3px;
+        }
+        
+        /* BOTONES */
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #45a049;
+        }
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        /* TABLA */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        tr:hover {
+            background: #f9f9f9;
+        }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 2px;
+            width: auto;
+        }
+        
+        /* ESTADOS Y BADGES */
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-success {
+            background: #e8f5e9;
+            color: #4CAF50;
+        }
+        .badge-warning {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+        .badge-danger {
+            background: #ffebee;
+            color: #f44336;
+        }
+        
+        /* ALERTAS DE INVENTARIO */
+        .alert-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #f44336;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .stock-critico {
+            background-color: #ffebee !important;
+        }
+        .stock-advertencia {
+            background-color: #fff9e6 !important;
+        }
+        .stock-ok {
+            background-color: #f1f8f4 !important;
+        }
+        .indicador-stock {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .indicador-critico {
+            background: #f44336;
+        }
+        .indicador-advertencia {
+            background: #ff9800;
+        }
+        .indicador-ok {
+            background: #4CAF50;
+        }
+        .card-alerta-critica {
+            background: linear-gradient(135deg, #ff5252 0%, #f44336 100%);
+            color: white;
+        }
+        .card-alerta-advertencia {
+            background: linear-gradient(135deg, #ffa726 0%, #ff9800 100%);
+            color: white;
+        }
+        .lista-alertas {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .item-alerta {
+            padding: 10px;
+            border-left: 4px solid #f44336;
+            margin-bottom: 10px;
+            background: #ffebee;
+            border-radius: 4px;
+        }
+        .item-alerta-titulo {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .item-alerta-detalle {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        /* BÚSQUEDA */
+        .search-box {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        .search-input {
+            padding-left: 40px;
+        }
+        
+        /* ALERTAS */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .alert-info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-left: 4px solid #2196F3;
+        }
+        .alert-warning {
+            background: #fff3e0;
+            color: #f57c00;
+            border-left: 4px solid #ff9800;
+        }
+        
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        /* OCULTAR */
+        .hidden { display: none !important; }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 10px;
+            }
+            
+            .header-content > div:last-child {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .header-user {
+                font-size: 0.9em;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .tab {
+                padding: 12px 20px;
+                font-size: 0.9em;
+                min-width: 120px;
+            }
+            
+            .card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .form-group label {
+                font-size: 0.9em;
+            }
+            
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                font-size: 16px; /* Evita zoom en iOS */
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 1em;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            
+            .stat-card {
+                padding: 12px;
+            }
+            
+            .stat-number {
+                font-size: 1.5em;
+            }
+            
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            table {
+                min-width: 600px;
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 0.85em;
+            }
+            
+            .alert {
+                padding: 12px;
+                font-size: 0.9em;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .role-buttons {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .role-btn {
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.3em;
+            }
+            
+            .header p {
+                font-size: 0.85em;
+            }
+            
+            .header-content > div:last-child button {
+                font-size: 0.75em !important;
+                padding: 6px 10px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- PANTALLA DE SELECCIÓN DE ROL -->
+<div id="roleSelector" class="role-selector">
+    <div class="role-container">
+        <h1 class="role-title">🔑 Sistema Cocina</h1>
+        <p class="role-subtitle">El Rincón del Barril - Selecciona tu rol</p>
+        
+        <div class="role-buttons">
+            <div class="role-btn eloy" onclick="selectRole('eloy')">
+                <div class="role-icon">👨‍🍳</div>
+                <div class="role-name">SOY ELOY</div>
+                <div class="role-description">Registro de Entradas</div>
+            </div>
+            
+            <div class="role-btn oscar" onclick="selectRole('oscar')">
+                <div class="role-icon">📦</div>
+                <div class="role-name">SOY OSCAR</div>
+                <div class="role-description">Salidas e Inventario</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SISTEMA PRINCIPAL -->
+<div id="mainSystem" class="hidden">
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-content">
+            <div>
+                <div class="header-title">Sistema Cocina</div>
+                <div class="header-subtitle" id="headerSubtitle">El Rincón del Barril</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="header-user" id="currentUser">Usuario</div>
+                <button onclick="volverAlMenuPrincipal()" style="background: rgba(255,255,255,0.3); border: 2px solid white; color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px;">
+                    🏠 Menú Principal
+                </button>
+                <button onclick="volverAlMenu()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px;">
+                    🔄 Cambiar Usuario
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- TABS -->
+    <div class="tabs">
+        <div class="tab" id="tabEntradas" onclick="switchTab('entradas')">
+            <span class="tab-icon">📥</span>
+            <span class="tab-name">Entradas</span>
+        </div>
+        <div class="tab" id="tabSalidas" onclick="switchTab('salidas')">
+            <span class="tab-icon">📤</span>
+            <span class="tab-name">Salidas</span>
+        </div>
+        <div class="tab" id="tabInventario" onclick="switchTab('inventario')">
+            <span class="tab-icon">📊</span>
+            <span class="tab-name">Inventario</span>
+            <span class="alert-badge" id="alertBadge" style="display: none;">0</span>
+        </div>
+    </div>
+    
+    <!-- CONTENIDO -->
+    <div class="content">
+        
+        <!-- TAB 1: ENTRADAS -->
+        <div id="contentEntradas" class="tab-content">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statsEntradasHoy">0</div>
+                    <div class="stat-label">Entradas Hoy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statsEntradasMes">0</div>
+                    <div class="stat-label">Este Mes</div>
+                </div>
+            </div>
+            
+            <!-- Formulario -->
+            <div class="card">
+                <h2 class="card-title">📥 Registrar Entrada</h2>
+                
+                <div class="form-group">
+                    <label>Producto *</label>
+                    <select id="entradaProducto" onchange="autoCompleteEntrada()" style="width: 100%; padding: 12px; font-size: 16px;">
+                        <option value="">Seleccionar producto...</option>
+                    </select>
+                    <div class="search-box" style="margin-top: 8px;">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="entradaProductoSearch" class="search-input" 
+                               placeholder="Filtrar productos..." oninput="filterProductsEntrada()">
+                    </div>
+                    <div class="input-hint">Puedes usar el filtro de arriba para buscar más rápido</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Cantidad *</label>
+                    <input type="number" id="entradaCantidad" step="0.01" placeholder="0.00">
+                </div>
+                
+                <div class="form-group">
+                    <label>Unidad</label>
+                    <input type="text" id="entradaUnidad" placeholder="kg, Un, Ml...">
+                    <div class="input-hint">Se completa automático según producto</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Proveedor</label>
+                    <select id="entradaProveedor">
+                        <option value="">Seleccionar proveedor...</option>
+                        <option value="SURTIEMBUTIDOS SAN NICOLAS">SURTIEMBUTIDOS SAN NICOLAS</option>
+                        <option value="CHARCUTERIA">CHARCUTERIA</option>
+                        <option value="ATLANTIC">ATLANTIC</option>
+                        <option value="NOVILLON">NOVILLON</option>
+                        <option value="MC POLLO">MC POLLO</option>
+                        <option value="MCCORMICK">MCCORMICK</option>
+                        <option value="BODEGA">BODEGA</option>
+                        <option value="MIS TRES AMORES">MIS TRES AMORES</option>
+                        <option value="MAKRO">MAKRO</option>
+                        <option value="COCA COLA">COCA COLA</option>
+                        <option value="CENABASTOS">CENABASTOS</option>
+                        <option value="PLASTICOS">PLASTICOS</option>
+                        <option value="produccion">Producción Interna</option>
+                        <option value="Barril">Barril</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                    <div class="input-hint">Se completa automático según producto (editable)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Responsable</label>
+                    <input type="text" id="entradaResponsable" placeholder="Nombre responsable">
+                    <div class="input-hint">Se completa automático</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Factura (opcional)</label>
+                    <input type="text" id="entradaFactura" placeholder="Número de factura">
+                </div>
+                
+                <div class="form-group">
+                    <label>Lote (opcional)</label>
+                    <input type="text" id="entradaLote" placeholder="Número de lote">
+                </div>
+                
+                <button class="btn btn-success" onclick="guardarEntrada()">
+                    ✅ GUARDAR ENTRADA
+                </button>
+            </div>
+            
+            <!-- Tabla de entradas -->
+            <div class="card">
+                <h2 class="card-title">📋 Entradas Registradas</h2>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-primary" onclick="exportarExcelEntradas()" style="flex: 1;">
+                        📊 EXPORTAR ENTRADAS
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportarAuditoria()" style="flex: 1;">
+                        📋 EXPORTAR AUDITORÍA
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="tablaEntradas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Proveedor</th>
+                                <th>Responsable</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyEntradas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB 2: SALIDAS -->
+        <div id="contentSalidas" class="tab-content">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statsSalidasHoy">0</div>
+                    <div class="stat-label">Salidas Hoy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statsMermasHoy">0</div>
+                    <div class="stat-label">Mermas Hoy</div>
+                </div>
+            </div>
+            
+            <!-- Formulario -->
+            <div class="card">
+                <h2 class="card-title">📤 Registrar Salida</h2>
+                
+                <div class="form-group">
+                    <label>Tipo de Salida *</label>
+                    <select id="salidaTipo" onchange="mostrarProductosSalida()">
+                        <option value="">Seleccionar tipo...</option>
+                        <option value="produccion">📦 Producción</option>
+                        <option value="barril">🔥 Barril</option>
+                        <option value="consumo">🍽️ Consumo</option>
+                        <option value="merma">🗑️ Merma</option>
+                    </select>
+                </div>
+                
+                <!-- Contenedor dinámico según tipo -->
+                <div id="salidaFormDinamico"></div>
+                
+                <button class="btn btn-success" onclick="guardarSalida()" id="btnGuardarSalida" style="display:none;">
+                    ✅ GUARDAR SALIDA
+                </button>
+            </div>
+            
+            <!-- Tabla de salidas -->
+            <div class="card">
+                <h2 class="card-title">📋 Salidas Registradas</h2>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-primary" onclick="exportarExcelSalidas()" style="flex: 1;">
+                        📊 EXPORTAR SALIDAS
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportarAuditoria()" style="flex: 1;">
+                        📋 EXPORTAR AUDITORÍA
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Detalles</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodySalidas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB 3: INVENTARIO -->
+        <div id="contentInventario" class="tab-content">
+            <!-- Alerta de inventario inicial -->
+            <div class="alert alert-info" id="alertInventarioInicial">
+                📦 <strong>Inventario del día:</strong> 
+                <span id="totalProductosInventario">0</span> productos registrados con fecha de hoy.
+                <button class="btn btn-secondary btn-small" onclick="scrollToTablaInventario()" style="margin-left:10px;">
+                    Ver Productos
+                </button>
+            </div>
+            
+            <!-- Ver entradas (solo lectura para Oscar) -->
+            <div class="alert alert-info" id="alertVerEntradas" style="display:none;">
+                👁️ <strong>Entradas registradas:</strong> Aquí puedes ver lo que Eloy registró
+                <button class="btn btn-secondary btn-small" onclick="toggleVerEntradas()" style="margin-left:10px;">
+                    Ver Entradas
+                </button>
+            </div>
+            
+            <div id="verEntradasContainer" style="display:none;" class="card">
+                <h2 class="card-title">👁️ Entradas (Solo Lectura)</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Proveedor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyVerEntradas"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- PANEL DE ALERTAS CRÍTICAS -->
+            <div id="panelAlertasCriticas" style="display: none;">
+                <!-- Alerta Crítica -->
+                <div class="card card-alerta-critica" id="cardCritica" style="display: none;">
+                    <h2 class="card-title" style="color: white;">
+                        🚨 PRODUCTOS CRÍTICOS
+                    </h2>
+                    <div style="font-size: 14px; margin-bottom: 15px; opacity: 0.95;">
+                        <span id="numCriticos">0</span> productos por debajo del mínimo - Necesitan pedido urgente
+                    </div>
+                    <button class="btn" onclick="verSoloCriticos()" style="background: white; color: #f44336;">
+                        🔍 VER SOLO CRÍTICOS
+                    </button>
+                    <button class="btn" onclick="generarOrdenCompra()" style="background: rgba(255,255,255,0.3); color: white; margin-top: 10px; border: 2px solid white;">
+                        📋 GENERAR ORDEN DE COMPRA
+                    </button>
+                </div>
+                
+                <!-- Alerta Advertencia -->
+                <div class="card card-alerta-advertencia" id="cardAdvertencia" style="display: none;">
+                    <h2 class="card-title" style="color: white;">
+                        ⚠️ PRODUCTOS EN ADVERTENCIA
+                    </h2>
+                    <div style="font-size: 14px; margin-bottom: 15px; opacity: 0.95;">
+                        <span id="numAdvertencias">0</span> productos próximos al mínimo - Pronto necesitarán pedido
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statsProductosTotal">34</div>
+                    <div class="stat-label">Productos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statsConteoHoy">0</div>
+                    <div class="stat-label">Conteos Hoy</div>
+                </div>
+            </div>
+            
+            <!-- PANEL DE ALERTAS DE INVENTARIO -->
+            <div id="panelAlertas" class="card" style="border-left: 4px solid #f44336;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 class="card-title" style="margin: 0;">⚠️ ALERTAS DE INVENTARIO</h2>
+                    <button class="btn btn-small" onclick="toggleFiltroAlertas()" id="btnFiltroAlertas" style="background: #f44336; color: white;">
+                        🔍 Ver solo críticos
+                    </button>
+                </div>
+                
+                <!-- Contadores de alertas -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); color: white; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: bold;" id="contadorCriticos">0</div>
+                        <div style="font-size: 12px; opacity: 0.9;">🔴 CRÍTICOS</div>
+                        <div style="font-size: 10px; opacity: 0.8;">Bajo mínimo</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: bold;" id="contadorAdvertencia">0</div>
+                        <div style="font-size: 12px; opacity: 0.9;">🟡 ADVERTENCIA</div>
+                        <div style="font-size: 10px; opacity: 0.8;">Cerca del mínimo</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%); color: white; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 32px; font-weight: bold;" id="contadorOK">0</div>
+                        <div style="font-size: 12px; opacity: 0.9;">🟢 OK</div>
+                        <div style="font-size: 10px; opacity: 0.8;">Stock saludable</div>
+                    </div>
+                </div>
+                
+                <!-- Lista de productos críticos -->
+                <div id="listaProductosCriticos" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Se llena dinámicamente -->
+                </div>
+                
+                <!-- Botón de orden de compra -->
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="btn btn-danger" onclick="generarOrdenCompra()" style="flex: 2;">
+                        📋 GENERAR ORDEN DE COMPRA
+                    </button>
+                    <button class="btn btn-secondary" onclick="actualizarAlertas()" style="flex: 1;">
+                        🔄 Actualizar
+                    </button>
+                    <button class="btn" onclick="abrirConfiguracionCriticos()" style="flex: 1; background: #667eea; color: white;">
+                        ⚙️ Configurar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- MODAL DE CONFIGURACIÓN DE PRODUCTOS CRÍTICOS -->
+            <div id="modalConfigCriticos" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto; padding: 20px;">
+                <div style="max-width: 1200px; margin: 0 auto; background: white; border-radius: 15px; padding: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0; color: #667eea;">⚙️ CONFIGURACIÓN DE PRODUCTOS CRÍTICOS</h2>
+                        <button onclick="cerrarConfiguracionCriticos()" style="background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">
+                            ✕ Cerrar
+                        </button>
+                    </div>
+                    
+                    <p style="color: #666; margin-bottom: 20px;">
+                        Aquí puedes editar las cantidades mínimas, costos y proveedores de los 22 productos con control estricto. También puedes agregar proveedores alternativos y comparar precios.
+                    </p>
+                    
+                    <!-- Tabla de configuración -->
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #667eea; color: white;">
+                                    <th style="padding: 12px; text-align: left;">Producto</th>
+                                    <th style="padding: 12px; text-align: center;">Mínimo</th>
+                                    <th style="padding: 12px; text-align: center;">Unidad</th>
+                                    <th style="padding: 12px; text-align: center;">Costo</th>
+                                    <th style="padding: 12px; text-align: left;">Proveedor Principal</th>
+                                    <th style="padding: 12px; text-align: center;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaConfigCriticos">
+                                <!-- Se llena dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button onclick="guardarConfiguracionCriticos()" class="btn btn-success" style="flex: 1;">
+                            ✅ GUARDAR CAMBIOS
+                        </button>
+                        <button onclick="restaurarConfiguracionDefecto()" class="btn btn-secondary" style="flex: 1;">
+                            🔄 RESTAURAR POR DEFECTO
+                        </button>
+                    </div>
+
+                    <!-- SEPARADOR -->
+                    <hr style="margin: 30px 0; border: none; border-top: 2px solid #e0e0e0;">
+
+                    <!-- GESTIÓN DE CATÁLOGO DE PRODUCTOS CON PIN -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                            <h2 style="margin: 0; color: #FF9800;">📦 CATÁLOGO DE PRODUCTOS</h2>
+                            <span style="background: #FF9800; color: white; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 12px;">🔐 ADMIN</span>
+                        </div>
+
+                        <!-- PANTALLA DE PIN (visible por defecto) -->
+                        <div id="pinGateCatalogo" style="background: #fff8e1; border: 2px solid #FF9800; border-radius: 14px; padding: 28px; text-align: center;">
+                            <div style="font-size: 2.2rem; margin-bottom: 10px;">🔐</div>
+                            <h3 style="color: #e65100; margin-bottom: 6px;">Zona de Administrador</h3>
+                            <p style="color: #888; font-size: 0.88rem; margin-bottom: 20px;">Solo Sergio puede modificar el catálogo de productos.<br>Ingresa el PIN para continuar.</p>
+                            <div style="display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                                <input type="password" id="inputPinCatalogo" maxlength="6" placeholder="● ● ● ●"
+                                       onkeydown="if(event.key==='Enter') verificarPinCatalogo()"
+                                       style="width: 130px; padding: 12px; font-size: 1.3rem; letter-spacing: 6px; text-align: center; border: 2px solid #FF9800; border-radius: 10px; outline: none;">
+                                <button onclick="verificarPinCatalogo()" 
+                                        style="background: #FF9800; color: white; border: none; padding: 12px 24px; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer;">
+                                    Entrar ➜
+                                </button>
+                            </div>
+                            <p id="pinErrorCatalogo" style="color: #f44336; font-size: 0.85rem; margin-top: 12px; display: none;">❌ PIN incorrecto. Inténtalo de nuevo.</p>
+                        </div>
+
+                        <!-- CONTENIDO DEL CATÁLOGO (oculto hasta verificar PIN) -->
+                        <div id="contenidoCatalogo" style="display: none;">
+                            <div style="background: #e8f5e9; border-radius: 10px; padding: 10px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                                <span style="color: #2e7d32; font-size: 0.88rem; font-weight: 600;">✅ Acceso de administrador activo</span>
+                                <div style="display: flex; gap: 8px;">
+                                    <button onclick="resetCatalogoDefecto()" style="background: #9e9e9e; color: white; border: none; padding: 6px 14px; border-radius: 8px; font-size: 0.78rem; cursor: pointer;">
+                                        🔄 Restablecer originales
+                                    </button>
+                                    <button onclick="cerrarSesionCatalogo()" style="background: #f44336; color: white; border: none; padding: 6px 14px; border-radius: 8px; font-size: 0.78rem; cursor: pointer;">
+                                        🔒 Bloquear
+                                    </button>
+                                </div>
+                            </div>
+                            <p style="color: #666; margin-bottom: 16px; font-size: 0.9rem;">
+                                Agrega, edita o elimina productos del catálogo. Los cambios se aplican de inmediato en todos los registros.
+                            </p>
+
+                        <!-- FORMULARIO AGREGAR PRODUCTO -->
+                        <div style="background: #fff8e1; border: 2px solid #FF9800; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+                            <h3 style="color: #e65100; margin-bottom: 14px; font-size: 1rem;">➕ Agregar nuevo producto</h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;">
+                                <div>
+                                    <label style="font-size: 0.8rem; color: #555; display: block; margin-bottom: 4px;">Nombre *</label>
+                                    <input id="nuevoNombre" type="text" placeholder="Ej: Queso mozzarella"
+                                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; color: #555; display: block; margin-bottom: 4px;">Categoría *</label>
+                                    <select id="nuevoCategoria" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                                        <option value="Carnes">🥩 Carnes</option>
+                                        <option value="Lácteos">🧀 Lácteos</option>
+                                        <option value="Verduras">🥦 Verduras</option>
+                                        <option value="Panadería">🍞 Panadería</option>
+                                        <option value="Preparados">🍳 Preparados</option>
+                                        <option value="Granos">🌾 Granos</option>
+                                        <option value="Despensa">🫙 Despensa</option>
+                                        <option value="Salsas">🫙 Salsas</option>
+                                        <option value="Bebidas">🥤 Bebidas</option>
+                                        <option value="Otros">📦 Otros</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; color: #555; display: block; margin-bottom: 4px;">Unidad *</label>
+                                    <select id="nuevoUnidad" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                                        <option value="g">g (gramos)</option>
+                                        <option value="Kg">Kg (kilogramos)</option>
+                                        <option value="Un">Un (unidades)</option>
+                                        <option value="Lt">Lt (litros)</option>
+                                        <option value="ml">ml (mililitros)</option>
+                                        <option value="Paq">Paq (paquete)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; color: #555; display: block; margin-bottom: 4px;">Proveedor</label>
+                                    <input id="nuevoProveedor" type="text" placeholder="Ej: ATLANTIC"
+                                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; color: #555; display: block; margin-bottom: 4px;">¿Tiene estado?</label>
+                                    <select id="nuevoTieneEstado" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                                        <option value="false">No (solo cantidad)</option>
+                                        <option value="true">Sí (crudo/cocido)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button onclick="agregarProductoCatalogo()" class="btn btn-success" style="margin-top: 14px; width: 100%;">
+                                ✅ AGREGAR PRODUCTO AL CATÁLOGO
+                            </button>
+                        </div>
+
+                        <!-- TABLA DE PRODUCTOS EXISTENTES -->
+                        <div style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
+                            <input type="text" id="filtroCatalogo" placeholder="🔍 Buscar producto..." oninput="renderizarTablaCatalogo()"
+                                   style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px;">
+                            <span id="contadorCatalogo" style="color: #888; font-size: 0.85rem; white-space: nowrap;"></span>
+                        </div>
+
+                        <div style="overflow-x: auto; max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 10px;">
+                            <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                                <thead style="position: sticky; top: 0; z-index: 1;">
+                                    <tr style="background: #FF9800; color: white;">
+                                        <th style="padding: 10px 12px; text-align: left;">Producto</th>
+                                        <th style="padding: 10px 12px; text-align: center;">Categoría</th>
+                                        <th style="padding: 10px 12px; text-align: center;">Unidad</th>
+                                        <th style="padding: 10px 12px; text-align: left;">Proveedor</th>
+                                        <th style="padding: 10px 12px; text-align: center;">Estado</th>
+                                        <th style="padding: 10px 12px; text-align: center;">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaCatalogo">
+                                    <!-- Se llena dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                        </div><!-- fin contenidoCatalogo -->
+                    </div><!-- fin sección catálogo -->
+                    <!-- FIN CATÁLOGO -->
+                </div>
+            </div>
+            
+            <!-- MODAL DE PROVEEDORES ALTERNATIVOS -->
+            <div id="modalProveedores" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1100; overflow-y: auto; padding: 20px;">
+                <div style="max-width: 800px; margin: 0 auto; background: white; border-radius: 15px; padding: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0; color: #667eea;" id="tituloProveedores">🏪 Proveedores</h2>
+                        <button onclick="cerrarModalProveedores()" style="background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">
+                            ✕ Cerrar
+                        </button>
+                    </div>
+                    
+                    <!-- Proveedor actual -->
+                    <div id="proveedorActual" style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #4CAF50;">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                    
+                    <!-- Lista de proveedores alternativos -->
+                    <div id="listaProveedoresAlternativos" style="margin-bottom: 20px;">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                    
+                    <!-- Agregar nuevo proveedor -->
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px;">
+                        <h3 style="margin-top: 0;">➕ Agregar Proveedor Alternativo</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <input type="text" id="nuevoProveedorNombre" placeholder="Nombre del proveedor" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                            <input type="number" id="nuevoProveedorCosto" placeholder="Costo unitario" step="0.01" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        </div>
+                        <button onclick="agregarProveedorAlternativo()" class="btn btn-primary" style="width: 100%;">
+                            ✅ AGREGAR PROVEEDOR
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulario -->
+            <div class="card">
+                <h2 class="card-title">📊 Registrar Conteo Físico</h2>
+                
+                <div class="form-group">
+                    <label>Producto *</label>
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="inventarioProductoSearch" class="search-input" 
+                               placeholder="Buscar producto..." oninput="filterProductsInventario()">
+                    </div>
+                    <select id="inventarioProducto" onchange="autoCompleteInventario()">
+                        <option value="">Seleccionar producto...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Cantidad Contada *</label>
+                    <input type="number" id="inventarioCantidad" step="0.01" placeholder="0.00">
+                </div>
+                
+                <div id="inventarioEstadoContainer" class="form-group" style="display:none;">
+                    <label>Estado *</label>
+                    <select id="inventarioEstado">
+                        <option value="">Seleccionar...</option>
+                        <option value="crudo">Crudo</option>
+                        <option value="cocido">Cocido</option>
+                    </select>
+                    <div class="input-hint">Solo para carnes y comidas preparadas</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Proveedor</label>
+                    <input type="text" id="inventarioProveedor" placeholder="Auto-completa" readonly style="background:#f5f5f5;">
+                </div>
+                
+                <div class="form-group">
+                    <label>Unidad</label>
+                    <input type="text" id="inventarioUnidad" placeholder="Auto-completa" readonly style="background:#f5f5f5;">
+                </div>
+                
+                <button class="btn btn-success" onclick="guardarInventario()">
+                    ✅ GUARDAR CONTEO
+                </button>
+            </div>
+            
+            <!-- CONTEO RÁPIDO DIARIO -->
+            <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h2 class="card-title" style="color: white;">
+                    🔍 CONTEO RÁPIDO DIARIO
+                </h2>
+                <p style="font-size: 14px; opacity: 0.95; margin-bottom: 15px;">
+                    Conteo físico de solo los 22 productos críticos (5-10 minutos). Detecta automáticamente consumos no registrados y genera alertas.
+                </p>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" onclick="iniciarConteoRapido()" style="flex: 2; background: white; color: #667eea;">
+                        ⚡ INICIAR CONTEO RÁPIDO
+                    </button>
+                    <button class="btn" onclick="verUltimoConteo()" style="flex: 1; background: rgba(255,255,255,0.3); color: white; border: 2px solid white;">
+                        📅 Ver Último
+                    </button>
+                </div>
+                <div style="font-size: 12px; margin-top: 10px; opacity: 0.9;">
+                    <strong>Último conteo:</strong> <span id="ultimoConteoFecha">Sin conteo reciente</span>
+                </div>
+            </div>
+            
+            <!-- Tabla inventario -->
+            <div class="card">
+                <h2 class="card-title">📋 Inventario Actual</h2>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn btn-primary" onclick="exportarExcelInventario()" style="flex: 2;">
+                        📊 EXPORTAR INVENTARIO
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportarAuditoria()" style="flex: 2;">
+                        📋 EXPORTAR AUDITORÍA
+                    </button>
+                    <button class="btn btn-danger" onclick="reiniciarInventario()" style="flex: 1;">
+                        🔄 Reiniciar
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyInventario"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- MODAL CONTEO RÁPIDO -->
+    <div id="modalConteoRapido" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto; padding: 20px;">
+        <div style="max-width: 600px; margin: 20px auto; background: white; border-radius: 15px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #667eea; margin: 0;">⚡ Conteo Rápido Diario</h2>
+                <button onclick="cerrarConteoRapido()" style="background: #f44336; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    ✖ Cerrar
+                </button>
+            </div>
+            
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin: 0; font-size: 14px; color: #1976d2;">
+                    <strong>⏱️ Instrucciones:</strong> Cuenta físicamente cada producto y registra la cantidad real. El sistema comparará con el stock teórico y detectará automáticamente discrepancias.
+                </p>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+                <div>
+                    <div style="font-size: 24px; font-weight: bold; color: #667eea;" id="progresoConteo">0/22</div>
+                    <div style="font-size: 12px; color: #666;">Productos contados</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 18px; font-weight: bold; color: #f44336;" id="discrepanciasContadas">0</div>
+                    <div style="font-size: 12px; color: #666;">Discrepancias detectadas</div>
+                </div>
+            </div>
+            
+            <div id="listaConteoRapido"></div>
+            
+            <div style="position: sticky; bottom: 0; background: white; padding-top: 20px; border-top: 2px solid #ddd; margin-top: 20px;">
+                <button class="btn btn-success" onclick="finalizarConteoRapido()">
+                    ✅ FINALIZAR CONTEO RÁPIDO
+                </button>
+                <button class="btn btn-secondary" onclick="cerrarConteoRapido()" style="margin-top: 10px;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========================================
+// CONFIGURACIÓN Y DATOS
+// ========================================
+
+let currentRole = null;
+let currentUser = '';
+
+// Base de datos de productos de COCINA con cantidades iniciales
+let PRODUCTOS_COCINA = [
+    // CARNES
+    {nombre: 'Tocineta', proveedor: 'SURTIEMBUTIDOS SAN NICOLAS', unidad: 'g', categoria: 'Carnes', tieneEstado: false, stockInicial: 10000, estadoInicial: 'crudo'},
+    {nombre: 'Salchicha alemana', proveedor: 'CHARCUTERIA', unidad: 'Un', categoria: 'Carnes', tieneEstado: false, stockInicial: 45},
+    {nombre: 'Punta de anca de res', proveedor: 'NOVILLON', unidad: 'g', categoria: 'Carnes', tieneEstado: true, stockInicial: 15850, estadoInicial: 'crudo'},
+    {nombre: 'Pechuga de pollo', proveedor: 'MC POLLO', unidad: 'g', categoria: 'Carnes', tieneEstado: false, stockInicial: 10600, estadoInicial: 'crudo'},
+    {nombre: 'Pechuga abierta', proveedor: 'MC POLLO', unidad: 'g', categoria: 'Carnes', tieneEstado: true, stockInicial: 0, estadoInicial: 'crudo'},
+    {nombre: 'Pecho de res', proveedor: 'ATLANTIC', unidad: 'g', categoria: 'Carnes', tieneEstado: false, stockInicial: 0, estadoInicial: 'crudo'},
+    {nombre: 'Tocino de cerdo con piel', proveedor: 'ATLANTIC', unidad: 'g', categoria: 'Carnes', tieneEstado: true, stockInicial: 0, estadoInicial: 'crudo'},
+    {nombre: 'Morcilla', proveedor: 'NOVILLON', unidad: 'g', categoria: 'Carnes', tieneEstado: false, stockInicial: 700, estadoInicial: 'crudo'},
+    {nombre: 'Lomo de cerdo', proveedor: 'ATLANTIC', unidad: 'g', categoria: 'Carnes', tieneEstado: true, stockInicial: 25850, estadoInicial: 'crudo'},
+    {nombre: 'Costilla de cerdo', proveedor: 'ATLANTIC', unidad: 'g', categoria: 'Carnes', tieneEstado: true, stockInicial: 3100, estadoInicial: 'crudo'},
+    {nombre: 'Contramuslos de pollo', proveedor: 'MC POLLO', unidad: 'g', categoria: 'Carnes', tieneEstado: true, stockInicial: 0, estadoInicial: 'crudo'},
+    {nombre: 'Colita de cadera', proveedor: 'NOVILLON', unidad: 'g', categoria: 'Carnes', tieneEstado: true, stockInicial: 2660, estadoInicial: 'crudo'},
+    {nombre: 'Chorizo x25', proveedor: 'SURTIEMBUTIDOS SAN NICOLAS', unidad: 'g', categoria: 'Carnes', tieneEstado: false, stockInicial: 3125, estadoInicial: 'crudo'},
+    {nombre: 'Carne molida regular', proveedor: 'ATLANTIC', unidad: 'g', categoria: 'Carnes', tieneEstado: false, stockInicial: 31600, estadoInicial: 'crudo'},
+    {nombre: 'Carne molida angus CAB', proveedor: 'ATLANTIC', unidad: 'g', categoria: 'Carnes', tieneEstado: false, stockInicial: 22420, estadoInicial: 'crudo'},
+    // LÁCTEOS
+    {nombre: 'Queso cheddar x16', proveedor: 'ATLANTIC', unidad: 'Un', categoria: 'Lácteos', tieneEstado: false, stockInicial: 36},
+    // VERDURAS
+    {nombre: 'Papa marquise', proveedor: 'ATLANTIC', unidad: 'g', categoria: 'Verduras', tieneEstado: false, stockInicial: 25.3},
+    {nombre: 'Cebolla cabezona', proveedor: 'MIS TRES AMORES', unidad: 'Kg', categoria: 'Verduras', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Tomate', proveedor: 'MIS TRES AMORES', unidad: 'Kg', categoria: 'Verduras', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Papa pastusa', proveedor: 'MIS TRES AMORES', unidad: 'Kg', categoria: 'Verduras', tieneEstado: false, stockInicial: 0},
+    // PANADERÍA
+    {nombre: 'Pan de mini hamburguesa', proveedor: 'MCCORMICK', unidad: 'Un', categoria: 'Panadería', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Pan brioche de perro', proveedor: 'MCCORMICK', unidad: 'Un', categoria: 'Panadería', tieneEstado: false, stockInicial: 8},
+    {nombre: 'Pan brioche de hamburguesa', proveedor: 'MCCORMICK', unidad: 'Un', categoria: 'Panadería', tieneEstado: false, stockInicial: 70},
+    // PREPARADOS
+    {nombre: 'Lomo de cerdo cocido', proveedor: 'PRODUCCION', unidad: 'g', categoria: 'Preparados', tieneEstado: false, stockInicial: 0, estadoInicial: 'cocido'},
+    {nombre: 'Mini croqueta de carne', proveedor: 'PRODUCCION', unidad: 'Un', categoria: 'Preparados', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Croqueta de carne', proveedor: 'PRODUCCION', unidad: 'Un', categoria: 'Preparados', tieneEstado: false, stockInicial: 163},
+    {nombre: 'Punta de anca de res cocida', proveedor: 'PRODUCCION', unidad: 'g', categoria: 'Preparados', tieneEstado: true, stockInicial: 0, estadoInicial: 'crudo'},
+    // GRANOS
+    {nombre: 'Frijol bolon grande', proveedor: 'BODEGA', unidad: 'Kg', categoria: 'Granos', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Arroz', proveedor: 'MIS TRES AMORES', unidad: 'Kg', categoria: 'Granos', tieneEstado: false, stockInicial: 0},
+    // DESPENSA
+    {nombre: 'Panela', proveedor: 'BODEGA', unidad: 'Un', categoria: 'Despensa', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Huevos', proveedor: 'BODEGA', unidad: 'Un', categoria: 'Despensa', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Papa ripio', proveedor: 'CHARCUTERIA', unidad: 'g', categoria: 'Despensa', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Vinagre', proveedor: 'ATLANTIC', unidad: 'Lt', categoria: 'Despensa', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Salsa soya', proveedor: 'CHARCUTERIA', unidad: 'Lt', categoria: 'Despensa', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Ajo Badia', proveedor: 'ATLANTIC', unidad: 'g', categoria: 'Despensa', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Paprika Badia', proveedor: 'ATLANTIC', unidad: 'g', categoria: 'Despensa', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Pimienta Badia', proveedor: 'ATLANTIC', unidad: 'g', categoria: 'Despensa', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Sal Fina', proveedor: 'BODEGA', unidad: 'g', categoria: 'Despensa', tieneEstado: false, stockInicial: 0},
+    {nombre: 'Sal Gruesa', proveedor: 'BODEGA', unidad: 'g', categoria: 'Despensa', tieneEstado: false, stockInicial: 0},
+    // SALSAS
+    {nombre: 'Mayonesa', proveedor: 'BODEGA', unidad: 'Un', categoria: 'Salsas', tieneEstado: false, stockInicial: 0}
+];
+
+// Cantidades mínimas críticas para alertas de inventario
+const CANTIDADES_MINIMAS = {
+    // ⚙️ Actualizado por Sergio - Febrero 2026
+    'Pechuga abierta':           { minimo: 15000, unidad: 'g',  costo: 17    },
+    'Colita de cadera':          { minimo: 5000,  unidad: 'g',  costo: 30    },
+    'Punta de anca cocida':      { minimo: 7000,  unidad: 'g',  costo: 43    },
+    'Morcilla':                  { minimo: 3000,  unidad: 'g',  costo: 16    },
+    'Costilla de cerdo':         { minimo: 15000, unidad: 'g',  costo: 23    },
+    'Panceta de cerdo':          { minimo: 23000, unidad: 'g',  costo: 24    },
+    'Lomo de cerdo cocido':      { minimo: 20000, unidad: 'g',  costo: 19    },
+    'Croqueta de carne':         { minimo: 150,   unidad: 'Un', costo: 4981  },
+    'Mini croqueta de carne':    { minimo: 36,    unidad: 'Un', costo: 2559  },
+    'Papa marquise':             { minimo: 75000, unidad: 'g',  costo: 9     },
+    'Queso cheddar x16':         { minimo: 300,   unidad: 'Un', costo: 910   },
+    'Chorizo x25':               { minimo: 4000,  unidad: 'g',  costo: 35    },
+    'Tocineta':                  { minimo: 9000,  unidad: 'g',  costo: 32    },
+    'Pan brioche de hamburguesa':{ minimo: 300,   unidad: 'Un', costo: 1700  },
+    'Pan brioche de perro':      { minimo: 20,    unidad: 'Un', costo: 1600  },
+    'Pan de mini hamburguesa':   { minimo: 48,    unidad: 'Un', costo: 950   },
+    'Salchicha alemana':         { minimo: 50,    unidad: 'Un', costo: 2300  },
+    'Icopor P1':                 { minimo: 40,    unidad: 'Un', costo: 500   },
+    'Contenedor de sopa':        { minimo: 20,    unidad: 'Un', costo: 850   },
+    'Caja hamburguesa':          { minimo: 500,   unidad: 'Un', costo: 750   },
+    'Caja mediana':              { minimo: 100,   unidad: 'Un', costo: 750   },
+    'Caja grande':               { minimo: 100,   unidad: 'Un', costo: 750   }
+};
+
+// Productos específicos por tipo de salida
+const PRODUCTOS_PRODUCCION = ['Pechuga de pollo', 'Carne molida regular', 'Carne molida angus CAB'];
+const PRODUCTOS_BARRIL = ['Tocino de cerdo con piel', 'Lomo de cerdo', 'Costilla de cerdo'];
+
+// ========================================
+// CATÁLOGO PERSONALIZADO (editable por Sergio)
+// ========================================
+const PRODUCTOS_COCINA_DEFAULT = JSON.parse(JSON.stringify(PRODUCTOS_COCINA)); // copia base
+
+function cargarCatalogoPersonalizado() {
+    try {
+        const guardado = localStorage.getItem('catalogoProductosCocina');
+        if (guardado) {
+            const datos = JSON.parse(guardado);
+            if (Array.isArray(datos) && datos.length > 0) {
+                PRODUCTOS_COCINA.length = 0;
+                datos.forEach(p => PRODUCTOS_COCINA.push(p));
+            }
+        }
+    } catch(e) {
+        console.warn('No se pudo cargar el catálogo personalizado:', e);
+    }
+}
+
+function guardarCatalogoPersonalizado() {
+    localStorage.setItem('catalogoProductosCocina', JSON.stringify(PRODUCTOS_COCINA));
+}
+
+function resetCatalogoDefecto() {
+    if (!confirm('⚠️ ¿Restablecer el catálogo a los 38 productos originales?\n\nSe perderán todos los productos que hayas agregado o modificado.')) return;
+    PRODUCTOS_COCINA.length = 0;
+    PRODUCTOS_COCINA_DEFAULT.forEach(p => PRODUCTOS_COCINA.push(p));
+    localStorage.removeItem('catalogoProductosCocina');
+    cargarProductos();
+    renderizarTablaCatalogo();
+    alert('✅ Catálogo restablecido a los valores originales.');
+}
+
+// Llamar al inicio
+document.addEventListener('DOMContentLoaded', function() {
+    cargarCatalogoPersonalizado();
+});
+
+// ========================================
+// GESTIÓN DE ROL Y ACCESO
+// ========================================
+
+
+// ========================================
+// MIGRACIÓN COCINA: Actualiza configuracionCriticos en localStorage
+// ⚙️ Versión mínimos: Febrero 2026 - Sergio
+// ========================================
+function migrarStocksMinimosCocina() {
+    const VERSION_MINIMOS = 'cocina_minimos_v3_febrero2026';
+    if (localStorage.getItem(VERSION_MINIMOS)) return; // Ya se migró
+
+    // Sobrescribir configuracionCriticos con los nuevos valores de CANTIDADES_MINIMAS
+    const configActual = JSON.parse(localStorage.getItem('configuracionCriticos') || '{}');
+    let actualizados = 0;
+
+    Object.keys(CANTIDADES_MINIMAS).forEach(nombre => {
+        const nuevo = CANTIDADES_MINIMAS[nombre];
+        if (configActual[nombre]) {
+            // Actualizar solo minimo y costo, preservar proveedores que Sergio haya configurado
+            configActual[nombre].minimo = nuevo.minimo;
+            configActual[nombre].unidad = nuevo.unidad;
+            configActual[nombre].costo  = nuevo.costo;
+        } else {
+            // Crear entrada nueva
+            configActual[nombre] = {
+                minimo: nuevo.minimo,
+                unidad: nuevo.unidad,
+                costo:  nuevo.costo,
+                proveedorPrincipal: '',
+                proveedoresAlternativos: []
+            };
+        }
+        actualizados++;
+    });
+
+    localStorage.setItem('configuracionCriticos', JSON.stringify(configActual));
+    localStorage.setItem(VERSION_MINIMOS, 'true');
+    console.log('✅ COCINA: ' + actualizados + ' productos migrados a mínimos Febrero 2026');
+}
+
+function selectRole(role) {
+    // Migrar mínimos al nuevo estándar de Febrero 2026
+    migrarStocksMinimosCocina();
+
+    currentRole = role;
+    currentUser = role === 'eloy' ? 'Eloy' : 'Oscar';
+    
+    // Guardar rol en localStorage
+    localStorage.setItem('currentRole', role);
+    
+    // Ocultar selector y mostrar sistema
+    document.getElementById('roleSelector').classList.add('hidden');
+    document.getElementById('mainSystem').classList.remove('hidden');
+    document.getElementById('currentUser').textContent = currentUser;
+    
+    // Configurar tabs según rol
+    if (role === 'eloy') {
+        // Eloy: solo Entradas activo
+        document.getElementById('tabEntradas').classList.remove('disabled');
+        document.getElementById('tabSalidas').classList.add('disabled');
+        document.getElementById('tabInventario').classList.add('disabled');
+        switchTab('entradas');
+        document.getElementById('headerSubtitle').textContent = 'Registro de Entradas';
+    } else {
+        // Oscar: Salidas e Inventario activos, Entradas solo lectura
+        document.getElementById('tabEntradas').classList.add('disabled');
+        document.getElementById('tabSalidas').classList.remove('disabled');
+        document.getElementById('tabInventario').classList.remove('disabled');
+        switchTab('salidas');
+        document.getElementById('headerSubtitle').textContent = 'Salidas e Inventario';
+        document.getElementById('alertVerEntradas').style.display = 'block';
+    }
+    
+    // Cargar datos
+    cargarProductos();
+    
+    // Cargar inventario inicial si no existe
+    const inventarioCargado = cargarInventarioInicial();
+    if (inventarioCargado && currentRole === 'oscar') {
+        setTimeout(() => {
+            alert('📦 Inventario inicial cargado con 38 productos. Revisa la pestaña Inventario para ver las cantidades.');
+        }, 500);
+    }
+    
+    cargarDatos();
+    registrarAuditoria('Inicio de sesión', '', `${currentUser} inició sesión`);
+}
+
+function switchTab(tab) {
+    // Si es disabled, no hacer nada
+    const tabElement = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+    if (tabElement.classList.contains('disabled')) {
+        return;
+    }
+    
+    // Desactivar todos
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    // Activar seleccionado
+    tabElement.classList.add('active');
+    document.getElementById('content' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+}
+
+// ========================================
+// GESTIÓN DE PRODUCTOS
+// ========================================
+
+function cargarProductos() {
+    // Cargar en select de entradas
+    const selectEntrada = document.getElementById('entradaProducto');
+    selectEntrada.innerHTML = '<option value="">Seleccionar producto...</option>';
+    PRODUCTOS_COCINA.forEach(prod => {
+        selectEntrada.innerHTML += `<option value="${prod.nombre}">${prod.nombre}</option>`;
+    });
+    
+    // Cargar en select de inventario
+    const selectInventario = document.getElementById('inventarioProducto');
+    selectInventario.innerHTML = '<option value="">Seleccionar producto...</option>';
+    PRODUCTOS_COCINA.forEach(prod => {
+        selectInventario.innerHTML += `<option value="${prod.nombre}">${prod.nombre}</option>`;
+    });
+}
+
+function filterProductsEntrada() {
+    const search = document.getElementById('entradaProductoSearch').value.toLowerCase();
+    const select = document.getElementById('entradaProducto');
+    const currentValue = select.value; // Guardar selección actual
+    
+    // Recrear options (mejor compatibilidad móvil)
+    select.innerHTML = '<option value="">Seleccionar producto...</option>';
+    
+    PRODUCTOS_COCINA.forEach(prod => {
+        if (prod.nombre.toLowerCase().includes(search)) {
+            const option = document.createElement('option');
+            option.value = prod.nombre;
+            option.textContent = prod.nombre;
+            if (prod.nombre === currentValue) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        }
+    });
+}
+
+function filterProductsInventario() {
+    const search = document.getElementById('inventarioProductoSearch').value.toLowerCase();
+    const select = document.getElementById('inventarioProducto');
+    const currentValue = select.value;
+    
+    // Recrear options (mejor compatibilidad móvil)
+    select.innerHTML = '<option value="">Seleccionar producto...</option>';
+    
+    PRODUCTOS_COCINA.forEach(prod => {
+        if (prod.nombre.toLowerCase().includes(search)) {
+            const option = document.createElement('option');
+            option.value = prod.nombre;
+            option.textContent = prod.nombre;
+            if (prod.nombre === currentValue) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        }
+    });
+}
+
+function autoCompleteEntrada() {
+    const productoNombre = document.getElementById('entradaProducto').value;
+    const producto = PRODUCTOS_COCINA.find(p => p.nombre === productoNombre);
+    
+    if (producto) {
+        document.getElementById('entradaUnidad').value = producto.unidad;
+        document.getElementById('entradaProveedor').value = producto.proveedor;
+        document.getElementById('entradaResponsable').value = currentUser;
+    }
+}
+
+function autoCompleteInventario() {
+    const productoNombre = document.getElementById('inventarioProducto').value;
+    const producto = PRODUCTOS_COCINA.find(p => p.nombre === productoNombre);
+    
+    if (producto) {
+        document.getElementById('inventarioUnidad').value = producto.unidad;
+        document.getElementById('inventarioProveedor').value = producto.proveedor;
+        
+        // Mostrar campo Estado solo si el producto lo requiere
+        if (producto.tieneEstado) {
+            document.getElementById('inventarioEstadoContainer').style.display = 'block';
+        } else {
+            document.getElementById('inventarioEstadoContainer').style.display = 'none';
+            document.getElementById('inventarioEstado').value = '';
+        }
+    }
+}
+
+// ========================================
+// SALIDAS - FORMULARIO DINÁMICO
+// ========================================
+
+function mostrarProductosSalida() {
+    const tipo = document.getElementById('salidaTipo').value;
+    const container = document.getElementById('salidaFormDinamico');
+    const btnGuardar = document.getElementById('btnGuardarSalida');
+    
+    if (!tipo) {
+        container.innerHTML = '';
+        btnGuardar.style.display = 'none';
+        return;
+    }
+    
+    let html = '';
+    
+    if (tipo === 'produccion') {
+        html = `
+            <div class="alert alert-info">
+                📦 <strong>Producción:</strong> Producto transformado para venta
+            </div>
+            <div class="form-group">
+                <label>Producto *</label>
+                <select id="salidaProducto">
+                    <option value="">Seleccionar...</option>
+                    ${PRODUCTOS_PRODUCCION.map(p => `<option value="${p}">${p}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Cantidad *</label>
+                <input type="number" id="salidaCantidad" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Lote (opcional)</label>
+                <input type="text" id="salidaLote" placeholder="Número de lote">
+            </div>
+        `;
+    }
+    else if (tipo === 'barril') {
+        html = `
+            <div class="alert alert-info">
+                🔥 <strong>Barril:</strong> Producto para cocinar al barril
+            </div>
+            <div class="form-group">
+                <label>Producto *</label>
+                <select id="salidaProducto">
+                    <option value="">Seleccionar...</option>
+                    ${PRODUCTOS_BARRIL.map(p => `<option value="${p}">${p}</option>`).join('')}
+                    <option value="__nuevo__">➕ Crear nuevo producto</option>
+                </select>
+            </div>
+            <div class="form-group" id="nuevoProductoContainer" style="display:none;">
+                <label>Nombre del nuevo producto</label>
+                <input type="text" id="nuevoProductoNombre" placeholder="Ej: Chicharrón especial">
+            </div>
+            <div class="form-group">
+                <label>Cantidad *</label>
+                <input type="number" id="salidaCantidad" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Lote (opcional)</label>
+                <input type="text" id="salidaLote" placeholder="Número de lote">
+            </div>
+        `;
+    }
+    else if (tipo === 'consumo') {
+        html = `
+            <div class="alert alert-info">
+                🍽️ <strong>Consumo:</strong> Consumo interno
+            </div>
+            <div class="form-group">
+                <label>Producto *</label>
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="consumoProductoSearch" class="search-input" 
+                           placeholder="Buscar producto..." oninput="filterProductsConsumo()">
+                </div>
+                <select id="salidaProducto">
+                    <option value="">Seleccionar producto...</option>
+                    ${PRODUCTOS_COCINA.map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Cantidad *</label>
+                <input type="number" id="salidaCantidad" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Lote (opcional)</label>
+                <input type="text" id="salidaLote" placeholder="Número de lote">
+            </div>
+        `;
+    }
+    else if (tipo === 'merma') {
+        html = `
+            <div class="alert alert-warning">
+                🗑️ <strong>Merma:</strong> Producto perdido o dañado
+            </div>
+            <div class="form-group">
+                <label>Categoría de Merma *</label>
+                <select id="mermaCategoria" onchange="mostrarFormMerma()">
+                    <option value="">Seleccionar...</option>
+                    <option value="produccion">🏭 Merma por Producción/Transformación</option>
+                    <option value="dano">🗑️ Merma por Daño/Pérdida</option>
+                </select>
+            </div>
+            <div id="mermaFormContainer"></div>
+        `;
+    }
+    
+    container.innerHTML = html;
+    btnGuardar.style.display = 'block';
+    
+    // Si es barril, detectar cuando selecciona "nuevo producto"
+    if (tipo === 'barril') {
+        document.getElementById('salidaProducto').addEventListener('change', function() {
+            const nuevoContainer = document.getElementById('nuevoProductoContainer');
+            if (this.value === '__nuevo__') {
+                nuevoContainer.style.display = 'block';
+            } else {
+                nuevoContainer.style.display = 'none';
+            }
+        });
+    }
+}
+
+function filterProductsConsumo() {
+    const search = document.getElementById('consumoProductoSearch').value.toLowerCase();
+    const select = document.getElementById('salidaProducto');
+    const options = select.querySelectorAll('option');
+    
+    options.forEach((option, index) => {
+        if (index === 0) return;
+        const text = option.text.toLowerCase();
+        option.style.display = text.includes(search) ? '' : 'none';
+    });
+}
+
+function mostrarFormMerma() {
+    const categoria = document.getElementById('mermaCategoria').value;
+    const container = document.getElementById('mermaFormContainer');
+    
+    if (!categoria) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    
+    if (categoria === 'produccion') {
+        html = `
+            <div class="form-group">
+                <label>Producto Origen *</label>
+                <select id="mermaProductoOrigen">
+                    <option value="">Seleccionar...</option>
+                    ${PRODUCTOS_COCINA.map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Cantidad Origen *</label>
+                <input type="number" id="mermaCantidadOrigen" step="0.01" placeholder="0.00">
+                <div class="input-hint">Cantidad inicial procesada</div>
+            </div>
+            <div class="form-group">
+                <label>Proceso *</label>
+                <select id="mermaProceso">
+                    <option value="">Seleccionar...</option>
+                    <option value="filetear">Filetear</option>
+                    <option value="trozar">Trozar</option>
+                    <option value="limpiar">Limpiar/Desgrasar</option>
+                    <option value="deshuesar">Deshuesar</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-group" id="mermaProcesoOtroContainer" style="display:none;">
+                <label>Especificar proceso</label>
+                <input type="text" id="mermaProcesoOtro" placeholder="Ej: Cortar en cubos">
+            </div>
+            <div class="form-group">
+                <label>Merma Generada *</label>
+                <input type="number" id="mermaCantidadGenerada" step="0.01" placeholder="0.00">
+                <div class="input-hint">Cantidad perdida en el proceso</div>
+            </div>
+            <div class="form-group">
+                <label>Porcentaje de Merma</label>
+                <input type="text" id="mermaPorcentaje" readonly style="background:#f5f5f5;" placeholder="Se calcula automático">
+            </div>
+            <div class="form-group">
+                <label>Notas (opcional)</label>
+                <textarea id="mermaNotas" placeholder="Ej: Huesos, piel y grasa"></textarea>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        
+        // Calcular porcentaje automático
+        document.getElementById('mermaCantidadOrigen').addEventListener('input', calcularPorcentajeMerma);
+        document.getElementById('mermaCantidadGenerada').addEventListener('input', calcularPorcentajeMerma);
+        
+        // Mostrar campo "otro" si selecciona otro
+        document.getElementById('mermaProceso').addEventListener('change', function() {
+            const otroContainer = document.getElementById('mermaProcesoOtroContainer');
+            if (this.value === 'otro') {
+                otroContainer.style.display = 'block';
+            } else {
+                otroContainer.style.display = 'none';
+            }
+        });
+    }
+    else if (categoria === 'dano') {
+        html = `
+            <div class="form-group">
+                <label>Producto *</label>
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="mermaDanoProductoSearch" class="search-input" 
+                           placeholder="Buscar producto..." oninput="filterProductsMermaDano()">
+                </div>
+                <select id="salidaProducto">
+                    <option value="">Seleccionar producto...</option>
+                    ${PRODUCTOS_COCINA.map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Cantidad *</label>
+                <input type="number" id="salidaCantidad" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Motivo *</label>
+                <select id="mermaMotivo">
+                    <option value="">Seleccionar...</option>
+                    <option value="dano">Se dañó/Descompuso</option>
+                    <option value="caida">Se cayó al piso</option>
+                    <option value="vencido">Producto vencido</option>
+                    <option value="mal_almacenado">Mal almacenado</option>
+                    <option value="quemado">Quemado/Sobrecocido</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-group" id="mermaMotivoOtroContainer" style="display:none;">
+                <label>Especificar motivo</label>
+                <input type="text" id="mermaMotivoOtro" placeholder="Describir motivo">
+            </div>
+            <div class="form-group">
+                <label>Notas (opcional)</label>
+                <textarea id="mermaNotas" placeholder="Detalles adicionales"></textarea>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        
+        // Mostrar campo "otro" si selecciona otro
+        document.getElementById('mermaMotivo').addEventListener('change', function() {
+            const otroContainer = document.getElementById('mermaMotivoOtroContainer');
+            if (this.value === 'otro') {
+                otroContainer.style.display = 'block';
+            } else {
+                otroContainer.style.display = 'none';
+            }
+        });
+    }
+}
+
+function filterProductsMermaDano() {
+    const search = document.getElementById('mermaDanoProductoSearch').value.toLowerCase();
+    const select = document.getElementById('salidaProducto');
+    const options = select.querySelectorAll('option');
+    
+    options.forEach((option, index) => {
+        if (index === 0) return;
+        const text = option.text.toLowerCase();
+        option.style.display = text.includes(search) ? '' : 'none';
+    });
+}
+
+function calcularPorcentajeMerma() {
+    const origen = parseFloat(document.getElementById('mermaCantidadOrigen').value) || 0;
+    const generada = parseFloat(document.getElementById('mermaCantidadGenerada').value) || 0;
+    
+    if (origen > 0) {
+        const porcentaje = (generada / origen * 100).toFixed(1);
+        document.getElementById('mermaPorcentaje').value = porcentaje + '%';
+    } else {
+        document.getElementById('mermaPorcentaje').value = '';
+    }
+}
+
+// ========================================
+// GUARDAR DATOS
+// ========================================
+
+function guardarEntrada() {
+    const productoSelect = document.getElementById('entradaProducto');
+    const cantidadInput = document.getElementById('entradaCantidad');
+    
+    const producto = productoSelect.value;
+    const cantidad = cantidadInput.value;
+    
+    // Debug para móvil
+    console.log('DEBUG ENTRADA:', {
+        producto: producto,
+        productoOptions: productoSelect.options.length,
+        cantidad: cantidad,
+        cantidadValue: cantidadInput.value
+    });
+    
+    // Validación específica
+    if (!producto || producto === '') {
+        alert('⚠️ Por favor selecciona un PRODUCTO\n\nProductos disponibles: ' + productoSelect.options.length);
+        productoSelect.focus();
+        return;
+    }
+    
+    if (!cantidad || cantidad === '' || parseFloat(cantidad) <= 0) {
+        alert('⚠️ Por favor ingresa una CANTIDAD válida mayor a 0');
+        cantidadInput.focus();
+        return;
+    }
+    
+    // Verificar si está en modo edición
+    const form = document.querySelector('#contentEntradas form');
+    const editandoId = form && form.dataset.editandoId ? parseInt(form.dataset.editandoId) : null;
+    
+    const datosEntrada = {
+        fecha: new Date().toISOString(),
+        producto: producto,
+        cantidad: parseFloat(cantidad),
+        unidad: document.getElementById('entradaUnidad').value || '',
+        proveedor: document.getElementById('entradaProveedor').value || '',
+        responsable: document.getElementById('entradaResponsable').value || currentUser,
+        factura: document.getElementById('entradaFactura').value || '',
+        lote: document.getElementById('entradaLote').value || '',
+        usuario: currentUser
+    };
+    
+    console.log('Guardando entrada:', datosEntrada);
+    
+    // Guardar
+    let entradas = JSON.parse(localStorage.getItem('entradas') || '[]');
+    
+    if (editandoId) {
+        // MODO EDICIÓN
+        const index = entradas.findIndex(e => e.id === editandoId);
+        if (index !== -1) {
+            entradas[index] = { ...datosEntrada, id: editandoId, fechaModificacion: new Date().toISOString() };
+            registrarAuditoria('Editó', producto, `Entrada actualizada: ${cantidad} ${datosEntrada.unidad}`);
+            delete form.dataset.editandoId;
+            alert('✅ Entrada actualizada correctamente\n\nProducto: ' + producto + '\nCantidad: ' + cantidad);
+        } else {
+            alert('❌ Error: Entrada no encontrada');
+            return;
+        }
+    } else {
+        // MODO CREACIÓN
+        const entrada = { ...datosEntrada, id: Date.now() };
+        entradas.push(entrada);
+        registrarAuditoria('Creó', producto, `Entrada: ${cantidad} ${entrada.unidad}`);
+        alert('✅ Entrada guardada correctamente\n\nProducto: ' + producto + '\nCantidad: ' + cantidad);
+    }
+    
+    localStorage.setItem('entradas', JSON.stringify(entradas));
+    
+    // Limpiar form
+    document.getElementById('entradaProducto').value = '';
+    document.getElementById('entradaCantidad').value = '';
+    document.getElementById('entradaUnidad').value = '';
+    document.getElementById('entradaProveedor').value = '';
+    document.getElementById('entradaFactura').value = '';
+    document.getElementById('entradaLote').value = '';
+    document.getElementById('entradaProductoSearch').value = '';
+    
+    // Recargar productos (para restaurar lista completa)
+    cargarProductos();
+    
+    // Recargar tabla
+    cargarDatos();
+}
+
+function guardarSalida() {
+    const tipo = document.getElementById('salidaTipo').value;
+    
+    if (!tipo) {
+        alert('Selecciona el tipo de salida');
+        return;
+    }
+    
+    // Verificar modo edición
+    const form = document.querySelector('#contentSalidas form');
+    const editandoId = form && form.dataset.editandoId ? parseInt(form.dataset.editandoId) : null;
+    
+    let salida = {
+        id: editandoId || Date.now(),
+        fecha: new Date().toISOString(),
+        tipo: tipo,
+        usuario: currentUser
+    };
+    
+    if (editandoId) {
+        salida.fechaModificacion = new Date().toISOString();
+    }
+    
+    // Según tipo, capturar datos
+    if (tipo === 'produccion' || tipo === 'barril' || tipo === 'consumo') {
+        let producto = document.getElementById('salidaProducto').value;
+        const cantidad = document.getElementById('salidaCantidad').value;
+        
+        if (!producto || !cantidad) {
+            alert('Completa los campos obligatorios');
+            return;
+        }
+        
+        // Si es barril y seleccionó "nuevo"
+        if (tipo === 'barril' && producto === '__nuevo__') {
+            const nuevoNombre = document.getElementById('nuevoProductoNombre').value;
+            if (!nuevoNombre) {
+                alert('Escribe el nombre del nuevo producto');
+                return;
+            }
+            producto = nuevoNombre;
+        }
+        
+        salida.producto = producto;
+        salida.cantidad = parseFloat(cantidad);
+        salida.lote = document.getElementById('salidaLote').value;
+        
+        // Buscar unidad del producto
+        const prodData = PRODUCTOS_COCINA.find(p => p.nombre === producto);
+        salida.unidad = prodData ? prodData.unidad : 'Un';
+    }
+    else if (tipo === 'merma') {
+        const categoria = document.getElementById('mermaCategoria').value;
+        
+        if (!categoria) {
+            alert('Selecciona la categoría de merma');
+            return;
+        }
+        
+        salida.mermaCategoria = categoria;
+        
+        if (categoria === 'produccion') {
+            const productoOrigen = document.getElementById('mermaProductoOrigen').value;
+            const cantidadOrigen = document.getElementById('mermaCantidadOrigen').value;
+            const proceso = document.getElementById('mermaProceso').value;
+            const cantidadGenerada = document.getElementById('mermaCantidadGenerada').value;
+            
+            if (!productoOrigen || !cantidadOrigen || !proceso || !cantidadGenerada) {
+                alert('Completa todos los campos obligatorios');
+                return;
+            }
+            
+            salida.producto = productoOrigen;
+            salida.cantidadOrigen = parseFloat(cantidadOrigen);
+            salida.proceso = proceso === 'otro' ? document.getElementById('mermaProcesoOtro').value : proceso;
+            salida.cantidad = parseFloat(cantidadGenerada);
+            salida.porcentaje = document.getElementById('mermaPorcentaje').value;
+            salida.notas = document.getElementById('mermaNotas').value;
+            
+            const prodData = PRODUCTOS_COCINA.find(p => p.nombre === productoOrigen);
+            salida.unidad = prodData ? prodData.unidad : 'Un';
+        }
+        else if (categoria === 'dano') {
+            const producto = document.getElementById('salidaProducto').value;
+            const cantidad = document.getElementById('salidaCantidad').value;
+            const motivo = document.getElementById('mermaMotivo').value;
+            
+            if (!producto || !cantidad || !motivo) {
+                alert('Completa todos los campos obligatorios');
+                return;
+            }
+            
+            salida.producto = producto;
+            salida.cantidad = parseFloat(cantidad);
+            salida.motivo = motivo === 'otro' ? document.getElementById('mermaMotivoOtro').value : motivo;
+            salida.notas = document.getElementById('mermaNotas').value;
+            
+            const prodData = PRODUCTOS_COCINA.find(p => p.nombre === producto);
+            salida.unidad = prodData ? prodData.unidad : 'Un';
+        }
+    }
+    
+    // Guardar
+    let salidas = JSON.parse(localStorage.getItem('salidas') || '[]');
+    
+    if (editandoId) {
+        // MODO EDICIÓN
+        const index = salidas.findIndex(s => s.id === editandoId);
+        if (index !== -1) {
+            salidas[index] = salida;
+            registrarAuditoria('Editó', salida.producto, `Salida ${tipo} actualizada: ${salida.cantidad} ${salida.unidad || ''}`);
+            delete form.dataset.editandoId;
+            alert('✅ Salida actualizada correctamente');
+        } else {
+            alert('❌ Error: Salida no encontrada');
+            return;
+        }
+    } else {
+        // MODO CREACIÓN
+        salidas.push(salida);
+        registrarAuditoria('Creó', salida.producto, `Salida ${tipo}: ${salida.cantidad} ${salida.unidad || ''}`);
+        alert('✅ Salida guardada correctamente');
+    }
+    
+    localStorage.setItem('salidas', JSON.stringify(salidas));
+    
+    // Limpiar
+    document.getElementById('salidaTipo').value = '';
+    document.getElementById('salidaFormDinamico').innerHTML = '';
+    document.getElementById('btnGuardarSalida').style.display = 'none';
+    
+    // Recargar
+    cargarDatos();
+}
+
+function guardarInventario() {
+    const producto = document.getElementById('inventarioProducto').value;
+    const cantidad = document.getElementById('inventarioCantidad').value;
+    
+    if (!producto || !cantidad) {
+        alert('Completa los campos obligatorios');
+        return;
+    }
+    
+    const prodData = PRODUCTOS_COCINA.find(p => p.nombre === producto);
+    const estado = prodData && prodData.tieneEstado ? document.getElementById('inventarioEstado').value : '';
+    
+    if (prodData && prodData.tieneEstado && !estado) {
+        alert('Selecciona el estado (Crudo/Cocido)');
+        return;
+    }
+    
+    const inventario = {
+        id: Date.now(),
+        fecha: new Date().toISOString(),
+        producto: producto,
+        cantidad: parseFloat(cantidad),
+        estado: estado,
+        unidad: document.getElementById('inventarioUnidad').value,
+        proveedor: document.getElementById('inventarioProveedor').value,
+        usuario: currentUser
+    };
+    
+    // Guardar
+    let inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    inventarios.push(inventario);
+    localStorage.setItem('inventarios', JSON.stringify(inventarios));
+    
+    // Auditoría
+    registrarAuditoria('Contó', producto, `${cantidad} ${inventario.unidad} - ${estado || 'N/A'}`);
+    
+    // Limpiar
+    document.getElementById('inventarioProducto').value = '';
+    document.getElementById('inventarioProductoSearch').value = '';
+    document.getElementById('inventarioCantidad').value = '';
+    document.getElementById('inventarioEstado').value = '';
+    document.getElementById('inventarioUnidad').value = '';
+    document.getElementById('inventarioProveedor').value = '';
+    document.getElementById('inventarioEstadoContainer').style.display = 'none';
+    
+    // Recargar
+    cargarDatos();
+    alert('✅ Conteo guardado correctamente');
+}
+
+// ========================================
+// CARGAR Y MOSTRAR DATOS
+// ========================================
+
+function cargarDatos() {
+    cargarTablaEntradas();
+    cargarTablaSalidas();
+    cargarTablaInventario();
+    actualizarStats();
+    actualizarAlertas();
+    actualizarFechaUltimoConteo();
+}
+
+function cargarTablaEntradas() {
+    const entradas = JSON.parse(localStorage.getItem('entradas') || '[]');
+    const tbody = document.getElementById('bodyEntradas');
+    
+    tbody.innerHTML = entradas.map(e => `
+        <tr>
+            <td>${new Date(e.fecha).toLocaleDateString('es-CO')}</td>
+            <td>${e.producto}</td>
+            <td>${e.cantidad} ${e.unidad}</td>
+            <td>${e.proveedor}</td>
+            <td>${e.responsable}</td>
+            <td>
+                <button class="btn btn-warning btn-small" onclick="editarEntrada(${e.id})" title="Editar">✏️</button>
+                <button class="btn btn-danger btn-small" onclick="eliminarEntrada(${e.id})" title="Eliminar">🗑️</button>
+            </td>
+        </tr>
+    `).reverse().join('');
+    
+    // También cargar en "Ver Entradas" (para Oscar)
+    const bodyVer = document.getElementById('bodyVerEntradas');
+    bodyVer.innerHTML = entradas.map(e => `
+        <tr>
+            <td>${new Date(e.fecha).toLocaleDateString('es-CO')}</td>
+            <td>${e.producto}</td>
+            <td>${e.cantidad} ${e.unidad}</td>
+            <td>${e.proveedor}</td>
+        </tr>
+    `).reverse().join('');
+}
+
+function cargarTablaSalidas() {
+    const salidas = JSON.parse(localStorage.getItem('salidas') || '[]');
+    const tbody = document.getElementById('bodySalidas');
+    
+    tbody.innerHTML = salidas.map(s => {
+        let detalles = '';
+        if (s.tipo === 'merma' && s.mermaCategoria === 'produccion') {
+            detalles = `${s.proceso} - Merma: ${s.cantidad}${s.unidad} (${s.porcentaje})`;
+        } else if (s.tipo === 'merma' && s.mermaCategoria === 'dano') {
+            detalles = s.motivo;
+        } else {
+            detalles = s.lote || '-';
+        }
+        
+        return `
+            <tr>
+                <td>${new Date(s.fecha).toLocaleDateString('es-CO')}</td>
+                <td><span class="badge badge-${s.tipo === 'merma' ? 'danger' : 'success'}">${s.tipo.toUpperCase()}</span></td>
+                <td>${s.producto}</td>
+                <td>${s.cantidad} ${s.unidad || ''}</td>
+                <td>${detalles}</td>
+                <td>
+                    <button class="btn btn-warning btn-small" onclick="editarSalida(${s.id})" title="Editar">✏️</button>
+                    <button class="btn btn-danger btn-small" onclick="eliminarSalida(${s.id})" title="Eliminar">🗑️</button>
+                </td>
+            </tr>
+        `;
+    }).reverse().join('');
+}
+
+function cargarTablaInventario() {
+    let inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    const tbody = document.getElementById('bodyInventario');
+    
+    // Filtrar solo críticos si está activo
+    if (mostrandoSoloCriticos) {
+        inventarios = inventarios.filter(i => {
+            if (CANTIDADES_MINIMAS[i.producto]) {
+                const nivel = calcularNivelStock(i.producto, i.cantidad, i.unidad);
+                return nivel === 'critico';
+            }
+            return false;
+        });
+    }
+    
+    tbody.innerHTML = inventarios.map(i => {
+        // Calcular nivel de stock
+        const nivel = calcularNivelStock(i.producto, i.cantidad, i.unidad);
+        const claseStock = nivel === 'critico' ? 'stock-critico' : 
+                          nivel === 'advertencia' ? 'stock-advertencia' : 
+                          nivel === 'ok' ? 'stock-ok' : '';
+        
+        // Indicador visual
+        let indicador = '';
+        if (nivel === 'critico') {
+            indicador = '<span class="indicador-stock indicador-critico"></span>';
+        } else if (nivel === 'advertencia') {
+            indicador = '<span class="indicador-stock indicador-advertencia"></span>';
+        } else if (nivel === 'ok') {
+            indicador = '<span class="indicador-stock indicador-ok"></span>';
+        }
+        
+        return `
+        <tr class="${claseStock}">
+            <td>${indicador}${i.producto}</td>
+            <td>${i.cantidad} ${i.unidad}</td>
+            <td>${i.estado ? '<span class="badge badge-' + (i.estado === 'crudo' ? 'warning' : 'success') + '">' + i.estado.toUpperCase() + '</span>' : '-'}</td>
+            <td>${new Date(i.fecha).toLocaleDateString('es-CO')}</td>
+            <td>
+                <button class="btn btn-danger btn-small" onclick="eliminarInventario(${i.id})">🗑️</button>
+            </td>
+        </tr>
+    `;
+    }).reverse().join('');
+    
+    // Actualizar contador
+    document.getElementById('totalProductosInventario').textContent = inventarios.length;
+    
+    // Actualizar alertas
+    actualizarAlertasInventario();
+    actualizarFechaUltimoConteo();
+}
+
+function scrollToTablaInventario() {
+    const tabla = document.getElementById('bodyInventario');
+    if (tabla) {
+        tabla.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function actualizarStats() {
+    const hoy = new Date().toDateString();
+    
+    // Entradas
+    const entradas = JSON.parse(localStorage.getItem('entradas') || '[]');
+    const entradasHoy = entradas.filter(e => new Date(e.fecha).toDateString() === hoy).length;
+    const entradasMes = entradas.filter(e => new Date(e.fecha).getMonth() === new Date().getMonth()).length;
+    document.getElementById('statsEntradasHoy').textContent = entradasHoy;
+    document.getElementById('statsEntradasMes').textContent = entradasMes;
+    
+    // Salidas
+    const salidas = JSON.parse(localStorage.getItem('salidas') || '[]');
+    const salidasHoy = salidas.filter(s => new Date(s.fecha).toDateString() === hoy && s.tipo !== 'merma').length;
+    const mermasHoy = salidas.filter(s => new Date(s.fecha).toDateString() === hoy && s.tipo === 'merma').length;
+    document.getElementById('statsSalidasHoy').textContent = salidasHoy;
+    document.getElementById('statsMermasHoy').textContent = mermasHoy;
+    
+    // Inventario
+    const inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    const conteosHoy = inventarios.filter(i => new Date(i.fecha).toDateString() === hoy).length;
+    document.getElementById('statsConteoHoy').textContent = conteosHoy;
+}
+
+// ========================================
+// EDITAR Y ELIMINAR DATOS
+// ========================================
+
+function editarEntrada(id) {
+    const entradas = JSON.parse(localStorage.getItem('entradas') || '[]');
+    const entrada = entradas.find(e => e.id === id);
+    
+    if (!entrada) {
+        alert('❌ Entrada no encontrada');
+        return;
+    }
+    
+    // Pre-llenar formulario
+    document.getElementById('entradaProducto').value = entrada.producto;
+    document.getElementById('entradaProductoSearch').value = entrada.producto;
+    document.getElementById('entradaCantidad').value = entrada.cantidad;
+    document.getElementById('entradaUnidad').value = entrada.unidad;
+    document.getElementById('entradaProveedor').value = entrada.proveedor;
+    document.getElementById('entradaResponsable').value = entrada.responsable;
+    document.getElementById('entradaFactura').value = entrada.factura || '';
+    document.getElementById('entradaLote').value = entrada.lote || '';
+    
+    // Cambiar a tab de entradas si no está allí
+    document.querySelector('[onclick="showTab(\'entradas\')"]').click();
+    
+    // Guardar ID en un campo oculto o data attribute
+    const form = document.querySelector('#contentEntradas form');
+    if (form) {
+        form.dataset.editandoId = id;
+    }
+    
+    // Scroll al formulario
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    alert('📝 Editando entrada. Modifica los campos y guarda los cambios.');
+}
+
+function editarSalida(id) {
+    const salidas = JSON.parse(localStorage.getItem('salidas') || '[]');
+    const salida = salidas.find(s => s.id === id);
+    
+    if (!salida) {
+        alert('❌ Salida no encontrada');
+        return;
+    }
+    
+    // Pre-llenar formulario según el tipo
+    document.getElementById('salidaProducto').value = salida.producto;
+    document.getElementById('salidaProductoSearch').value = salida.producto;
+    document.getElementById('salidaCantidad').value = salida.cantidad;
+    document.getElementById('salidaUnidad').value = salida.unidad;
+    document.getElementById('salidaTipo').value = salida.tipo;
+    
+    // Mostrar campos según tipo
+    if (salida.tipo === 'produccion') {
+        document.getElementById('camposProduccion').style.display = 'block';
+        document.getElementById('camposMerma').style.display = 'none';
+        document.getElementById('salidaLote').value = salida.lote || '';
+    } else if (salida.tipo === 'merma') {
+        document.getElementById('camposProduccion').style.display = 'none';
+        document.getElementById('camposMerma').style.display = 'block';
+        document.getElementById('salidaMermaCategoria').value = salida.mermaCategoria || 'produccion';
+        
+        if (salida.mermaCategoria === 'produccion') {
+            document.getElementById('camposMermaProduccion').style.display = 'block';
+            document.getElementById('camposMermaDano').style.display = 'none';
+            document.getElementById('salidaProceso').value = salida.proceso || '';
+            document.getElementById('salidaPorcentaje').value = salida.porcentaje || '';
+        } else {
+            document.getElementById('camposMermaProduccion').style.display = 'none';
+            document.getElementById('camposMermaDano').style.display = 'block';
+            document.getElementById('salidaMotivo').value = salida.motivo || '';
+        }
+    }
+    
+    // Cambiar a tab de salidas
+    document.querySelector('[onclick="showTab(\'salidas\')"]').click();
+    
+    // Guardar ID para edición
+    const form = document.querySelector('#contentSalidas form');
+    if (form) {
+        form.dataset.editandoId = id;
+    }
+    
+    // Scroll al formulario
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    alert('📝 Editando salida. Modifica los campos y guarda los cambios.');
+}
+
+// ========================================
+// ELIMINAR DATOS
+// ========================================
+
+function eliminarEntrada(id) {
+    if (!confirm('¿Eliminar esta entrada?')) return;
+    
+    let entradas = JSON.parse(localStorage.getItem('entradas') || '[]');
+    const entrada = entradas.find(e => e.id === id);
+    entradas = entradas.filter(e => e.id !== id);
+    localStorage.setItem('entradas', JSON.stringify(entradas));
+    
+    registrarAuditoria('Eliminó', entrada.producto, 'Entrada eliminada');
+    cargarDatos();
+}
+
+function eliminarSalida(id) {
+    if (!confirm('¿Eliminar esta salida?')) return;
+    
+    let salidas = JSON.parse(localStorage.getItem('salidas') || '[]');
+    const salida = salidas.find(s => s.id === id);
+    salidas = salidas.filter(s => s.id !== id);
+    localStorage.setItem('salidas', JSON.stringify(salidas));
+    
+    registrarAuditoria('Eliminó', salida.producto, 'Salida eliminada');
+    cargarDatos();
+}
+
+function eliminarInventario(id) {
+    if (!confirm('¿Eliminar este conteo?')) return;
+    
+    let inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    const inventario = inventarios.find(i => i.id === id);
+    inventarios = inventarios.filter(i => i.id !== id);
+    localStorage.setItem('inventarios', JSON.stringify(inventarios));
+    
+    registrarAuditoria('Eliminó', inventario.producto, 'Conteo eliminado');
+    cargarDatos();
+}
+
+// ========================================
+// AUDITORÍA
+// ========================================
+
+function registrarAuditoria(accion, producto, detalles) {
+    const registro = {
+        fecha: new Date().toISOString(),
+        usuario: currentUser,
+        accion: accion,
+        producto: producto,
+        detalles: detalles
+    };
+    
+    let auditoria = JSON.parse(localStorage.getItem('auditoria') || '[]');
+    auditoria.push(registro);
+    localStorage.setItem('auditoria', JSON.stringify(auditoria));
+}
+
+// ========================================
+// EXPORTAR A EXCEL
+// ========================================
+
+function exportarExcelEntradas() {
+    const entradas = JSON.parse(localStorage.getItem('entradas') || '[]');
+    
+    const data = entradas.map(e => ({
+        'Fecha': new Date(e.fecha).toLocaleDateString('es-CO'),
+        'Hora': new Date(e.fecha).toLocaleTimeString('es-CO'),
+        'Producto': e.producto,
+        'Cantidad': e.cantidad,
+        'Unidad': e.unidad,
+        'Proveedor': e.proveedor,
+        'Responsable': e.responsable,
+        'Factura': e.factura,
+        'Lote': e.lote,
+        'Usuario': e.usuario
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Entradas');
+    
+    const fechaHoy = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `entradas_${fechaHoy}.xlsx`);
+}
+
+function exportarExcelSalidas() {
+    const salidas = JSON.parse(localStorage.getItem('salidas') || '[]');
+    
+    const data = salidas.map(s => {
+        let obj = {
+            'Fecha': new Date(s.fecha).toLocaleDateString('es-CO'),
+            'Hora': new Date(s.fecha).toLocaleTimeString('es-CO'),
+            'Tipo': s.tipo,
+            'Producto': s.producto,
+            'Cantidad': s.cantidad,
+            'Unidad': s.unidad || ''
+        };
+        
+        if (s.tipo === 'merma') {
+            obj['Categoría Merma'] = s.mermaCategoria;
+            if (s.mermaCategoria === 'produccion') {
+                obj['Proceso'] = s.proceso;
+                obj['Cantidad Origen'] = s.cantidadOrigen;
+                obj['Porcentaje'] = s.porcentaje;
+            } else {
+                obj['Motivo'] = s.motivo;
+            }
+            obj['Notas'] = s.notas;
+        } else {
+            obj['Lote'] = s.lote;
+        }
+        
+        obj['Usuario'] = s.usuario;
+        return obj;
+    });
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Salidas');
+    
+    const fechaHoy = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `salidas_${fechaHoy}.xlsx`);
+}
+
+function exportarExcelInventario() {
+    const inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    const configMinimos = JSON.parse(localStorage.getItem('configuracionCriticos') || '{}');
+    
+    const data = inventarios.map(i => ({
+        'Fecha': new Date(i.fecha).toLocaleDateString('es-CO'),
+        'Hora': new Date(i.fecha).toLocaleTimeString('es-CO'),
+        'Producto': i.producto,
+        'Cantidad': i.cantidad,
+        'Unidad': i.unidad,
+        'Estado': i.estado || '-',
+        'Proveedor': i.proveedor,
+        'Usuario': i.usuario,
+        'Stock Minimo': configMinimos[i.producto] ? configMinimos[i.producto].minimo : (CANTIDADES_MINIMAS[i.producto] ? CANTIDADES_MINIMAS[i.producto].minimo : 0)
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+    
+    // Agregar fecha de exportación en nombre del archivo
+    const fechaHoy = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `cocina_${fechaHoy}.xlsx`);
+}
+
+// Exportar auditoría
+function exportarAuditoria() {
+    const auditoria = JSON.parse(localStorage.getItem('auditoria') || '[]');
+    
+    const data = auditoria.map(a => ({
+        'Fecha': new Date(a.fecha).toLocaleDateString('es-CO'),
+        'Hora': new Date(a.fecha).toLocaleTimeString('es-CO'),
+        'Usuario': a.usuario,
+        'Acción': a.accion,
+        'Producto': a.producto,
+        'Detalles': a.detalles
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Auditoría');
+    
+    const fechaHoy = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `auditoria-cocina_${fechaHoy}.xlsx`);
+}
+
+// ========================================
+// UTILIDADES
+// ========================================
+
+function toggleVerEntradas() {
+    const container = document.getElementById('verEntradasContainer');
+    container.style.display = container.style.display === 'none' ? 'block' : 'none';
+}
+
+function volverAlMenu() {
+    if (confirm('¿Volver al menú de selección? (No perderás los datos guardados)')) {
+        currentRole = null;
+        currentUser = '';
+        localStorage.removeItem('currentRole');
+        
+        // Ocultar sistema y mostrar selector
+        document.getElementById('mainSystem').classList.add('hidden');
+        document.getElementById('roleSelector').classList.remove('hidden');
+    }
+}
+
+function volverAlMenuPrincipal() {
+    if (confirm('¿Volver al menú principal de sistemas? (No perderás los datos guardados)')) {
+        window.location.href = 'index.html';
+    }
+}
+
+function reiniciarInventario() {
+    if (confirm('⚠️ ¿REINICIAR inventario a valores iniciales? Esto borrará todos los conteos actuales y recargará las cantidades del primer día.')) {
+        localStorage.removeItem('inventarios');
+        cargarInventarioInicial();
+        cargarDatos();
+        alert('✅ Inventario reiniciado con valores iniciales');
+        registrarAuditoria('Reinició inventario', '', 'Inventario reiniciado a valores iniciales');
+    }
+}
+
+// ========================================
+// INICIALIZACIÓN
+// ========================================
+
+// Función para cargar inventario inicial con fecha de hoy
+function cargarInventarioInicial() {
+    // Solo cargar si no existe inventario
+    const inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    
+    if (inventarios.length === 0) {
+        console.log('🔄 Cargando inventario inicial...');
+        const hoy = new Date().toISOString();
+        const inventarioInicial = [];
+        
+        let contador = 0;
+        PRODUCTOS_COCINA.forEach((prod, index) => {
+            if (prod.stockInicial > 0) {
+                inventarioInicial.push({
+                    id: Date.now() + index,
+                    fecha: hoy,
+                    producto: prod.nombre,
+                    cantidad: prod.stockInicial,
+                    estado: prod.estadoInicial || (prod.tieneEstado ? 'crudo' : ''),
+                    unidad: prod.unidad,
+                    proveedor: prod.proveedor,
+                    usuario: 'Sistema - Carga Inicial'
+                });
+                contador++;
+            }
+        });
+        
+        localStorage.setItem('inventarios', JSON.stringify(inventarioInicial));
+        console.log('✅ Inventario inicial cargado:', contador, 'productos con stock');
+        console.log('📦 Productos cargados:', inventarioInicial.map(i => i.producto + ': ' + i.cantidad + i.unidad).join(', '));
+        return true;
+    } else {
+        console.log('ℹ️ Inventario ya existe:', inventarios.length, 'productos');
+        return false;
+    }
+}
+
+// ========================================
+// SISTEMA DE ALERTAS DE INVENTARIO MÍNIMO
+// ========================================
+
+// Calcular nivel de stock de un producto
+function calcularNivelStock(nombreProducto, cantidadActual, unidadProducto) {
+    // Obtener configuración actualizada (puede haber sido editada)
+    const configCriticos = cargarConfiguracionCriticos();
+    const config = configCriticos[nombreProducto] || CANTIDADES_MINIMAS[nombreProducto];
+    
+    if (!config) return 'normal'; // No es producto crítico
+    
+    // Convertir unidades si es necesario (g vs Kg)
+    let cantidadComparar = cantidadActual;
+    if (config.unidad === 'g' && unidadProducto === 'Kg') {
+        cantidadComparar = cantidadActual * 1000;
+    } else if (config.unidad === 'Kg' && unidadProducto === 'g') {
+        cantidadComparar = cantidadActual / 1000;
+    }
+    
+    const minimo = config.minimo;
+    const advertencia = minimo * 1.2; // 20% por encima del mínimo
+    
+    if (cantidadComparar < minimo) {
+        return 'critico'; // Rojo
+    } else if (cantidadComparar < advertencia) {
+        return 'advertencia'; // Amarillo
+    } else {
+        return 'ok'; // Verde
+    }
+}
+
+// Actualizar alertas visuales en el sistema
+function actualizarAlertasInventario() {
+    const inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    
+    let criticos = 0;
+    let advertencias = 0;
+    let productosAlerta = [];
+    
+    // Contar productos críticos y en advertencia
+    Object.keys(CANTIDADES_MINIMAS).forEach(nombreProducto => {
+        const inv = inventarios.find(i => i.producto === nombreProducto);
+        if (inv) {
+            const nivel = calcularNivelStock(inv.producto, inv.cantidad, inv.unidad);
+            if (nivel === 'critico') {
+                criticos++;
+                productosAlerta.push({
+                    nombre: inv.producto,
+                    cantidad: inv.cantidad,
+                    unidad: inv.unidad,
+                    minimo: CANTIDADES_MINIMAS[nombreProducto].minimo,
+                    nivel: 'critico'
+                });
+            } else if (nivel === 'advertencia') {
+                advertencias++;
+                productosAlerta.push({
+                    nombre: inv.producto,
+                    cantidad: inv.cantidad,
+                    unidad: inv.unidad,
+                    minimo: CANTIDADES_MINIMAS[nombreProducto].minimo,
+                    nivel: 'advertencia'
+                });
+            }
+        } else {
+            // Producto no encontrado en inventario = crítico
+            criticos++;
+            productosAlerta.push({
+                nombre: nombreProducto,
+                cantidad: 0,
+                unidad: CANTIDADES_MINIMAS[nombreProducto].unidad,
+                minimo: CANTIDADES_MINIMAS[nombreProducto].minimo,
+                nivel: 'critico'
+            });
+        }
+    });
+    
+    // Actualizar badge en el tab
+    const badge = document.getElementById('alertBadge');
+    if (badge) {
+        if (criticos > 0) {
+            badge.textContent = criticos;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+    
+    // Actualizar panel de alertas
+    const panelAlertas = document.getElementById('panelAlertasCriticas');
+    const cardCritica = document.getElementById('cardCritica');
+    const cardAdvertencia = document.getElementById('cardAdvertencia');
+    
+    if (panelAlertas && cardCritica && cardAdvertencia) {
+        if (criticos > 0 || advertencias > 0) {
+            panelAlertas.style.display = 'block';
+            
+            if (criticos > 0) {
+                cardCritica.style.display = 'block';
+                document.getElementById('numCriticos').textContent = criticos;
+            } else {
+                cardCritica.style.display = 'none';
+            }
+            
+            if (advertencias > 0) {
+                cardAdvertencia.style.display = 'block';
+                document.getElementById('numAdvertencias').textContent = advertencias;
+            } else {
+                cardAdvertencia.style.display = 'none';
+            }
+        } else {
+            panelAlertas.style.display = 'none';
+        }
+    }
+    
+    return productosAlerta;
+}
+
+// Filtrar solo productos críticos en la tabla
+let mostrandoSoloCriticos = false;
+function verSoloCriticos() {
+    mostrandoSoloCriticos = !mostrandoSoloCriticos;
+    cargarTablaInventario();
+}
+
+// Generar orden de compra en Excel
+function generarOrdenCompra() {
+    const productosAlerta = actualizarAlertasInventario();
+    const productsCriticos = productosAlerta.filter(p => p.nivel === 'critico');
+    
+    if (productsCriticos.length === 0) {
+        alert('✅ No hay productos críticos en este momento');
+        return;
+    }
+    
+    // Preparar datos para Excel
+    const datos = productsCriticos.map(p => {
+        const config = CANTIDADES_MINIMAS[p.nombre];
+        const faltante = config.minimo - p.cantidad;
+        return {
+            'Producto': p.nombre,
+            'Stock Actual': p.cantidad,
+            'Unidad': p.unidad,
+            'Mínimo Requerido': config.minimo,
+            'Cantidad a Pedir': Math.ceil(faltante),
+            'Costo Unitario': '$' + config.costo.toLocaleString('es-CO'),
+            'Costo Total': '$' + (Math.ceil(faltante) * config.costo).toLocaleString('es-CO')
+        };
+    });
+    
+    // Crear Excel
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(datos);
+    
+    // Ajustar anchos de columna
+    ws['!cols'] = [
+        {wch: 30}, {wch: 12}, {wch: 8}, {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15}
+    ];
+    
+    XLSX.utils.book_append_sheet(wb, ws, 'Orden de Compra');
+    
+    const fecha = new Date().toLocaleDateString('es-CO').replace(/\//g, '-');
+    XLSX.writeFile(wb, `Orden_Compra_${fecha}.xlsx`);
+    
+    alert(`📋 Orden de compra generada con ${productsCriticos.length} productos críticos`);
+}
+
+// ========================================
+// CONTEO RÁPIDO DIARIO
+// ========================================
+
+let datosConteoRapido = {};
+
+function iniciarConteoRapido() {
+    datosConteoRapido = {};
+    const modal = document.getElementById('modalConteoRapido');
+    const lista = document.getElementById('listaConteoRapido');
+    
+    if (!modal || !lista) return;
+    
+    // Obtener inventario actual para comparación
+    const inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    
+    // Generar lista de productos críticos
+    let html = '';
+    Object.keys(CANTIDADES_MINIMAS).forEach((nombreProducto, index) => {
+        const inv = inventarios.find(i => i.producto === nombreProducto);
+        const stockTeorico = inv ? inv.cantidad : 0;
+        const config = CANTIDADES_MINIMAS[nombreProducto];
+        
+        html += `
+            <div class="form-group" style="padding: 15px; background: #f9f9f9; border-radius: 8px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="color: #333;">${index + 1}. ${nombreProducto}</strong>
+                    <span style="font-size: 12px; color: #666;">Stock teórico: ${stockTeorico} ${config.unidad}</span>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" 
+                           id="conteoRapido_${nombreProducto.replace(/\s/g, '_')}" 
+                           placeholder="Cantidad física contada" 
+                           step="0.01"
+                           onchange="registrarConteoProducto('${nombreProducto}', ${stockTeorico}, '${config.unidad}')"
+                           style="flex: 2; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                    <span style="flex: 1; display: flex; align-items: center; color: #666;">${config.unidad}</span>
+                </div>
+                <div id="alerta_${nombreProducto.replace(/\s/g, '_')}" style="margin-top: 8px; font-size: 12px;"></div>
+            </div>
+        `;
+    });
+    
+    lista.innerHTML = html;
+    document.getElementById('progresoConteo').textContent = '0/22';
+    document.getElementById('discrepanciasContadas').textContent = '0';
+    modal.style.display = 'block';
+}
+
+function registrarConteoProducto(nombreProducto, stockTeorico, unidad) {
+    const inputId = 'conteoRapido_' + nombreProducto.replace(/\s/g, '_');
+    const alertaId = 'alerta_' + nombreProducto.replace(/\s/g, '_');
+    const cantidadFisica = parseFloat(document.getElementById(inputId).value) || 0;
+    
+    // Guardar datos
+    datosConteoRapido[nombreProducto] = {
+        fisica: cantidadFisica,
+        teorica: stockTeorico,
+        unidad: unidad
+    };
+    
+    // Calcular discrepancia
+    const diferencia = cantidadFisica - stockTeorico;
+    const porcentaje = stockTeorico > 0 ? (Math.abs(diferencia) / stockTeorico * 100) : 100;
+    
+    // Mostrar alerta si hay discrepancia significativa (>10%)
+    const alertaDiv = document.getElementById(alertaId);
+    if (porcentaje > 10) {
+        if (diferencia < 0) {
+            alertaDiv.innerHTML = `<span style="color: #f44336;">⚠️ Faltante: ${Math.abs(diferencia).toFixed(2)} ${unidad} (${porcentaje.toFixed(0)}% menos)</span>`;
+        } else {
+            alertaDiv.innerHTML = `<span style="color: #ff9800;">⚠️ Sobrante: ${diferencia.toFixed(2)} ${unidad} (${porcentaje.toFixed(0)}% más)</span>`;
+        }
+    } else {
+        alertaDiv.innerHTML = `<span style="color: #4CAF50;">✓ Correcto</span>`;
+    }
+    
+    // Actualizar progreso
+    const contados = Object.keys(datosConteoRapido).length;
+    const discrepancias = Object.values(datosConteoRapido).filter(d => {
+        const dif = Math.abs(d.fisica - d.teorica);
+        const porc = d.teorica > 0 ? (dif / d.teorica * 100) : 0;
+        return porc > 10;
+    }).length;
+    
+    document.getElementById('progresoConteo').textContent = `${contados}/22`;
+    document.getElementById('discrepanciasContadas').textContent = discrepancias;
+}
+
+function finalizarConteoRapido() {
+    const contados = Object.keys(datosConteoRapido).length;
+    
+    if (contados < 22) {
+        if (!confirm(`⚠️ Solo has contado ${contados}/22 productos. ¿Deseas continuar de todos modos?`)) {
+            return;
+        }
+    }
+    
+    // Actualizar inventario con cantidades físicas
+    const inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    const ajustes = [];
+    
+    Object.keys(datosConteoRapido).forEach(nombreProducto => {
+        const datos = datosConteoRapido[nombreProducto];
+        const inv = inventarios.find(i => i.producto === nombreProducto);
+        
+        if (inv) {
+            const diferencia = datos.fisica - datos.teorica;
+            const porcentaje = datos.teorica > 0 ? (Math.abs(diferencia) / datos.teorica * 100) : 100;
+            
+            if (porcentaje > 10) {
+                ajustes.push({
+                    producto: nombreProducto,
+                    teorico: datos.teorica,
+                    fisico: datos.fisica,
+                    diferencia: diferencia,
+                    porcentaje: porcentaje
+                });
+            }
+            
+            // Actualizar cantidad
+            inv.cantidad = datos.fisica;
+            inv.fecha = new Date().toISOString();
+        }
+    });
+    
+    localStorage.setItem('inventarios', JSON.stringify(inventarios));
+    
+    // Registrar auditoría de conteo rápido
+    const auditoria = JSON.parse(localStorage.getItem('auditoria') || '[]');
+    auditoria.push({
+        fecha: new Date().toISOString(),
+        tipo: 'conteo_rapido',
+        usuario: currentUser,
+        detalles: `Conteo rápido completado. ${contados} productos contados, ${ajustes.length} ajustes realizados`,
+        ajustes: ajustes
+    });
+    localStorage.setItem('auditoria', JSON.stringify(auditoria));
+    
+    // Guardar fecha del último conteo
+    localStorage.setItem('ultimoConteoRapido', new Date().toISOString());
+    
+    // Cerrar modal y actualizar vistas
+    cerrarConteoRapido();
+    cargarTablaInventario();
+    actualizarAlertasInventario();
+    actualizarFechaUltimoConteo();
+    
+    // Mostrar resumen
+    let mensaje = `✅ Conteo rápido completado\n\n`;
+    mensaje += `📊 Productos contados: ${contados}/22\n`;
+    if (ajustes.length > 0) {
+        mensaje += `⚠️ Ajustes realizados: ${ajustes.length}\n\n`;
+        mensaje += 'Discrepancias significativas:\n';
+        ajustes.forEach(a => {
+            mensaje += `• ${a.producto}: ${a.diferencia > 0 ? '+' : ''}${a.diferencia.toFixed(2)} (${a.porcentaje.toFixed(0)}%)\n`;
+        });
+    } else {
+        mensaje += `✓ No se detectaron discrepancias significativas`;
+    }
+    
+    alert(mensaje);
+}
+
+function cerrarConteoRapido() {
+    document.getElementById('modalConteoRapido').style.display = 'none';
+    datosConteoRapido = {};
+}
+
+function actualizarFechaUltimoConteo() {
+    const ultimoConteo = localStorage.getItem('ultimoConteoRapido');
+    const elemento = document.getElementById('ultimoConteoFecha');
+    
+    if (elemento && ultimoConteo) {
+        const fecha = new Date(ultimoConteo);
+        const ahora = new Date();
+        const diferenciaHoras = Math.floor((ahora - fecha) / (1000 * 60 * 60));
+        
+        if (diferenciaHoras < 24) {
+            elemento.textContent = `Hace ${diferenciaHoras} horas`;
+        } else {
+            elemento.textContent = fecha.toLocaleString('es-CO');
+        }
+    }
+}
+
+function verUltimoConteo() {
+    const auditoria = JSON.parse(localStorage.getItem('auditoria') || '[]');
+    const ultimoConteo = auditoria.filter(a => a.tipo === 'conteo_rapido').pop();
+    
+    if (!ultimoConteo) {
+        alert('ℹ️ No hay conteos rápidos previos');
+        return;
+    }
+    
+    const fecha = new Date(ultimoConteo.fecha).toLocaleString('es-CO');
+    let mensaje = `📅 Último Conteo Rápido\n\n`;
+    mensaje += `Fecha: ${fecha}\n`;
+    mensaje += `Usuario: ${ultimoConteo.usuario}\n`;
+    mensaje += `Detalles: ${ultimoConteo.detalles}\n\n`;
+    
+    if (ultimoConteo.ajustes && ultimoConteo.ajustes.length > 0) {
+        mensaje += 'Ajustes realizados:\n';
+        ultimoConteo.ajustes.forEach(a => {
+            mensaje += `• ${a.producto}: ${a.diferencia > 0 ? '+' : ''}${a.diferencia.toFixed(2)} (${a.porcentaje.toFixed(0)}%)\n`;
+        });
+    }
+    
+    alert(mensaje);
+}
+
+// ========================================
+// SISTEMA DE ALERTAS DE INVENTARIO
+// ========================================
+
+function actualizarAlertas() {
+    const inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    let criticos = 0;
+    let advertencia = 0;
+    let ok = 0;
+    const productosProblema = [];
+    
+    // Obtener configuración actualizada (puede haber sido editada)
+    const configCriticos = cargarConfiguracionCriticos();
+    
+    // Analizar cada producto del inventario que tenga cantidad mínima definida
+    Object.keys(configCriticos).forEach(nombreProducto => {
+        const inv = inventarios.find(i => i.producto === nombreProducto);
+        if (inv) {
+            const nivel = calcularNivelStock(nombreProducto, inv.cantidad, inv.unidad);
+            const config = configCriticos[nombreProducto];
+            
+            if (nivel === 'critico') {
+                criticos++;
+                productosProblema.push({
+                    nombre: nombreProducto,
+                    cantidad: inv.cantidad,
+                    minimo: config.minimo,
+                    unidad: config.unidad,
+                    faltante: config.minimo - inv.cantidad,
+                    nivel: 'critico'
+                });
+            } else if (nivel === 'advertencia') {
+                advertencia++;
+                productosProblema.push({
+                    nombre: nombreProducto,
+                    cantidad: inv.cantidad,
+                    minimo: config.minimo,
+                    unidad: config.unidad,
+                    faltante: config.minimo - inv.cantidad,
+                    nivel: 'advertencia'
+                });
+            } else if (nivel === 'ok') {
+                ok++;
+            }
+        } else {
+            // Producto sin stock registrado = crítico
+            criticos++;
+            const config = configCriticos[nombreProducto];
+            productosProblema.push({
+                nombre: nombreProducto,
+                cantidad: 0,
+                minimo: config.minimo,
+                unidad: config.unidad,
+                faltante: config.minimo,
+                nivel: 'critico'
+            });
+        }
+    });
+    
+    // Actualizar contadores
+    document.getElementById('contadorCriticos').textContent = criticos;
+    document.getElementById('contadorAdvertencia').textContent = advertencia;
+    document.getElementById('contadorOK').textContent = ok;
+    
+    // Generar lista de productos problema
+    const listaDiv = document.getElementById('listaProductosCriticos');
+    if (productosProblema.length === 0) {
+        listaDiv.innerHTML = `
+            <div style="text-align: center; padding: 30px; color: #4CAF50;">
+                <div style="font-size: 48px;">✓</div>
+                <div style="font-size: 18px; font-weight: bold; margin-top: 10px;">¡Todo en orden!</div>
+                <div style="font-size: 14px; opacity: 0.8; margin-top: 5px;">Todos los productos tienen stock saludable</div>
+            </div>
+        `;
+    } else {
+        listaDiv.innerHTML = productosProblema.map(p => {
+            const color = p.nivel === 'critico' ? '#f44336' : '#ff9800';
+            const icono = p.nivel === 'critico' ? '🔴' : '🟡';
+            const badge = p.nivel === 'critico' ? 'URGENTE' : 'PRONTO';
+            
+            return `
+                <div style="background: #f9f9f9; border-left: 4px solid ${color}; padding: 12px; margin-bottom: 8px; border-radius: 6px;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; color: #333; margin-bottom: 4px;">
+                                ${icono} ${p.nombre}
+                                <span style="background: ${color}; color: white; font-size: 10px; padding: 2px 6px; border-radius: 3px; margin-left: 8px;">${badge}</span>
+                            </div>
+                            <div style="font-size: 13px; color: #666;">
+                                Stock actual: <strong>${p.cantidad} ${p.unidad}</strong> | 
+                                Mínimo: <strong>${p.minimo} ${p.unidad}</strong>
+                            </div>
+                            <div style="font-size: 12px; color: ${color}; margin-top: 4px;">
+                                ⚠️ Faltan: <strong>${Math.max(0, p.faltante).toFixed(2)} ${p.unidad}</strong> para llegar al mínimo
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Actualizar badge en el header si existe
+    const badge = document.getElementById('badgeAlertas');
+    if (badge) {
+        if (criticos > 0) {
+            badge.textContent = criticos;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+function toggleFiltroAlertas() {
+    mostrandoSoloCriticos = !mostrandoSoloCriticos;
+    const btn = document.getElementById('btnFiltroAlertas');
+    
+    if (mostrandoSoloCriticos) {
+        btn.textContent = '📋 Ver todos';
+        btn.style.background = '#4CAF50';
+    } else {
+        btn.textContent = '🔍 Ver solo críticos';
+        btn.style.background = '#f44336';
+    }
+    
+    cargarTablaInventario();
+}
+
+function generarOrdenCompra() {
+    const inventarios = JSON.parse(localStorage.getItem('inventarios') || '[]');
+    const productos = [];
+    
+    // Obtener configuración actualizada
+    const configCriticos = cargarConfiguracionCriticos();
+    
+    // Recopilar productos que necesitan pedido (críticos y advertencia)
+    Object.keys(configCriticos).forEach(nombreProducto => {
+        const inv = inventarios.find(i => i.producto === nombreProducto);
+        const cantidad = inv ? inv.cantidad : 0;
+        const config = configCriticos[nombreProducto];
+        const nivel = calcularNivelStock(nombreProducto, cantidad, config.unidad);
+        
+        if (nivel === 'critico' || nivel === 'advertencia') {
+            // Calcular cantidad a pedir (para llegar al mínimo + 20%)
+            const cantidadObjetivo = config.minimo * 1.2;
+            const cantidadPedir = Math.max(0, cantidadObjetivo - cantidad);
+            
+            // Obtener mejor proveedor (si hay alternativos)
+            const mejorProveedor = obtenerMejorProveedor(nombreProducto, config);
+            
+            productos.push({
+                Producto: nombreProducto,
+                'Stock Actual': cantidad,
+                'Stock Mínimo': config.minimo,
+                'Cantidad a Pedir': Math.ceil(cantidadPedir),
+                Unidad: config.unidad,
+                'Costo Unitario': mejorProveedor.costo,
+                'Costo Total': (Math.ceil(cantidadPedir) * mejorProveedor.costo).toFixed(2),
+                Proveedor: mejorProveedor.nombre,
+                Urgencia: nivel === 'critico' ? 'URGENTE' : 'PRONTO'
+            });
+        }
+    });
+    
+    if (productos.length === 0) {
+        alert('✓ No hay productos que requieran pedido en este momento');
+        return;
+    }
+    
+    // Calcular total
+    const totalOrden = productos.reduce((sum, p) => sum + parseFloat(p['Costo Total']), 0);
+    
+    // Crear libro Excel
+    const wb = XLSX.utils.book_new();
+    
+    // Hoja 1: Orden de compra
+    const ws = XLSX.utils.json_to_sheet(productos);
+    
+    // Agregar fila de total
+    const totalRow = {
+        Producto: 'TOTAL ORDEN',
+        'Costo Total': totalOrden.toFixed(2)
+    };
+    XLSX.utils.sheet_add_json(ws, [totalRow], {skipHeader: true, origin: -1});
+    
+    // Ajustar anchos de columna
+    ws['!cols'] = [
+        {wch: 30}, {wch: 12}, {wch: 12}, {wch: 15}, 
+        {wch: 8}, {wch: 12}, {wch: 12}, {wch: 25}, {wch: 10}
+    ];
+    
+    XLSX.utils.book_append_sheet(wb, ws, 'Orden de Compra');
+    
+    // Descargar
+    const fecha = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `Orden_Compra_${fecha}.xlsx`);
+    
+    // Registrar en auditoría
+    registrarAuditoria(
+        'Orden de compra generada',
+        'Sistema',
+        `${productos.length} productos, Total: $${totalOrden.toFixed(2)}`
+    );
+    
+    alert(`✓ Orden de compra generada exitosamente\n\n${productos.length} productos\nTotal estimado: $${totalOrden.toLocaleString('es-CO', {minimumFractionDigits: 2})}`);
+}
+
+function obtenerMejorProveedor(nombreProducto, config) {
+    // Si tiene proveedores alternativos, comparar precios
+    if (config.proveedoresAlternativos && config.proveedoresAlternativos.length > 0) {
+        let mejorProveedor = {
+            nombre: config.proveedorPrincipal,
+            costo: config.costo
+        };
+        
+        config.proveedoresAlternativos.forEach(prov => {
+            if (prov.costo < mejorProveedor.costo) {
+                mejorProveedor = {
+                    nombre: prov.nombre,
+                    costo: prov.costo
+                };
+            }
+        });
+        
+        return mejorProveedor;
+    }
+    
+    // Si no hay alternativos, usar el principal
+    const producto = PRODUCTOS_COCINA.find(p => p.nombre === nombreProducto);
+    return {
+        nombre: config.proveedorPrincipal || (producto ? producto.proveedor : ''),
+        costo: config.costo
+    };
+}
+
+// ========================================
+// CONFIGURACIÓN DE PRODUCTOS CRÍTICOS
+// ========================================
+
+let productoEditandoProveedores = null;
+
+function cargarConfiguracionCriticos() {
+    const configGuardada = localStorage.getItem('configuracionCriticos');
+    if (configGuardada) {
+        return JSON.parse(configGuardada);
+    }
+    
+    // Si no hay configuración guardada, usar CANTIDADES_MINIMAS con estructura mejorada
+    const configDefault = {};
+    Object.keys(CANTIDADES_MINIMAS).forEach(nombre => {
+        const config = CANTIDADES_MINIMAS[nombre];
+        const producto = PRODUCTOS_COCINA.find(p => p.nombre === nombre);
+        
+        configDefault[nombre] = {
+            minimo: config.minimo,
+            unidad: config.unidad,
+            costo: config.costo,
+            proveedorPrincipal: producto ? producto.proveedor : '',
+            proveedoresAlternativos: []
+        };
+    });
+    
+    return configDefault;
+}
+
+function guardarConfiguracionCriticosStorage(config) {
+    localStorage.setItem('configuracionCriticos', JSON.stringify(config));
+}
+
+function abrirConfiguracionCriticos() {
+    const config = cargarConfiguracionCriticos();
+    const tbody = document.getElementById('tablaConfigCriticos');
+    
+    tbody.innerHTML = Object.keys(config).map(nombre => {
+        const c = config[nombre];
+        const numProveedores = c.proveedoresAlternativos ? c.proveedoresAlternativos.length : 0;
+        
+        return `
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 12px; font-weight: 500;">${nombre}</td>
+                <td style="padding: 12px; text-align: center;">
+                    <input type="number" 
+                           value="${c.minimo}" 
+                           onchange="actualizarCampoConfig('${nombre}', 'minimo', this.value)"
+                           style="width: 80px; padding: 6px; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+                </td>
+                <td style="padding: 12px; text-align: center;">
+                    <strong>${c.unidad}</strong>
+                </td>
+                <td style="padding: 12px; text-align: center;">
+                    <input type="number" 
+                           value="${c.costo}" 
+                           step="0.01"
+                           onchange="actualizarCampoConfig('${nombre}', 'costo', this.value)"
+                           style="width: 100px; padding: 6px; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+                </td>
+                <td style="padding: 12px;">
+                    <input type="text" 
+                           value="${c.proveedorPrincipal}" 
+                           onchange="actualizarCampoConfig('${nombre}', 'proveedorPrincipal', this.value)"
+                           style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;">
+                </td>
+                <td style="padding: 12px; text-align: center;">
+                    <button onclick="abrirProveedoresAlternativos('${nombre}')" 
+                            class="btn btn-small" 
+                            style="background: #2196F3; color: white; padding: 6px 12px;">
+                        🏪 Proveedores ${numProveedores > 0 ? `(${numProveedores})` : ''}
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    document.getElementById('modalConfigCriticos').style.display = 'block';
+}
+
+function cerrarConfiguracionCriticos() {
+    document.getElementById('modalConfigCriticos').style.display = 'none';
+}
+
+function actualizarCampoConfig(nombreProducto, campo, valor) {
+    const config = cargarConfiguracionCriticos();
+    
+    if (config[nombreProducto]) {
+        // Convertir a número si es minimo o costo
+        if (campo === 'minimo' || campo === 'costo') {
+            config[nombreProducto][campo] = parseFloat(valor) || 0;
+        } else {
+            config[nombreProducto][campo] = valor;
+        }
+    }
+    
+    // Guardar temporalmente (se guarda definitivo al presionar "Guardar cambios")
+    window.configTemporal = config;
+}
+
+function guardarConfiguracionCriticos() {
+    const config = window.configTemporal || cargarConfiguracionCriticos();
+    guardarConfiguracionCriticosStorage(config);
+    
+    // Actualizar CANTIDADES_MINIMAS en memoria
+    Object.keys(config).forEach(nombre => {
+        if (CANTIDADES_MINIMAS[nombre]) {
+            CANTIDADES_MINIMAS[nombre].minimo = config[nombre].minimo;
+            CANTIDADES_MINIMAS[nombre].costo = config[nombre].costo;
+        }
+    });
+    
+    // Registrar en auditoría
+    registrarAuditoria(
+        'Configuración actualizada',
+        currentUser,
+        'Productos críticos: mínimos, costos y proveedores'
+    );
+    
+    // Actualizar alertas
+    actualizarAlertas();
+    
+    alert('✓ Configuración guardada exitosamente');
+    cerrarConfiguracionCriticos();
+}
+
+function restaurarConfiguracionDefecto() {
+    if (!confirm('⚠️ ¿Estás seguro de restaurar los valores por defecto? Se perderán todos los cambios personalizados.')) {
+        return;
+    }
+    
+    localStorage.removeItem('configuracionCriticos');
+    
+    // Registrar en auditoría
+    registrarAuditoria(
+        'Configuración restaurada',
+        currentUser,
+        'Valores por defecto restablecidos'
+    );
+    
+    alert('✓ Configuración restaurada a valores por defecto');
+    abrirConfiguracionCriticos();
+}
+
+// ========================================
+// GESTIÓN DE PROVEEDORES ALTERNATIVOS
+// ========================================
+
+function abrirProveedoresAlternativos(nombreProducto) {
+    productoEditandoProveedores = nombreProducto;
+    const config = cargarConfiguracionCriticos();
+    const producto = config[nombreProducto];
+    
+    document.getElementById('tituloProveedores').textContent = `🏪 Proveedores - ${nombreProducto}`;
+    
+    // Mostrar proveedor actual
+    const divActual = document.getElementById('proveedorActual');
+    divActual.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div style="font-weight: bold; font-size: 16px; color: #4CAF50;">✓ PROVEEDOR PRINCIPAL</div>
+                <div style="font-size: 14px; margin-top: 5px;">${producto.proveedorPrincipal}</div>
+                <div style="font-size: 13px; color: #666; margin-top: 3px;">Costo: $${producto.costo.toLocaleString('es-CO')} por ${producto.unidad}</div>
+            </div>
+            <div style="background: #4CAF50; color: white; padding: 8px 15px; border-radius: 6px; font-weight: bold;">
+                ACTUAL
+            </div>
+        </div>
+    `;
+    
+    // Mostrar proveedores alternativos
+    const divAlternativos = document.getElementById('listaProveedoresAlternativos');
+    if (producto.proveedoresAlternativos && producto.proveedoresAlternativos.length > 0) {
+        divAlternativos.innerHTML = `
+            <h3 style="margin-bottom: 10px;">📋 Proveedores Alternativos</h3>
+            ${producto.proveedoresAlternativos.map((prov, index) => {
+                const esEconomico = prov.costo < producto.costo;
+                const diferencia = ((prov.costo - producto.costo) / producto.costo * 100).toFixed(1);
+                
+                return `
+                    <div style="background: ${esEconomico ? '#fff3cd' : '#f5f5f5'}; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: ${esEconomico ? '2px solid #ff9800' : '1px solid #ddd'};">
+                        <div style="display: flex; justify-content: between; align-items: start;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; font-size: 15px;">${prov.nombre}</div>
+                                <div style="font-size: 14px; color: #666; margin-top: 3px;">
+                                    Costo: $${prov.costo.toLocaleString('es-CO')} por ${producto.unidad}
+                                    ${esEconomico ? 
+                                        `<span style="color: #ff9800; font-weight: bold;"> (${Math.abs(diferencia)}% más económico) 💰</span>` :
+                                        `<span style="color: #f44336;"> (+${diferencia}% más caro)</span>`
+                                    }
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                ${esEconomico ? 
+                                    `<button onclick="cambiarProveedorPrincipal(${index})" class="btn btn-small" style="background: #ff9800; color: white; padding: 6px 12px;">
+                                        ⭐ Usar como principal
+                                    </button>` : ''
+                                }
+                                <button onclick="eliminarProveedorAlternativo(${index})" class="btn btn-small" style="background: #f44336; color: white; padding: 6px 12px;">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        `;
+    } else {
+        divAlternativos.innerHTML = `
+            <div style="text-align: center; padding: 30px; color: #999;">
+                <div style="font-size: 48px;">🏪</div>
+                <div style="margin-top: 10px;">No hay proveedores alternativos registrados</div>
+                <div style="font-size: 14px; margin-top: 5px;">Agrega proveedores para comparar precios</div>
+            </div>
+        `;
+    }
+    
+    // Limpiar campos
+    document.getElementById('nuevoProveedorNombre').value = '';
+    document.getElementById('nuevoProveedorCosto').value = '';
+    
+    document.getElementById('modalProveedores').style.display = 'block';
+}
+
+function cerrarModalProveedores() {
+    document.getElementById('modalProveedores').style.display = 'none';
+    productoEditandoProveedores = null;
+}
+
+function agregarProveedorAlternativo() {
+    const nombre = document.getElementById('nuevoProveedorNombre').value.trim();
+    const costo = parseFloat(document.getElementById('nuevoProveedorCosto').value);
+    
+    if (!nombre || !costo || costo <= 0) {
+        alert('⚠️ Por favor completa todos los campos correctamente');
+        return;
+    }
+    
+    const config = cargarConfiguracionCriticos();
+    const producto = config[productoEditandoProveedores];
+    
+    if (!producto.proveedoresAlternativos) {
+        producto.proveedoresAlternativos = [];
+    }
+    
+    // Verificar que no exista ya
+    if (producto.proveedoresAlternativos.some(p => p.nombre.toLowerCase() === nombre.toLowerCase())) {
+        alert('⚠️ Este proveedor ya está registrado');
+        return;
+    }
+    
+    producto.proveedoresAlternativos.push({ nombre, costo });
+    guardarConfiguracionCriticosStorage(config);
+    
+    // Registrar en auditoría
+    registrarAuditoria(
+        'Proveedor alternativo agregado',
+        currentUser,
+        `${productoEditandoProveedores}: ${nombre} - $${costo}`
+    );
+    
+    alert(`✓ Proveedor "${nombre}" agregado exitosamente`);
+    abrirProveedoresAlternativos(productoEditandoProveedores);
+}
+
+function eliminarProveedorAlternativo(index) {
+    if (!confirm('¿Eliminar este proveedor alternativo?')) {
+        return;
+    }
+    
+    const config = cargarConfiguracionCriticos();
+    const producto = config[productoEditandoProveedores];
+    
+    const proveedorEliminado = producto.proveedoresAlternativos[index];
+    producto.proveedoresAlternativos.splice(index, 1);
+    
+    guardarConfiguracionCriticosStorage(config);
+    
+    // Registrar en auditoría
+    registrarAuditoria(
+        'Proveedor alternativo eliminado',
+        currentUser,
+        `${productoEditandoProveedores}: ${proveedorEliminado.nombre}`
+    );
+    
+    abrirProveedoresAlternativos(productoEditandoProveedores);
+}
+
+function cambiarProveedorPrincipal(indexAlternativo) {
+    if (!confirm('¿Cambiar al proveedor principal por este proveedor alternativo?')) {
+        return;
+    }
+    
+    const config = cargarConfiguracionCriticos();
+    const producto = config[productoEditandoProveedores];
+    
+    // Guardar el actual como alternativo
+    const actualProveedor = {
+        nombre: producto.proveedorPrincipal,
+        costo: producto.costo
+    };
+    
+    // Obtener el nuevo principal
+    const nuevoProveedor = producto.proveedoresAlternativos[indexAlternativo];
+    
+    // Hacer el cambio
+    producto.proveedorPrincipal = nuevoProveedor.nombre;
+    producto.costo = nuevoProveedor.costo;
+    
+    // Remover de alternativos y agregar el antiguo
+    producto.proveedoresAlternativos.splice(indexAlternativo, 1);
+    producto.proveedoresAlternativos.push(actualProveedor);
+    
+    guardarConfiguracionCriticosStorage(config);
+    
+    // Registrar en auditoría
+    registrarAuditoria(
+        'Proveedor principal cambiado',
+        currentUser,
+        `${productoEditandoProveedores}: Ahora ${nuevoProveedor.nombre} ($${nuevoProveedor.costo})`
+    );
+    
+    alert(`✓ Proveedor principal actualizado a "${nuevoProveedor.nombre}"`);
+    abrirProveedoresAlternativos(productoEditandoProveedores);
+}
+
+// Cargar datos al inicio (si ya hay sesión activa)
+if (localStorage.getItem('currentRole')) {
+    const savedRole = localStorage.getItem('currentRole');
+    selectRole(savedRole);
+} else {
+    // Cargar inventario inicial aunque no haya sesión
+    cargarInventarioInicial();
+}
+
+// ========================================
+// PIN Y GESTIÓN DE CATÁLOGO DE PRODUCTOS
+// ========================================
+
+const CATALOG_PIN = '2604'; // PIN de Sergio — puedes cambiarlo aquí
+
+function verificarPinCatalogo() {
+    const input = document.getElementById('inputPinCatalogo');
+    const error = document.getElementById('pinErrorCatalogo');
+    if (input.value === CATALOG_PIN) {
+        document.getElementById('pinGateCatalogo').style.display = 'none';
+        document.getElementById('contenidoCatalogo').style.display = 'block';
+        input.value = '';
+        error.style.display = 'none';
+        renderizarTablaCatalogo();
+    } else {
+        error.style.display = 'block';
+        input.value = '';
+        input.focus();
+        // Animación shake
+        input.style.borderColor = '#f44336';
+        setTimeout(() => { input.style.borderColor = '#FF9800'; }, 1200);
+    }
+}
+
+function cerrarSesionCatalogo() {
+    document.getElementById('pinGateCatalogo').style.display = 'block';
+    document.getElementById('contenidoCatalogo').style.display = 'none';
+    document.getElementById('inputPinCatalogo').value = '';
+    document.getElementById('pinErrorCatalogo').style.display = 'none';
+}
+
+function renderizarTablaCatalogo() {
+    const tbody = document.getElementById('tablaCatalogo');
+    const contador = document.getElementById('contadorCatalogo');
+    if (!tbody) return;
+
+    const filtro = (document.getElementById('filtroCatalogo')?.value || '').toLowerCase();
+    const productosFiltrados = PRODUCTOS_COCINA.filter(p =>
+        p.nombre.toLowerCase().includes(filtro) ||
+        (p.categoria || '').toLowerCase().includes(filtro) ||
+        (p.proveedor || '').toLowerCase().includes(filtro)
+    );
+
+    if (contador) contador.textContent = `${productosFiltrados.length} de ${PRODUCTOS_COCINA.length} productos`;
+
+    const emojiCat = {
+        'Carnes': '🥩', 'Lácteos': '🧀', 'Verduras': '🥦', 'Panadería': '🍞',
+        'Preparados': '🍳', 'Granos': '🌾', 'Despensa': '🫙', 'Salsas': '🫙',
+        'Bebidas': '🥤', 'Otros': '📦'
+    };
+    const categorias = ['Carnes','Lácteos','Verduras','Panadería','Preparados','Granos','Despensa','Salsas','Bebidas','Otros'];
+    const unidades   = ['g','Kg','Un','Lt','ml','Paq'];
+
+    tbody.innerHTML = productosFiltrados.map((prod, idx) => {
+        const idxReal = PRODUCTOS_COCINA.indexOf(prod);
+        const rowBg   = idx % 2 === 0 ? '#fff' : '#fafafa';
+        return `
+            <tr style="border-bottom:1px solid #eee; background:${rowBg};">
+                <td style="padding:9px 10px;">
+                    <input type="text" value="${prod.nombre}"
+                           onchange="editarCampoCatalogo(${idxReal},'nombre',this.value)"
+                           style="width:100%; border:1px solid #e0e0e0; border-radius:5px; padding:5px 7px; font-size:0.83rem;">
+                </td>
+                <td style="padding:9px 8px; text-align:center;">
+                    <select onchange="editarCampoCatalogo(${idxReal},'categoria',this.value)"
+                            style="border:1px solid #e0e0e0; border-radius:5px; padding:4px; font-size:0.78rem;">
+                        ${categorias.map(c => `<option value="${c}" ${prod.categoria===c?'selected':''}>${emojiCat[c]||'📦'} ${c}</option>`).join('')}
+                    </select>
+                </td>
+                <td style="padding:9px 8px; text-align:center;">
+                    <select onchange="editarCampoCatalogo(${idxReal},'unidad',this.value)"
+                            style="border:1px solid #e0e0e0; border-radius:5px; padding:4px; font-size:0.78rem;">
+                        ${unidades.map(u => `<option value="${u}" ${prod.unidad===u?'selected':''}>${u}</option>`).join('')}
+                    </select>
+                </td>
+                <td style="padding:9px 10px;">
+                    <input type="text" value="${prod.proveedor||''}" placeholder="Proveedor"
+                           onchange="editarCampoCatalogo(${idxReal},'proveedor',this.value)"
+                           style="width:100%; border:1px solid #e0e0e0; border-radius:5px; padding:5px 7px; font-size:0.83rem;">
+                </td>
+                <td style="padding:9px 8px; text-align:center;">
+                    <select onchange="editarCampoCatalogo(${idxReal},'tieneEstado',this.value==='true')"
+                            style="border:1px solid #e0e0e0; border-radius:5px; padding:4px; font-size:0.78rem;">
+                        <option value="false" ${!prod.tieneEstado?'selected':''}>No</option>
+                        <option value="true"  ${prod.tieneEstado ?'selected':''}>Sí</option>
+                    </select>
+                </td>
+                <td style="padding:9px 8px; text-align:center;">
+                    <button onclick="eliminarProductoCatalogo(${idxReal})" title="Eliminar"
+                            style="background:#f44336; color:white; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; font-size:0.9rem;">
+                        🗑️
+                    </button>
+                </td>
+            </tr>`;
+    }).join('');
+
+    if (productosFiltrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#888;">No se encontraron productos</td></tr>`;
+    }
+}
+
+function editarCampoCatalogo(idx, campo, valor) {
+    if (!PRODUCTOS_COCINA[idx]) return;
+    PRODUCTOS_COCINA[idx][campo] = valor;
+    guardarCatalogoPersonalizado();
+    cargarProductos();
+}
+
+function agregarProductoCatalogo() {
+    const nombre     = document.getElementById('nuevoNombre').value.trim();
+    const categoria  = document.getElementById('nuevoCategoria').value;
+    const unidad     = document.getElementById('nuevoUnidad').value;
+    const proveedor  = document.getElementById('nuevoProveedor').value.trim();
+    const tieneEstado = document.getElementById('nuevoTieneEstado').value === 'true';
+
+    if (!nombre) {
+        alert('⚠️ El nombre del producto es obligatorio.');
+        document.getElementById('nuevoNombre').focus();
+        return;
+    }
+    if (PRODUCTOS_COCINA.some(p => p.nombre.toLowerCase() === nombre.toLowerCase())) {
+        alert(`⚠️ Ya existe un producto llamado "${nombre}".\nVerifica el catálogo.`);
+        return;
+    }
+
+    PRODUCTOS_COCINA.push({
+        nombre, proveedor, unidad, categoria, tieneEstado, stockInicial: 0,
+        ...(tieneEstado ? { estadoInicial: 'crudo' } : {})
+    });
+
+    guardarCatalogoPersonalizado();
+    cargarProductos();
+    renderizarTablaCatalogo();
+
+    // Limpiar formulario
+    document.getElementById('nuevoNombre').value    = '';
+    document.getElementById('nuevoProveedor').value = '';
+    document.getElementById('nuevoTieneEstado').value = 'false';
+
+    alert(`✅ Producto "${nombre}" agregado al catálogo.`);
+}
+
+function eliminarProductoCatalogo(idx) {
+    const prod = PRODUCTOS_COCINA[idx];
+    if (!prod) return;
+    if (!confirm(`🗑️ ¿Eliminar "${prod.nombre}" del catálogo?\n\nEl historial de movimientos se conserva, pero el producto no aparecerá en nuevos registros.`)) return;
+
+    PRODUCTOS_COCINA.splice(idx, 1);
+    guardarCatalogoPersonalizado();
+    cargarProductos();
+    renderizarTablaCatalogo();
+    alert(`✅ Producto eliminado del catálogo.`);
+}
+
+function resetCatalogoDefecto() {
+    if (!confirm('⚠️ ¿Restablecer el catálogo a los 38 productos originales?\n\nSe perderán todos los productos agregados o modificados.')) return;
+    PRODUCTOS_COCINA.length = 0;
+    PRODUCTOS_COCINA_DEFAULT.forEach(p => PRODUCTOS_COCINA.push(p));
+    localStorage.removeItem('catalogoProductosCocina');
+    cargarProductos();
+    renderizarTablaCatalogo();
+    alert('✅ Catálogo restablecido a los valores originales.');
+}
+
+</script>
+
+</body>
+</html>
