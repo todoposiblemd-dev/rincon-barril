@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alertas y Cumplimiento – El Rincón del Barril</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family:'DM Sans',sans-serif;
+            background:linear-gradient(145deg,#1a1a2e 0%,#2C1810 50%,#1a1a2e 100%);
+            min-height:100vh; padding:32px 20px 60px; color:white;
+        }
+        .container { max-width:920px; margin:0 auto; }
+        .back-link {
+            display:inline-flex; align-items:center; gap:6px;
+            color:rgba(255,255,255,.45); text-decoration:none;
+            font-size:.82rem; margin-bottom:22px; transition:color .2s;
+        }
+        .back-link:hover { color:white; }
+        header { text-align:center; margin-bottom:28px; }
+        header .h-icon { font-size:2.2rem; margin-bottom:10px; }
+        header h1 { font-family:'DM Serif Display',serif; font-size:1.9rem; margin-bottom:6px; }
+        header p { font-size:.88rem; opacity:.6; }
+
+        .legend {
+            display:flex; flex-wrap:wrap; gap:12px;
+            background:rgba(255,255,255,.06); border-radius:12px;
+            padding:12px 16px; margin-bottom:22px; font-size:.78rem; opacity:.8;
+        }
+        .legend-item { display:flex; align-items:center; gap:5px; }
+
+        .summary-grid {
+            display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+            gap:10px; margin-bottom:24px;
+        }
+        .sc {
+            background:rgba(255,255,255,.08); border-radius:13px;
+            padding:14px 16px; border-left:4px solid transparent;
+        }
+        .sc.green  { border-color:#4CAF50; }
+        .sc.yellow { border-color:#FF9800; }
+        .sc.red    { border-color:#C41E3A; }
+        .sc.black  { border-color:#555; }
+        .sc-n { font-size:1.7rem; font-weight:700; margin-bottom:3px; }
+        .sc-n.green  { color:#81C784; }
+        .sc-n.yellow { color:#FFB74D; }
+        .sc-n.red    { color:#EF5350; }
+        .sc-n.black  { color:#777; }
+        .sc-l { font-size:.72rem; opacity:.55; text-transform:uppercase; letter-spacing:.4px; }
+
+        .section { background:white; border-radius:18px; overflow:hidden; margin-bottom:16px; box-shadow:0 4px 20px rgba(0,0,0,.25); }
+        .sec-hdr {
+            display:flex; align-items:center; gap:12px;
+            padding:16px 20px; border-bottom:1px solid #f0f0f0;
+            cursor:pointer; transition:background .15s; user-select:none;
+        }
+        .sec-hdr:hover { background:#fafafa; }
+        .sec-icon { font-size:1.3rem; }
+        .sec-title { flex:1; font-weight:700; color:#1a1a1a; font-size:.95rem; }
+        .sec-badge { padding:3px 11px; border-radius:20px; font-size:.7rem; font-weight:700; color:white; }
+        .sec-chev { font-size:.85rem; opacity:.35; transition:transform .25s; }
+        .sec-hdr.open .sec-chev { transform:rotate(180deg); }
+        .sec-body { display:none; }
+        .sec-body.open { display:block; }
+
+        .item { display:flex; align-items:flex-start; gap:13px; padding:14px 20px; border-bottom:1px solid #f7f7f7; }
+        .item:last-child { border-bottom:none; }
+        .i-dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; margin-top:1px; }
+        .i-dot.green  { background:#E8F5E9; color:#388E3C; }
+        .i-dot.yellow { background:#FFF8E1; color:#F57C00; }
+        .i-dot.red    { background:#FFEBEE; color:#C62828; }
+        .i-dot.black  { background:#f0f0f0; color:#888; }
+        .i-body { flex:1; min-width:0; }
+        .i-title { font-weight:600; color:#1a1a1a; font-size:.88rem; margin-bottom:3px; }
+        .i-desc  { font-size:.78rem; color:#777; line-height:1.5; margin-bottom:5px; }
+        .i-tags  { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:5px; }
+        .tag { display:inline-block; padding:2px 9px; border-radius:8px; font-size:.71rem; font-weight:600; }
+        .tag-warn  { background:#fff3e0; color:#E65100; }
+        .tag-blue  { background:#e3f2fd; color:#1565C0; }
+        .tag-green { background:#E8F5E9; color:#2E7D32; }
+        .i-hist { font-size:.7rem; color:#aaa; margin-top:3px; line-height:1.6; }
+        .btn-done {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:4px 12px; border-radius:20px; border:none;
+            background:#f0f4ff; color:#1565C0;
+            font-size:.72rem; font-weight:700;
+            cursor:pointer; transition:background .2s; margin-top:4px;
+        }
+        .btn-done:hover { background:#dbe8ff; }
+        .btn-done.is-done { background:#E8F5E9; color:#2E7D32; }
+        .i-right { text-align:right; flex-shrink:0; min-width:90px; }
+        .i-days { font-size:.95rem; font-weight:700; }
+        .i-days.green  { color:#4CAF50; }
+        .i-days.yellow { color:#FF9800; }
+        .i-days.red    { color:#C41E3A; }
+        .i-days.black  { color:#bbb; }
+        .i-date { font-size:.7rem; color:#aaa; margin-top:2px; line-height:1.4; }
+
+        /* MODAL */
+        .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+        .overlay.on { display:flex; }
+        .modal { background:white; border-radius:18px; padding:28px 26px; max-width:420px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,.4); animation:pop .2s ease; }
+        @keyframes pop { from{transform:scale(.92);opacity:0} to{transform:scale(1);opacity:1} }
+        .modal h3 { font-size:1.1rem; color:#1a1a1a; margin-bottom:5px; }
+        .modal .msub { font-size:.82rem; color:#888; margin-bottom:18px; }
+        .mfield { margin-bottom:14px; }
+        .mlabel { font-size:.78rem; font-weight:600; color:#555; margin-bottom:5px; display:block; }
+        .minput { width:100%; padding:10px 14px; border-radius:10px; border:1.5px solid #e0e0e0; font-size:.9rem; font-family:inherit; transition:border .2s; }
+        .minput:focus { outline:none; border-color:#1565C0; }
+        .mtoggle { display:flex; align-items:center; gap:10px; margin-bottom:14px; cursor:pointer; }
+        .mtoggle input { width:16px; height:16px; cursor:pointer; }
+        .mtoggle span { font-size:.83rem; color:#444; }
+        .merr { color:#C62828; font-size:.78rem; margin-bottom:10px; display:none; }
+        .mbtns { display:flex; gap:10px; }
+        .mbtn { flex:1; padding:10px; border-radius:10px; border:none; font-size:.88rem; font-weight:700; cursor:pointer; transition:background .2s; }
+        .mbtn.cancel  { background:#f5f5f5; color:#555; }
+        .mbtn.cancel:hover  { background:#eee; }
+        .mbtn.confirm { background:#1565C0; color:white; }
+        .mbtn.confirm:hover { background:#0D47A1; }
+
+        .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px); background:#1a1a1a; color:white; padding:10px 22px; border-radius:20px; font-size:.84rem; font-weight:500; transition:transform .3s; z-index:2000; white-space:nowrap; }
+        .toast.show { transform:translateX(-50%) translateY(0); }
+
+        footer { text-align:center; color:rgba(255,255,255,.3); font-size:.76rem; margin-top:30px; }
+
+        @media(max-width:600px){
+            .item { flex-wrap:wrap; }
+            .i-right { width:100%; text-align:left; margin-left:43px; }
+            .summary-grid { grid-template-columns:1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="index.html" class="back-link">← Volver al inicio</a>
+    <header>
+        <div class="h-icon">⚖️</div>
+        <h1 id="pg-title">Alertas y Cumplimiento</h1>
+        <p id="pg-sub"></p>
+    </header>
+    <div class="legend">
+        <div class="legend-item">🟢 <span>+60 días — tranquilo</span></div>
+        <div class="legend-item">🟡 <span>15-60 días — empieza a gestionar</span></div>
+        <div class="legend-item">🔴 <span>&lt;15 días o pendiente — urgente</span></div>
+        <div class="legend-item">⚫ <span>Vencido — actúa hoy</span></div>
+    </div>
+    <div class="summary-grid" id="sum-grid"></div>
+    <div id="sec-wrap"></div>
+    <footer>
+        <p id="ft-txt"></p>
+        <p>Alertas y Cumplimiento v1.1 · <span id="ft-date"></span></p>
+    </footer>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+    <div class="modal">
+        <h3 id="m-label">Marcar como cumplido</h3>
+        <p class="msub" id="m-sub">Ingresa el PIN de administrador</p>
+        <div id="step-pin">
+            <div class="mfield">
+                <label class="mlabel">PIN de administrador</label>
+                <input class="minput" type="password" id="m-pin" placeholder="••••" maxlength="6">
+            </div>
+            <div class="merr" id="m-err">PIN incorrecto. Intenta de nuevo.</div>
+            <div class="mbtns">
+                <button class="mbtn cancel" onclick="closeModal()">Cancelar</button>
+                <button class="mbtn confirm" onclick="checkPin()">Continuar →</button>
+            </div>
+        </div>
+        <div id="step-fecha" style="display:none">
+            <div class="mtoggle" id="toggle-wrap">
+                <input type="checkbox" id="m-tiene-fecha" onchange="toggleFechaWrap()">
+                <span>Tiene fecha de próximo vencimiento</span>
+            </div>
+            <div class="mfield" id="fecha-wrap" style="display:none">
+                <label class="mlabel">Próximo vencimiento</label>
+                <input class="minput" type="date" id="m-venc">
+            </div>
+            <div class="mfield">
+                <label class="mlabel">Nota (opcional)</label>
+                <input class="minput" type="text" id="m-nota" placeholder="ej: Certificado vigente hasta dic 2026">
+            </div>
+            <div class="mbtns">
+                <button class="mbtn cancel" onclick="closeModal()">Cancelar</button>
+                <button class="mbtn confirm" onclick="guardar()">✓ Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// CONFIG — editar por cliente
+// ══════════════════════════════════════════
+const CFG = {
+    cliente: 'El Rincón del Barril',
+    nit: '1090436126-1',
+    regimen: 'Persona Natural · No responsable de IVA',
+    pin: '2604',
+    key: 'rb_cumplimiento',
+    footer: '© 2026 El Rincón del Barril · Sistema desarrollado por TodoPosibleMD',
+    secciones: [
+        { id:'camara', titulo:'Cámara de Comercio', icon:'🏛', items:[
+            { id:'renovacion_camara', label:'Renovación matrícula mercantil', tipo:'anual', fecha:'03-31',
+              desc:'Matrícula No. 456805 · Vence 31 de marzo cada año. Multa desde 17 SMLV si no renueva.',
+              accion:'Ir a Cámara de Comercio Cúcuta — Av 0 #13-37', accionTipo:'warn', marcable:true },
+            { id:'ingresos_camara', label:'Reportar ingresos reales en renovación', tipo:'pendiente',
+              desc:'Estados financieros actuales muestran $0. Reportar cifras reales al renovar para evitar inconsistencias con DIAN.',
+              accion:'Coordinar con contador antes de renovar', accionTipo:'warn', marcable:true },
+        ]},
+        { id:'dian', titulo:'DIAN — RUT y Obligaciones', icon:'🧾', items:[
+            { id:'cod22', label:'Código 22 — Obligado a cumplir deberes formales', tipo:'ok',
+              desc:'Inscrito en el RUT. ✅ Sin acción requerida.', marcable:false },
+            { id:'cod49', label:'Código 49 — No responsable de IVA', tipo:'ok',
+              desc:'Figura en el RUT. Verificar con contador si aplica según ingresos reales.',
+              accion:'Confirmar con contador', accionTipo:'blue', marcable:false },
+            { id:'cod52', label:'Código 52 — Facturador electrónico (falta en RUT)', tipo:'pendiente',
+              desc:'Facturador DIAN ya activo en práctica, pero código 52 no figura en RUT. Genera inconsistencias al emitir facturas.',
+              accion:'Actualizar RUT en www.dian.gov.co (gratuito)', accionTipo:'warn', marcable:true, sinVenc:true },
+            { id:'regimen47', label:'Régimen Simple de Tributación (Código 47)', tipo:'pendiente',
+              desc:'No inscrito. Contador debe determinar si aplica según ingresos reales (reemplaza IVA, Renta e ICA bimestral).',
+              accion:'Consultar con contador — decisión urgente', accionTipo:'warn', marcable:true },
+        ]},
+        { id:'ica', titulo:'ICA — Industria y Comercio', icon:'🏙', items:[
+            { id:'placa_ica', label:'Placa de Industria y Comercio asignada', tipo:'ok',
+              desc:'Asignada por Alcaldía de Cúcuta desde 02/04/2024. ✅', marcable:false },
+            { id:'decl_ica', label:'Declaración y pago ICA bimestral', tipo:'pendiente',
+              desc:'Con ingresos reales activos, debe declarar y pagar ICA bimestral. Tarifa aprox. 4-6 por mil sobre ingresos brutos.',
+              accion:'Confirmar calendario bimestral con contador', accionTipo:'warn', marcable:true },
+        ]},
+        { id:'sanidad', titulo:'Sanidad e Inocuidad', icon:'🏥', items:[
+            { id:'concepto_san', label:'Concepto sanitario favorable (INVIMA / Sec. Salud)', tipo:'pendiente',
+              desc:'Requerido para operar legalmente. Verificar vigencia del documento actual.',
+              accion:'Renovar con Secretaría de Salud Cúcuta', accionTipo:'warn', marcable:true },
+            { id:'carnets', label:'Carnés de manipulación de alimentos (equipo)', tipo:'pendiente',
+              desc:'Cada empleado debe tener su carné vigente.',
+              accion:'Verificar vencimiento por empleado en Central de Personal', accionTipo:'blue', marcable:true },
+            { id:'plagas', label:'Control de plagas / fumigación', tipo:'pendiente',
+              desc:'Frecuencia recomendada: trimestral. Al registrar en Saneamiento, el tracking es automático.',
+              accion:'Registrar en Sistema de Saneamiento', accionTipo:'blue', marcable:true },
+        ]},
+        { id:'seguridad', titulo:'Seguridad', icon:'🚒', items:[
+            { id:'bomberos', label:'Certificado de bomberos', tipo:'pendiente',
+              desc:'Requerido anualmente. Inspección del Cuerpo de Bomberos de Cúcuta.',
+              accion:'Solicitar inspección en Bomberos Cúcuta', accionTipo:'warn', marcable:true },
+            { id:'extintores', label:'Recarga y revisión de extintores', tipo:'pendiente',
+              desc:'Anualmente o después de cada uso. Proveedor certificado.',
+              accion:'Contactar proveedor certificado', accionTipo:'warn', marcable:true },
+            { id:'gas', label:'Revisión técnica instalaciones de gas', tipo:'pendiente',
+              desc:'Revisión anual por técnico certificado ANESE. Obligatoria en establecimientos con gas.',
+              accion:'Solicitar visita técnico certificado ANESE', accionTipo:'warn', marcable:true },
+        ]},
+        { id:'laboral', titulo:'Laboral y Nómina', icon:'👥', items:[
+            { id:'dotacion', label:'Dotación del equipo (Art. 230 CST)', tipo:'multi',
+              fechas:['04-30','08-31','12-20'],
+              desc:'3 entregas anuales: 30 abril, 31 agosto, 20 diciembre. Acta de entrega firmada.',
+              accion:'Ver actas en Central de Personal', accionTipo:'blue', marcable:true },
+            { id:'seg_social', label:'Pago seguridad social mensual', tipo:'mensual', dia:5,
+              desc:'Antes del día 5 de cada mes por cada empleado vinculado.',
+              accion:'Pagar en PILA (planilla integrada)', accionTipo:'warn', marcable:true },
+            { id:'prima', label:'Prima de servicios', tipo:'multi', fechas:['06-30','12-20'],
+              desc:'Dos pagos: 30 junio y 20 diciembre. 15 días de salario por semestre.',
+              accion:'Calcular con contador', accionTipo:'warn', marcable:true },
+            { id:'cesantias', label:'Consignación de cesantías', tipo:'anual', fecha:'02-14',
+              desc:'Antes del 14 de febrero: consignar cesantías del año anterior al fondo elegido.',
+              accion:'Consignar al fondo del empleado', accionTipo:'warn', marcable:true },
+            { id:'int_ces', label:'Intereses sobre cesantías', tipo:'anual', fecha:'01-31',
+              desc:'Pagar directamente al empleado antes del 31 enero. 12% anual sobre las cesantías.',
+              accion:'Pagar al empleado', accionTipo:'warn', marcable:true },
+        ]},
+        { id:'registro', titulo:'Registro e Identidad Legal', icon:'📋', items:[
+            { id:'ciiu', label:'CIIUs registrados correctamente', tipo:'ok',
+              desc:'I5611 · I5612 · I5629 · I5630 — actividades bien cubiertas. ✅', marcable:false },
+            { id:'sas', label:'Constitución como SAS (recomendado)', tipo:'pendiente',
+              desc:'Opera como persona natural — patrimonio de Sergio expuesto. Una SAS protege casa, carro y ahorros.',
+              accion:'Evaluar con contador y abogado', accionTipo:'warn', marcable:true },
+        ]},
+    ]
+};
+
+// ══════════════════════════════════════════
+// MOTOR
+// ══════════════════════════════════════════
+
+function loadC() { try { return JSON.parse(localStorage.getItem(CFG.key)||'{}'); } catch { return {}; } }
+function saveC(d) { localStorage.setItem(CFG.key, JSON.stringify(d)); }
+
+function hoy() { const d=new Date(); d.setHours(0,0,0,0); return d; }
+function dias(f) { if(!f) return null; const t=new Date(f); t.setHours(0,0,0,0); return Math.round((t-hoy())/86400000); }
+function fmtF(s) { if(!s) return ''; return new Date(s).toLocaleDateString('es-CO',{day:'numeric',month:'short',year:'numeric'}); }
+
+function proxAnual(md) {
+    const y=new Date().getFullYear();
+    let d=new Date(`${y}-${md}`); d.setHours(0,0,0,0);
+    if(d<hoy()) d=new Date(`${y+1}-${md}`);
+    return d.toISOString().split('T')[0];
+}
+function proxMulti(mds) {
+    const y=new Date().getFullYear(), h=hoy();
+    for(const md of mds){ const d=new Date(`${y}-${md}`); d.setHours(0,0,0,0); if(d>=h) return d.toISOString().split('T')[0]; }
+    return new Date(`${y+1}-${mds[0]}`).toISOString().split('T')[0];
+}
+function proxMensual(dia) {
+    const h=hoy();
+    let d=new Date(h.getFullYear(),h.getMonth(),dia);
+    if(d<h) d=new Date(h.getFullYear(),h.getMonth()+1,dia);
+    return d.toISOString().split('T')[0];
+}
+function getFecha(item) {
+    if(item.tipo==='anual')   return proxAnual(item.fecha);
+    if(item.tipo==='multi')   return proxMulti(item.fechas);
+    if(item.tipo==='mensual') return proxMensual(item.dia);
+    if(item.tipo==='fija')    return item.fecha;
+    return null;
+}
+
+function semaforo(d) {
+    if(d===null)  return {cls:'red',   icon:'🔴', lbl:'Pendiente'};
+    if(d<0)       return {cls:'black', icon:'⚫', lbl:`Vencido ${Math.abs(d)}d`};
+    if(d<15)      return {cls:'red',   icon:'🔴', lbl:`${d}d`};
+    if(d<60)      return {cls:'yellow',icon:'🟡', lbl:`${d}d`};
+    return              {cls:'green', icon:'🟢', lbl:`${d}d`};
+}
+
+function getEstado(item, cumpl) {
+    if(item.tipo==='ok') return {cls:'green',icon:'✅',lbl:'Al día',fecha:null};
+    const c = cumpl[item.id];
+    if(c) {
+        if(!c.vence) return {cls:'green',icon:'✅',lbl:'Cumplido',fecha:null,hist:c};
+        const d = dias(c.vence);
+        if(d>=0) return {...semaforo(d), fecha:c.vence, hist:c};
+        // venció → vuelve a pendiente
+    }
+    const fecha = getFecha(item);
+    return {...semaforo(dias(fecha)), fecha, hist: c && dias(c.vence)<0 ? {...c, expired:true} : null};
+}
+
+// ── RENDER ──
+
+function render() {
+    document.getElementById('pg-title').textContent = `Alertas · ${CFG.cliente}`;
+    document.getElementById('pg-sub').textContent   = `NIT ${CFG.nit} · ${CFG.regimen}`;
+    document.getElementById('ft-txt').textContent   = CFG.footer;
+    document.getElementById('ft-date').textContent  = 'Actualizado: '+new Date().toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'});
+
+    const cumpl = loadC();
+    const wrap  = document.getElementById('sec-wrap');
+    const sumG  = document.getElementById('sum-grid');
+    wrap.innerHTML = ''; sumG.innerHTML = '';
+
+    let cnt={green:0,yellow:0,red:0,black:0};
+
+    CFG.secciones.forEach((sec,si)=>{
+        const ests = sec.items.map(it=>getEstado(it,cumpl));
+        ests.forEach(e=>{ cnt[e.cls]=(cnt[e.cls]||0)+1; });
+
+        const worst = ests.some(e=>e.cls==='red'||e.cls==='black') ? 2 : ests.some(e=>e.cls==='yellow') ? 1 : 0;
+        const bc = worst===2?'#C41E3A':worst===1?'#FF9800':'#4CAF50';
+        const bt = worst===2?'⚠️ Atención':worst===1?'🟡 Revisar':'✅ Al día';
+
+        const section = document.createElement('div');
+        section.className='section';
+
+        const hdr = document.createElement('div');
+        hdr.className='sec-hdr'+(si===0?' open':'');
+        hdr.innerHTML=`<span class="sec-icon">${sec.icon}</span><span class="sec-title">${sec.titulo}</span><span class="sec-badge" style="background:${bc}">${bt}</span><span class="sec-chev">▼</span>`;
+
+        const body = document.createElement('div');
+        body.className='sec-body'+(si===0?' open':'');
+
+        sec.items.forEach((item,ii)=>{
+            const est=ests[ii], c=cumpl[item.id];
+            const div=document.createElement('div');
+            div.className='item';
+
+            let tags='';
+            if(item.accion){ const tc=item.accionTipo==='blue'?'tag-blue':'tag-warn'; tags+=`<span class="tag ${tc}">→ ${item.accion}</span>`; }
+            if(c&&c.nota)  { tags+=`<span class="tag tag-green">📝 ${c.nota}</span>`; }
+
+            let hist='';
+            if(est.hist&&!est.hist.expired){
+                hist=`<div class="i-hist">✓ Marcado cumplido el ${fmtF(c.fecha)}${c.vence?` · Próximo vencimiento: ${fmtF(c.vence)}`:' · Sin fecha de vencimiento'}</div>`;
+            } else if(est.hist&&est.hist.expired){
+                hist=`<div class="i-hist" style="color:#C62828">⚠️ Cumplimiento anterior venció el ${fmtF(c.vence)} — requiere renovación</div>`;
+            }
+
+            let btn='';
+            if(item.marcable){
+                const done=c&&est.cls==='green';
+                btn=`<button class="btn-done${done?' is-done':''}" onclick="openModal('${item.id}','${item.label.replace(/'/g,"\\'")}',${!!item.sinVenc})">${done?'✓ Actualizar':'○ Marcar cumplido'}</button>`;
+            }
+
+            div.innerHTML=`
+                <div class="i-dot ${est.cls}">${est.icon}</div>
+                <div class="i-body">
+                    <div class="i-title">${item.label}</div>
+                    <div class="i-desc">${item.desc}</div>
+                    <div class="i-tags">${tags}</div>
+                    ${hist}${btn}
+                </div>
+                <div class="i-right">
+                    <div class="i-days ${est.cls}">${est.lbl}</div>
+                    ${est.fecha?`<div class="i-date">Vence: ${fmtF(est.fecha)}</div>`:''}
+                </div>`;
+            body.appendChild(div);
+        });
+
+        hdr.addEventListener('click',()=>{ hdr.classList.toggle('open'); body.classList.toggle('open'); });
+        section.appendChild(hdr); section.appendChild(body);
+        wrap.appendChild(section);
+    });
+
+    // Summary
+    [{cls:'green',lbl:'Al día'},{cls:'yellow',lbl:'Por vencer'},{cls:'red',lbl:'Urgente'},{cls:'black',lbl:'Vencido'}]
+    .forEach(sc=>{
+        if(!cnt[sc.cls]) return;
+        const d=document.createElement('div');
+        d.className=`sc ${sc.cls}`;
+        d.innerHTML=`<div class="sc-n ${sc.cls}">${cnt[sc.cls]}</div><div class="sc-l">${sc.lbl}</div>`;
+        sumG.appendChild(d);
+    });
+}
+
+// ── MODAL ──
+
+let mId=null, mSinVenc=false;
+
+function openModal(id,label,sinVenc){
+    mId=id; mSinVenc=sinVenc;
+    document.getElementById('m-label').textContent=label;
+    document.getElementById('m-sub').textContent='Ingresa el PIN de administrador';
+    document.getElementById('m-pin').value='';
+    document.getElementById('m-err').style.display='none';
+    document.getElementById('step-pin').style.display='block';
+    document.getElementById('step-fecha').style.display='none';
+    document.getElementById('m-nota').value='';
+    document.getElementById('m-tiene-fecha').checked=false;
+    document.getElementById('fecha-wrap').style.display='none';
+    document.getElementById('toggle-wrap').style.display=sinVenc?'none':'flex';
+    document.getElementById('overlay').classList.add('on');
+    setTimeout(()=>document.getElementById('m-pin').focus(),100);
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('on'); mId=null; }
+document.getElementById('overlay').addEventListener('click',e=>{ if(e.target===document.getElementById('overlay')) closeModal(); });
+document.getElementById('m-pin').addEventListener('keydown',e=>{ if(e.key==='Enter') checkPin(); });
+
+function checkPin(){
+    if(document.getElementById('m-pin').value.trim()!==CFG.pin){
+        document.getElementById('m-err').style.display='block';
+        document.getElementById('m-pin').value='';
+        document.getElementById('m-pin').focus();
+        return;
+    }
+    document.getElementById('step-pin').style.display='none';
+    document.getElementById('step-fecha').style.display='block';
+}
+function toggleFechaWrap(){
+    document.getElementById('fecha-wrap').style.display=document.getElementById('m-tiene-fecha').checked?'block':'none';
+}
+function guardar(){
+    const tieneFecha=document.getElementById('m-tiene-fecha').checked&&!mSinVenc;
+    const venc=tieneFecha?document.getElementById('m-venc').value:null;
+    if(tieneFecha&&!venc){ document.getElementById('m-venc').focus(); return; }
+    const nota=document.getElementById('m-nota').value.trim();
+    const data=loadC();
+    data[mId]={ fecha:new Date().toISOString().split('T')[0], vence:venc||null, nota:nota||null };
+    saveC(data);
+    closeModal();
+    toast('✅ Guardado correctamente');
+    render();
+}
+
+// ── TOAST ──
+function toast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+render();
+</script>
+</body>
+</html>
