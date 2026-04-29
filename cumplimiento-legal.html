@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cumplimiento Legal — El Rincón del Barril</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rojo:#C41E3A; --rojo-d:#9B1530;
+  --verde:#2E7D32; --verde-l:#4CAF50;
+  --amarillo:#F57F17; --amarillo-l:#FF9800;
+  --azul:#1565C0; --azul-l:#2196F3;
+  --bg:linear-gradient(145deg,#1a1a2e 0%,#2C1810 50%,#1a1a2e 100%);
+  --card:#fff; --shadow:0 4px 20px rgba(0,0,0,.22);
+  --text:#222; --muted:#666; --border:#e8e8e8;
+  --gris:#f2f2f2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 20px 60px}
+header{text-align:center;color:#fff;margin-bottom:28px}
+header h1{font-family:'DM Serif Display',serif;font-size:2.2rem;margin-bottom:4px;text-shadow:2px 2px 8px rgba(0,0,0,.4)}
+header p{font-size:.95rem;opacity:.7;letter-spacing:.5px}
+.back{display:inline-block;margin-top:10px;color:rgba(255,255,255,.5);font-size:.82rem;text-decoration:none}
+.back:hover{color:#fff}
+.container{max-width:1100px;width:100%}
+
+/* SEMÁFORO TOP */
+.sem-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.sem{background:#fff;border-radius:14px;padding:16px 14px;text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.sem::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+.sem.verde::before{background:var(--verde-l)}
+.sem.amarillo::before{background:var(--amarillo-l)}
+.sem.rojo::before{background:var(--rojo)}
+.sem.gris::before{background:#bbb}
+.sem-icon{font-size:1.6rem;margin-bottom:4px}
+.sem-label{font-size:.68rem;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+.sem-val{font-size:1.1rem;font-weight:700;color:var(--text);margin:3px 0 2px}
+.sem-sub{font-size:.72rem;color:#999}
+
+/* TABS */
+.tabs-wrap{margin-bottom:18px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;background:rgba(255,255,255,.08);padding:6px;border-radius:14px}
+.tab-btn{flex:1;min-width:100px;padding:9px 8px;background:transparent;border:none;border-radius:10px;color:rgba(255,255,255,.65);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tab-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
+.tab-btn.active{background:#fff;color:var(--rojo);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.panel{display:none}.panel.active{display:block}
+
+/* CARD */
+.card{background:#fff;border-radius:18px;padding:24px;box-shadow:var(--shadow);margin-bottom:16px}
+.card-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--rojo);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* NORMA CARD */
+.norma{border-radius:14px;border:1px solid var(--border);margin-bottom:12px;overflow:hidden}
+.norma-hdr{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:#fff;transition:background .15s}
+.norma-hdr:hover{background:#fafafa}
+.norma-icon{font-size:1.4rem;flex-shrink:0}
+.norma-info{flex:1}
+.norma-nombre{font-size:.92rem;font-weight:600;color:var(--text)}
+.norma-base{font-size:.73rem;color:#999;margin-top:2px}
+.norma-estado{flex-shrink:0}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700}
+.b-ok{background:#E8F5E9;color:var(--verde)}
+.b-warn{background:#FFF8E1;color:var(--amarillo)}
+.b-crit{background:#FFEBEE;color:var(--rojo)}
+.b-info{background:#E3F2FD;color:var(--azul)}
+.norma-body{display:none;padding:0 16px 16px;border-top:1px solid #f5f5f5;background:#fafafa}
+.norma.open .norma-body{display:block}
+.norma.open .norma-hdr{background:#fff5f5}
+.norma-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px}
+.norma-item{background:#fff;border-radius:10px;padding:10px 12px;border:1px solid var(--border)}
+.norma-item-lbl{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#aaa;margin-bottom:4px}
+.norma-item-val{font-size:.85rem;color:var(--text);line-height:1.5}
+.norma-item-val a{color:var(--azul);text-decoration:none}
+.norma-item-val a:hover{text-decoration:underline}
+.consecuencia{background:#FFEBEE;border-left:4px solid var(--rojo);border-radius:0 8px 8px 0;padding:8px 12px;font-size:.8rem;color:#c62828;margin-top:10px;line-height:1.5}
+.nota-verde{background:#E8F5E9;border-left:4px solid var(--verde);border-radius:0 8px 8px 0;padding:8px 12px;font-size:.8rem;color:var(--verde);margin-top:8px;line-height:1.5}
+
+/* SECCIÓN */
+.seccion-titulo{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin:20px 0 10px;padding-bottom:6px;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;gap:8px}
+
+/* TOPES */
+.tope-card{border-radius:14px;border:1.5px solid var(--border);padding:16px;margin-bottom:10px;background:#fff}
+.tope-hdr{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.tope-num{font-size:1.1rem;font-weight:700;color:var(--text)}
+.tope-lbl{font-size:.85rem;color:var(--muted)}
+.tope-desc{font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:10px}
+.tope-activa{font-size:.8rem;font-weight:600;padding:4px 12px;border-radius:20px;display:inline-block}
+.tope-activa.verde{background:#E8F5E9;color:var(--verde)}
+.tope-activa.amarillo{background:#FFF8E1;color:var(--amarillo)}
+.tope-activa.rojo{background:#FFEBEE;color:var(--rojo)}
+.tope-activa.gris{background:#f5f5f5;color:#888}
+.progress-bar{height:8px;background:#f0f0f0;border-radius:4px;margin-top:8px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width .5s}
+
+/* AUTOAUDITORÍA */
+.audit-section{margin-bottom:20px}
+.audit-section-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#fff;background:var(--rojo);padding:6px 14px;border-radius:8px;margin-bottom:8px;display:inline-block}
+.audit-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#fff;border-radius:10px;border:1.5px solid var(--border);margin-bottom:6px;cursor:pointer;transition:all .15s}
+.audit-item:hover{border-color:#ddd;background:#fafafa}
+.audit-item.ok{border-color:var(--verde-l);background:#f9fff9}
+.audit-item.fail{border-color:var(--rojo);background:#fff9f9}
+.audit-item.na{border-color:#ddd;opacity:.6}
+.audit-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .15s}
+.audit-item.ok .audit-check{background:var(--verde-l);border-color:var(--verde-l);color:#fff}
+.audit-item.fail .audit-check{background:var(--rojo);border-color:var(--rojo);color:#fff}
+.audit-item.na .audit-check{background:#e0e0e0;border-color:#e0e0e0;color:#888}
+.audit-texto{flex:1;font-size:.85rem;color:var(--text);line-height:1.4}
+.audit-texto small{display:block;font-size:.72rem;color:#999;margin-top:2px}
+.audit-btns{display:flex;gap:4px}
+.audit-btn{padding:3px 10px;border-radius:8px;border:1px solid;font-size:.7rem;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;font-family:'DM Sans',sans-serif}
+.audit-btn.si{color:var(--verde);border-color:var(--verde)}.audit-btn.si:hover,.audit-btn.si.sel{background:var(--verde);color:#fff}
+.audit-btn.no{color:var(--rojo);border-color:var(--rojo)}.audit-btn.no:hover,.audit-btn.no.sel{background:var(--rojo);color:#fff}
+.audit-btn.na-btn{color:#888;border-color:#ccc}.audit-btn.na-btn:hover,.audit-btn.na-btn.sel{background:#888;color:#fff}
+
+/* PUNTAJE */
+.puntaje-box{background:linear-gradient(135deg,#1a1a2e,#2C1810);border-radius:16px;padding:20px;color:#fff;text-align:center;margin-bottom:20px}
+.puntaje-num{font-family:'DM Serif Display',serif;font-size:3rem;margin-bottom:4px}
+.puntaje-lbl{font-size:.85rem;opacity:.7}
+.puntaje-bar{height:10px;background:rgba(255,255,255,.1);border-radius:5px;margin:12px 0 8px;overflow:hidden}
+.puntaje-fill{height:100%;border-radius:5px;transition:width .8s}
+.hist-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:.82rem}
+.hist-item:last-child{border-bottom:none}
+
+/* ALERTAS PANEL */
+.alert-grupo{margin-bottom:14px}
+.alert-grupo-title{font-size:.72rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;opacity:.45;color:#fff;margin-bottom:6px}
+.alert-pills{display:flex;flex-wrap:wrap;gap:7px}
+.pill{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:.76rem;font-weight:600}
+.pill.rojo{background:rgba(196,30,58,.2);border:1px solid var(--rojo);color:#EF9A9A}
+.pill.amarillo{background:rgba(255,152,0,.15);border:1px solid #FF9800;color:#FFB74D}
+.pill.verde{background:rgba(76,175,80,.12);border:1px solid #4CAF50;color:#81C784}
+.pill.gris{background:rgba(0,0,0,.25);border:1px solid #555;color:#888}
+.pill.azul{background:rgba(33,150,243,.15);border:1px solid #2196F3;color:#90CAF9}
+
+/* CONFIG */
+.cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cfg-field{margin-bottom:12px}
+.cfg-label{display:block;font-size:.78rem;font-weight:600;color:#555;margin-bottom:4px}
+.cfg-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text);background:#fafafa}
+.cfg-input:focus{border-color:var(--rojo);outline:none;background:#fff}
+
+/* BTN */
+.btn{padding:10px 18px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--rojo);color:#fff}.btn-primary:hover{background:var(--rojo-d)}
+.btn-secondary{background:#f5f5f5;color:#555}.btn-secondary:hover{background:#e8e8e8}
+.btn-verde{background:var(--verde);color:#fff}.btn-verde:hover{background:#1b5e20}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+/* DISCLAIMER */
+.disclaimer{background:#fffde7;border:1.5px dashed #F9A825;border-radius:12px;padding:12px 16px;font-size:.8rem;color:#5D4037;line-height:1.6;margin-top:14px}
+
+@media(max-width:680px){
+  .sem-bar{grid-template-columns:1fr 1fr}
+  header h1{font-size:1.8rem}
+  .tabs{gap:4px}
+  .tab-btn{font-size:.75rem;padding:8px 6px;min-width:80px}
+  .cfg-grid{grid-template-columns:1fr}
+  .norma-grid{grid-template-columns:1fr}
+}
+</style>
+    <!-- Firebase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-app-compat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-database-compat.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div style="font-size:2.8rem;margin-bottom:10px">⚖️</div>
+  <h1>Cumplimiento Legal</h1>
+  <p id="hdr-nombre">El Rincón del Barril · Marco Normativo y Autoauditoría</p>
+  <a href="index.html" class="back">← Volver al inicio</a>
+</header>
+
+<!-- SEMÁFORO TOP -->
+<div class="sem-bar" id="sem-bar">
+  <div class="sem gris" id="sem-legal">
+    <div class="sem-icon">🏛</div>
+    <div class="sem-label">Legal y tributario</div>
+    <div class="sem-val" id="sv-legal">—</div>
+    <div class="sem-sub" id="ss-legal">Calculando...</div>
+  </div>
+  <div class="sem gris" id="sem-sanitario">
+    <div class="sem-icon">🏥</div>
+    <div class="sem-label">Sanitario</div>
+    <div class="sem-val" id="sv-san">—</div>
+    <div class="sem-sub" id="ss-san">Calculando...</div>
+  </div>
+  <div class="sem gris" id="sem-laboral">
+    <div class="sem-icon">👥</div>
+    <div class="sem-label">Laboral y SST</div>
+    <div class="sem-val" id="sv-lab">—</div>
+    <div class="sem-sub" id="ss-lab">Calculando...</div>
+  </div>
+  <div class="sem gris" id="sem-audit">
+    <div class="sem-icon">✅</div>
+    <div class="sem-label">Autoauditoría</div>
+    <div class="sem-val" id="sv-audit">—</div>
+    <div class="sem-sub" id="ss-audit">Sin registrar</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('alertas',this)">🔔 Alertas</button>
+    <button class="tab-btn" onclick="showTab('normas',this)">📋 Marco normativo</button>
+    <button class="tab-btn" onclick="showTab('topes',this)">📈 Topes de crecimiento</button>
+    <button class="tab-btn" onclick="showTab('auditoria',this)">✅ Autoauditoría</button>
+    <button class="tab-btn" onclick="showTab('config',this)">⚙️ Configuración</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 1: ALERTAS ACTIVAS
+══════════════════════════════════════ -->
+<div id="tab-alertas" class="panel active">
+  <div class="card">
+    <div class="card-title">🔔 Alertas activas del negocio</div>
+    <div id="alertas-content"><div style="color:#aaa;font-size:.85rem">Calculando alertas...</div></div>
+  </div>
+
+  <div class="card" style="background:linear-gradient(135deg,#1a1a2e,#2C1810);color:#fff">
+    <div style="font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:12px;color:#fff">💡 Lo más urgente para Sergio hoy</div>
+    <div id="urgente-content" style="font-size:.85rem;line-height:1.8;opacity:.85">Calculando...</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 2: MARCO NORMATIVO
+══════════════════════════════════════ -->
+<div id="tab-normas" class="panel">
+
+  <!-- LEGAL Y MERCANTIL -->
+  <div class="seccion-titulo">🏛 Legal y mercantil</div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">📋</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Matrícula Mercantil</div>
+        <div class="norma-base">Código de Comercio · Cámara de Comercio Cúcuta</div>
+      </div>
+      <span class="badge b-warn">Renovar enero–marzo</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Qué es?</div><div class="norma-item-val">El registro que le da existencia legal al negocio. Sin él no puedes emitir facturas válidas ni contratar con empresas.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuánto cuesta</div><div class="norma-item-val">~$200.000–$400.000/año según activos. Renovación en enero–marzo.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Dónde</div><div class="norma-item-val"><a href="https://www.ccucuta.org.co" target="_blank">ccucuta.org.co</a> · En línea o presencial</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Frecuencia</div><div class="norma-item-val">Anual — antes del 31 de marzo</div></div>
+      </div>
+      <div class="consecuencia">⚠️ Sin renovación: multa del 0.5% del capital registrado + eventual cierre del establecimiento.</div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🧾</div>
+      <div class="norma-info">
+        <div class="norma-nombre">RUT actualizado — Código CIIU y actividad</div>
+        <div class="norma-base">DIAN · Estatuto Tributario</div>
+      </div>
+      <span class="badge b-warn">Verificar</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Qué revisar?</div><div class="norma-item-val">Código 52 (restaurantes) activo. Régimen correcto. Datos del establecimiento actualizados.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuánto cuesta</div><div class="norma-item-val">Gratuito</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Dónde</div><div class="norma-item-val"><a href="https://www.dian.gov.co" target="_blank">dian.gov.co</a> · Muisca en línea</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuándo</div><div class="norma-item-val">Cada vez que cambien datos del negocio</div></div>
+      </div>
+      <div class="consecuencia">⚠️ RUT desactualizado puede bloquear la facturación electrónica y generar inconsistencias con la DIAN.</div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🗺️</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Concepto de Uso de Suelo</div>
+        <div class="norma-base">POT Cúcuta — Acuerdo 022/2019 · Planeación Municipal</div>
+      </div>
+      <span class="badge b-info">Verificar zona</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Qué es?</div><div class="norma-item-val">Confirma que la actividad de restaurante está permitida en la Av 16AE # 15N-118 Niza según el POT de Cúcuta.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuánto cuesta</div><div class="norma-item-val">Gratuito · Certificado emitido por Planeación</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Dónde</div><div class="norma-item-val">Planeación Municipal — Alcaldía de Cúcuta<br><a href="https://cucuta.gov.co" target="_blank">cucuta.gov.co</a></div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuándo</div><div class="norma-item-val">Al abrir o cambiar actividad. Conservar el documento.</div></div>
+      </div>
+      <div class="nota-verde">✅ Dato relevante: el Concejo de Cúcuta declaró la gastronomía cucuteña Patrimonio Cultural y Turístico (Acuerdo 019/2024) — puede abrir puertas a incentivos.</div>
+    </div>
+  </div>
+
+  <!-- SANITARIO -->
+  <div class="seccion-titulo">🏥 Sanitario — Resolución 2674/2013 INVIMA · Ley 9/1979</div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🔬</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Concepto Sanitario del Establecimiento</div>
+        <div class="norma-base">Resolución 2674/2013 · Secretaría de Salud Norte de Santander</div>
+      </div>
+      <span class="badge b-crit">Obligatorio</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Qué es?</div><div class="norma-item-val">Visita de inspección sanitaria que certifica que el restaurante cumple las condiciones para preparar alimentos. La visita es gratuita.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuánto cuesta</div><div class="norma-item-val">Gratuito — la Secretaría de Salud hace la visita sin costo</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cómo solicitarlo</div><div class="norma-item-val">Inscribirse en el proceso de autorregulación de la Secretaría de Salud NS, luego solicitar la visita.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Documentos en el local</div><div class="norma-item-val">Plan de saneamiento, certificados de manipulación de alimentos, cronograma de capacitación.</div></div>
+      </div>
+      <div class="consecuencia">⚠️ Sin concepto sanitario: cierre inmediato del establecimiento en caso de visita de inspección.</div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🧤</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Certificados de Manipulación de Alimentos</div>
+        <div class="norma-base">Resolución 2674/2013 Cap. VIII · Todo el personal</div>
+      </div>
+      <span class="badge b-crit">Todo el equipo</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Quién lo necesita?</div><div class="norma-item-val">Todo trabajador que manipule alimentos. Sin excepción. El inspector lo pedirá a cada persona.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuánto cuesta</div><div class="norma-item-val">~$30.000–$60.000 por persona. SENA lo ofrece gratuito periódicamente.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Dónde obtenerlo</div><div class="norma-item-val">SENA Cúcuta · Clínicas · Laboratorios privados autorizados · Vigencia: ~1 año</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">También incluye</div><div class="norma-item-val">Certificado médico de aptitud para manipular alimentos (examen médico).</div></div>
+      </div>
+      <div class="consecuencia">⚠️ Personal sin certificado vigente: infracción sanitaria, posible cierre y multa a Sergio como empleador.</div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🧼</div>
+      <div class="norma-info">
+        <div class="norma-nombre">BPM — Buenas Prácticas de Manufactura</div>
+        <div class="norma-base">Resolución 2674/2013 · Aplicación diaria en cocina</div>
+      </div>
+      <span class="badge b-ok">Documentado</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">Obligaciones clave</div><div class="norma-item-val">Uniforme claro, cabello recogido, uñas cortas, sin joyas, lavado de manos, no fumar ni comer en cocina.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Temperatura segura</div><div class="norma-item-val">Caliente: >60°C · Frío: <4°C · Zona peligro: 4–60°C (max 2 horas)</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">En el sistema</div><div class="norma-item-val">BPM incluido en módulo de Inducción (módulo 8) de la Central de Personal</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Evidencia requerida</div><div class="norma-item-val">Plan de saneamiento documentado · Registro de capacitaciones en BPM</div></div>
+      </div>
+      <div class="nota-verde">✅ El sistema de Saneamiento y el módulo de Inducción ya documentan el cumplimiento de BPM.</div>
+    </div>
+  </div>
+
+  <!-- LABORAL Y SST -->
+  <div class="seccion-titulo">👥 Laboral y Seguridad y Salud en el Trabajo</div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🏥</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Afiliación a Seguridad Social — EPS + ARL + Pensión</div>
+        <div class="norma-base">Ley 100/1993 · Decreto 1072/2015 · Ley 2381/2024</div>
+      </div>
+      <span class="badge b-crit">Desde el día 1</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Qué cubre?</div><div class="norma-item-val">EPS: salud · ARL: accidentes laborales · Pensión: vejez e invalidez. Los tres son obligatorios desde el primer día.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuánto cuesta</div><div class="norma-item-val">~$306.000/mes por trabajador en SMMLV. ARL en riesgo II (cocina): ~$14.000. Domiciliarios: riesgo IV más costoso.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuándo pagar</div><div class="norma-item-val">Día 5 del mes siguiente. Plataforma PILA en línea.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">El riesgo real</div><div class="norma-item-val">Un accidente sin ARL puede costar $8–40M en atención médica. Una demanda laboral: $30–100M.</div></div>
+      </div>
+      <div class="consecuencia">⚠️ Sin afiliación: Sergio asume TODOS los gastos médicos del accidente. Multas UGPP: 5%/mes sobre lo adeudado hasta 100% de la deuda.</div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🛡️</div>
+      <div class="norma-info">
+        <div class="norma-nombre">SG-SST — 7 Estándares Mínimos</div>
+        <div class="norma-base">Resolución 0312/2019 Capítulo 1 · Menos de 10 trabajadores Riesgo I-III</div>
+      </div>
+      <span class="badge b-warn">Requiere SS activa</span>
+    </div>
+    <div class="norma-body">
+      <div style="font-size:.82rem;color:var(--text);margin-bottom:10px;line-height:1.6">Los 7 estándares mínimos obligatorios para El Rincón del Barril:</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div class="norma-item"><div class="norma-item-lbl">1</div><div class="norma-item-val">✅ Afiliación a seguridad social de todos los trabajadores</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">2</div><div class="norma-item-val">Designar Vigía SST por escrito (o COPASST si hay ≥10)</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">3</div><div class="norma-item-val">Identificar peligros y evaluar riesgos del restaurante</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">4</div><div class="norma-item-val">Plan de capacitación anual en SST</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">5</div><div class="norma-item-val">Programa de prevención de accidentes documentado</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">6</div><div class="norma-item-val">Exámenes médicos de ingreso y periódicos</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">7</div><div class="norma-item-val">Autoevaluación anual en <a href="https://sgrl.mintrabajo.gov.co" target="_blank">sgrl.mintrabajo.gov.co</a> — diciembre</div></div>
+      </div>
+      <div class="consecuencia">⚠️ El estándar 1 es la afiliación SS — sin ella los demás no tienen validez. Multas hasta 500 SMMLV.</div>
+      <div class="nota-verde">📅 Autoevaluación anual: registrarla en diciembre en el portal del Ministerio del Trabajo.</div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">👕</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Dotación del Equipo</div>
+        <div class="norma-base">Art. 230 CST · 3 veces al año</div>
+      </div>
+      <span class="badge b-ok">Documentado</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">Fechas obligatorias</div><div class="norma-item-val">30 de abril · 31 de agosto · 20 de diciembre</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">¿Quién tiene derecho?</div><div class="norma-item-val">Trabajadores con más de 3 meses continuos y salario ≤ 2 SMMLV</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Costo estimado</div><div class="norma-item-val">$5–8M/año total según número de empleados</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">En el sistema</div><div class="norma-item-val">Registrado y con actas en la Central de Personal</div></div>
+      </div>
+      <div class="nota-verde">✅ El Procedimiento de Dotación ya está documentado en la Central de Personal.</div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">📋</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Reglamento Interno de Trabajo</div>
+        <div class="norma-base">Art. 105–115 CST · Publicación interna obligatoria</div>
+      </div>
+      <span class="badge b-ok">Creado v2.0</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Para qué sirve?</div><div class="norma-item-val">Define las reglas del juego. Sin él, Sergio no puede sancionar válidamente a un trabajador.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Requisito</div><div class="norma-item-val">Publicar en lugar visible + entregar a cada trabajador al ingresar. Desde 2022 NO se deposita en Mintrabajo.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">En el sistema</div><div class="norma-item-val">Editable con PIN en la Central de Personal. Genera PDF para firmar e imprimir.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Constancia de entrega</div><div class="norma-item-val">Generada desde el expediente de cada empleado. Firmar y archivar.</div></div>
+      </div>
+      <div id="rgl-estado-norma" style="margin-top:10px;font-size:.82rem;color:#888">Verificando estado...</div>
+    </div>
+  </div>
+
+  <!-- SEGURIDAD -->
+  <div class="seccion-titulo">🚒 Seguridad física del establecimiento</div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🚒</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Concepto Técnico de Bomberos</div>
+        <div class="norma-base">Cuerpo Oficial de Bomberos Cúcuta · Anual</div>
+      </div>
+      <span class="badge b-warn">Renovar anual</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Qué verifica?</div><div class="norma-item-val">Extintores vigentes, señalización de emergencia, salidas de evacuación despejadas, plan de emergencias básico.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuánto cuesta</div><div class="norma-item-val">~$150.000–$300.000 según tamaño del local</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Dónde</div><div class="norma-item-val">Bomberos Cúcuta · Solicitar visita de inspección</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Frecuencia</div><div class="norma-item-val">Anual. Renovar antes de que venza.</div></div>
+      </div>
+      <div class="consecuencia">⚠️ Sin concepto vigente: cierre inmediato del establecimiento. En caso de incendio, Sergio puede perder el seguro.</div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🧯</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Recarga de Extintores</div>
+        <div class="norma-base">NTC 2885 · Empresa certificada</div>
+      </div>
+      <span class="badge b-warn">Anual</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">Cuánto cuesta</div><div class="norma-item-val">~$60.000–$120.000 por extintor</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Tipo recomendado</div><div class="norma-item-val">CO₂ para área eléctrica · Multipropósito ABC para cocina</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuándo</div><div class="norma-item-val">Anual o cuando la aguja baje de la zona verde</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Señalización</div><div class="norma-item-val">Extintores en lugar visible con señal normalizada</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🔥</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Revisión Técnica de Gas Natural</div>
+        <div class="norma-base">Técnico certificado · Anual</div>
+      </div>
+      <span class="badge b-warn">Anual</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Qué incluye?</div><div class="norma-item-val">Revisión de tuberías, mangueras, válvulas, ventilación de cocina y estado de los quemadores.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuánto cuesta</div><div class="norma-item-val">~$100.000–$200.000</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Quién lo hace</div><div class="norma-item-val">Técnico certificado por la empresa de gas (Naturgas o similar en Cúcuta)</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Guardar</div><div class="norma-item-val">Certificado de la revisión — Bomberos lo puede pedir</div></div>
+      </div>
+      <div class="consecuencia">⚠️ Una fuga de gas sin revisión previa puede invalidar el seguro y generar responsabilidad penal.</div>
+    </div>
+  </div>
+
+  <!-- TRIBUTARIO -->
+  <div class="seccion-titulo">🧾 Tributario — Cúcuta y nacional</div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🏙️</div>
+      <div class="norma-info">
+        <div class="norma-nombre">ICA — Impuesto de Industria y Comercio Cúcuta</div>
+        <div class="norma-base">Acuerdo 025/2018 Municipio de Cúcuta · Bimestral</div>
+      </div>
+      <span class="badge b-warn">Bimestral</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Cómo se calcula?</div><div class="norma-item-val">Tarifa por mil sobre ingresos netos. Restaurantes = actividad de servicios. Confirmar tarifa exacta con Secretaría de Hacienda Cúcuta.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Ejemplo orientativo</div><div class="norma-item-val">Si vendes $70M y tarifa es 5x1000 = $350.000 bimestrales (orientativo — confirmar)</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuándo declarar</div><div class="norma-item-val">Bimestral: feb, abr, jun, ago, oct, dic. Calendario tributario Cúcuta 2026.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Dónde</div><div class="norma-item-val">Portal de impuestos Alcaldía Cúcuta · <a href="https://cucuta.gov.co" target="_blank">cucuta.gov.co</a></div></div>
+      </div>
+      <div class="disclaimer">⚠️ La tarifa exacta la confirma tu contador con la Secretaría de Hacienda de Cúcuta. Este módulo da orientación, no reemplaza la asesoría tributaria.</div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">📄</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Facturación Electrónica DIAN</div>
+        <div class="norma-base">DIAN · Resolución 000042/2020</div>
+      </div>
+      <span class="badge b-ok">Habilitado</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">Estado</div><div class="norma-item-val">✅ El facturador electrónico gratuito de la DIAN ya está habilitado para El Rincón del Barril</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Obligación</div><div class="norma-item-val">Emitir factura electrónica a quien la solicite. Conservar numeración consecutiva.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">IVA</div><div class="norma-item-val">Restaurantes en régimen ordinario son responsables de IVA. Confirmar con contador si aplica.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Lista de precios</div><div class="norma-item-val">Ley 1480/2011: precios visibles para el cliente. El menú físico o QR debe estar disponible antes de entrar.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESPECIALES -->
+  <div class="seccion-titulo">🎵 Obligaciones especiales del restaurante</div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🎵</div>
+      <div class="norma-info">
+        <div class="norma-nombre">SAYCO-ACINPRO — Derechos de Autor por Música</div>
+        <div class="norma-base">Ley 23/1982 · OSA — Organización Sayco Acinpro · Anual</div>
+      </div>
+      <span class="badge b-crit">Obligatorio si hay música</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Aplica?</div><div class="norma-item-val">Sí — El Rincón del Barril pone música ambiental. Aplica aunque sea música de Spotify o radio.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cuánto cuesta</div><div class="norma-item-val">Variable según área, aforo y estrato. Usar el simulador en <a href="https://www.osa.org.co/simulador.php" target="_blank">osa.org.co/simulador</a> con los datos del local.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Cómo registrarse</div><div class="norma-item-val">OSA Virtual en <a href="https://www.osa.org.co" target="_blank">osa.org.co</a> → Registra tu establecimiento → Descarga el formulario de autodeclaración.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Frecuencia</div><div class="norma-item-val">Anual. Puede pagarse mensual o anual.</div></div>
+      </div>
+      <div class="consecuencia">⚠️ Sin certificado SAYCO: multa equivalente al doble del valor anual + cierre temporal. OSA hace visitas de verificación.</div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🍺</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Licencia de Venta de Alcohol</div>
+        <div class="norma-base">Secretaría de Gobierno Alcaldía de Cúcuta</div>
+      </div>
+      <span class="badge b-crit">Venta de cerveza</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Aplica?</div><div class="norma-item-val">Sí — El Rincón del Barril vende cerveza nacional. Se requiere licencia municipal.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Dónde tramitarla</div><div class="norma-item-val">Secretaría de Gobierno — Alcaldía de Cúcuta. Presencial o virtual.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Decreto horarios</div><div class="norma-item-val">Decreto 0166/2024 Cúcuta establece horarios para establecimientos. Verificar horario autorizado.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Importante</div><div class="norma-item-val">No vender alcohol a menores de 18 años. Mantener aviso visible en el local.</div></div>
+      </div>
+      <div class="consecuencia">⚠️ Venta sin licencia: cierre inmediato + multa. Reincidencia: cancelación definitiva.</div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🔊</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Control de Ruido — Zona Niza</div>
+        <div class="norma-base">Resolución 0627/2006 MADS · CDMB Cúcuta</div>
+      </div>
+      <span class="badge b-warn">Verificar zona</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">Límites legales</div><div class="norma-item-val">Zona residencial: 65 dB día / 45 dB noche · Zona comercial: 70 dB día / 60 dB noche</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Riesgo en Niza</div><div class="norma-item-val">El barrio Niza tiene componente residencial. La parrilla + música + afluencia de fines de semana puede generar quejas.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Acción preventiva</div><div class="norma-item-val">Verificar clasificación de zona en Planeación. Extractor bien direccionado. Música a volumen moderado.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Quién regula</div><div class="norma-item-val">CDMB (Corporación Autónoma) y Alcaldía de Cúcuta pueden hacer mediciones ante quejas.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🏍️</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Domiciliarios — Requisitos del Vehículo y Conductor</div>
+        <div class="norma-base">Código de Tránsito · Res. 2674/2013 · Ley 2381/2024</div>
+      </div>
+      <span class="badge b-info">Si hay domicilios</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">Vehículo</div><div class="norma-item-val">SOAT vigente · Revisión técnicomecánica (si aplica) · Tarjeta de propiedad</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Conductor</div><div class="norma-item-val">Licencia A2 para motos ≥125cc · Casco NTC 4533 · Chaleco reflectivo con nombre del restaurante</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Alimentos</div><div class="norma-item-val">Caja térmica que mantenga temperatura segura. Prohíbe usar celular conduciendo.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">ARL domiciliarios</div><div class="norma-item-val">Riesgo IV (moto) — más costoso pero obligatorio. Desde julio 2025: contratistas también deben estar afiliados (Ley 2381/2024).</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AMBIENTAL -->
+  <div class="seccion-titulo">🌿 Ambiental — CORPONOR y Empresa de Acueducto</div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">🪣</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Trampa de Grasas</div>
+        <div class="norma-base">CORPONOR · EMPOCÚCUTA · Obligatorio restaurantes</div>
+      </div>
+      <span class="badge b-crit">Verificar</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">¿Qué es?</div><div class="norma-item-val">Dispositivo que retiene grasas antes de que lleguen al alcantarillado. Obligatorio en todo establecimiento gastronómico.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Mantenimiento</div><div class="norma-item-val">Limpieza periódica (mensual o según uso). Registro de mantenimiento documentado.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Quién verifica</div><div class="norma-item-val">EMPOCÚCUTA y CORPONOR en inspecciones ambientales</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Aceite usado</div><div class="norma-item-val">Prohibido tirar al desagüe. Debe entregarse a gestor ambiental certificado.</div></div>
+      </div>
+      <div class="consecuencia">⚠️ Sin trampa de grasas o con descargas ilegales: multa ambiental y corte del servicio de alcantarillado.</div>
+    </div>
+  </div>
+
+  <div class="norma" onclick="toggleNorma(this)">
+    <div class="norma-hdr">
+      <div class="norma-icon">♻️</div>
+      <div class="norma-info">
+        <div class="norma-nombre">Manejo de Residuos Sólidos y Aceite Usado</div>
+        <div class="norma-base">Decreto 2981/2013 · CORPONOR</div>
+      </div>
+      <span class="badge b-warn">Buenas prácticas</span>
+    </div>
+    <div class="norma-body">
+      <div class="norma-grid">
+        <div class="norma-item"><div class="norma-item-lbl">Separación</div><div class="norma-item-val">Orgánicos (desperdicios) · Reciclables (cartón, plástico) · No reciclables. Canecas identificadas por color.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Aceite de fritura</div><div class="norma-item-val">Nunca al desagüe. Almacenar en bidón sellado y entregar a empresa gestora autorizada (puede venderse).</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Recolección</div><div class="norma-item-val">Sacar residuos en los horarios de recolección de ESPC Cúcuta. No acumular frente al local.</div></div>
+        <div class="norma-item"><div class="norma-item-lbl">Metrología</div><div class="norma-item-val">Las básculas para pesar carnes deben tener calibración vigente (sello ONAC).</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-normas -->
+
+<!-- ══════════════════════════════════════
+     TAB 3: TOPES DE CRECIMIENTO
+══════════════════════════════════════ -->
+<div id="tab-topes" class="panel">
+  <div class="card">
+    <div class="card-title">📈 Topes que activan nuevas obligaciones</div>
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:18px">Cuando el negocio crece, ciertas cifras activan obligaciones legales nuevas. Aquí puedes ver en qué punto está Sergio y qué se activa al crecer.</p>
+    <div id="topes-content"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TAB 4: AUTOAUDITORÍA
+══════════════════════════════════════ -->
+<div id="tab-auditoria" class="panel">
+
+  <div class="puntaje-box">
+    <div class="puntaje-num" id="audit-puntaje">—</div>
+    <div class="puntaje-lbl" id="audit-puntaje-lbl">Puntos de cumplimiento</div>
+    <div class="puntaje-bar"><div class="puntaje-fill" id="audit-barra" style="width:0%"></div></div>
+    <div style="font-size:.8rem;opacity:.6;margin-top:4px" id="audit-fecha">Sin auditoría registrada</div>
+    <div style="margin-top:12px;font-size:.8rem;opacity:.6">Historial:</div>
+    <div id="audit-historial"></div>
+  </div>
+
+  <div id="audit-checklist"></div>
+
+  <div class="btn-row" style="justify-content:center;margin-top:16px">
+    <button class="btn btn-verde" onclick="auditGuardar()">💾 Guardar autoauditoría del mes</button>
+    <button class="btn btn-secondary" onclick="auditReset()">↺ Reiniciar</button>
+  </div>
+
+</div><!-- /tab-auditoria -->
+
+<!-- ══════════════════════════════════════
+     TAB 5: CONFIGURACIÓN
+══════════════════════════════════════ -->
+<div id="tab-config" class="panel">
+  <div class="card">
+    <div class="card-title">⚙️ Configuración</div>
+    <div class="cfg-grid">
+      <div class="cfg-field">
+        <label class="cfg-label">Nombre del negocio</label>
+        <input class="cfg-input" id="cfg-nombre" value="El Rincón del Barril">
+      </div>
+      <div class="cfg-field">
+        <label class="cfg-label">Fecha última renovación matrícula</label>
+        <input class="cfg-input" type="date" id="cfg-matricula">
+      </div>
+      <div class="cfg-field">
+        <label class="cfg-label">Fecha último concepto sanitario</label>
+        <input class="cfg-input" type="date" id="cfg-sanitario">
+      </div>
+      <div class="cfg-field">
+        <label class="cfg-label">Fecha último concepto bomberos</label>
+        <input class="cfg-input" type="date" id="cfg-bomberos">
+      </div>
+      <div class="cfg-field">
+        <label class="cfg-label">Fecha último SAYCO-ACINPRO</label>
+        <input class="cfg-input" type="date" id="cfg-sayco">
+      </div>
+      <div class="cfg-field">
+        <label class="cfg-label">Fecha revisión gas</label>
+        <input class="cfg-input" type="date" id="cfg-gas">
+      </div>
+      <div class="cfg-field">
+        <label class="cfg-label">Fecha recarga extintores</label>
+        <input class="cfg-input" type="date" id="cfg-extintores">
+      </div>
+      <div class="cfg-field">
+        <label class="cfg-label">Número de trabajadores activos</label>
+        <input class="cfg-input" type="number" id="cfg-trabajadores" value="5" min="1">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="cfgGuardar()">💾 Guardar configuración</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ── FIREBASE ─────────────────────────────────────────────────
+const FB_CFG_CUMPL = {
+  apiKey: "AIzaSyB-dBPWbqt9pOnxGNGSRzwjciZI7HjbHi8",
+  authDomain: "rincon-del-barril-c7d7e.firebaseapp.com",
+  databaseURL: "https://rincon-del-barril-c7d7e-default-rtdb.firebaseio.com",
+  projectId: "rincon-del-barril-c7d7e",
+  storageBucket: "rincon-del-barril-c7d7e.firebasestorage.app",
+  messagingSenderId: "156157399571",
+  appId: "1:156157399571:web:320fd8758f38e9d413e5e6"
+};
+let db_cumpl = null;
+try {
+  if (typeof firebase !== 'undefined') {
+    if (!firebase.apps.length) firebase.initializeApp(FB_CFG_CUMPL);
+    db_cumpl = firebase.database();
+  }
+} catch(e) {}
+const FB_PATH_CUMPL = 'rincon-barril/cumplimiento/';
+const fbCacheCumpl  = { cfg: null, audit: null };
+function fbSaveCumpl(sub, val) {
+  if (!db_cumpl) return;
+  db_cumpl.ref(FB_PATH_CUMPL + sub).set(val).catch(e => console.warn('FB cumpl write:', e));
+}
+async function cargarDesdeFirebaseCumpl() {
+  if (!db_cumpl) return;
+  try {
+    const snap = await db_cumpl.ref(FB_PATH_CUMPL).get();
+    if (snap.exists()) {
+      const d = snap.val();
+      if (d.cfg)   fbCacheCumpl.cfg   = d.cfg;
+      if (d.audit) fbCacheCumpl.audit = d.audit;
+    }
+  } catch(e) {}
+}
+// ─────────────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════
+// SISTEMA CUMPLIMIENTO LEGAL — El Rincón del Barril
+// TodoPosibleMD · v1.0 · 2026
+// ═══════════════════════════════════════════════════════════
+
+const CFG_KEY   = 'cumplimiento_cfg';
+const AUDIT_KEY = 'cumplimiento_audit';
+
+// ── CONFIG ─────────────────────────────────────────────────
+function cfgGet(){
+  try { if (fbCacheCumpl.cfg) return fbCacheCumpl.cfg; const r=localStorage.getItem(CFG_KEY); if(r) return JSON.parse(r); } catch(e){}
+  return { nombre:'El Rincón del Barril', matricula:'', sanitario:'', bomberos:'', sayco:'', gas:'', extintores:'', trabajadores:5 };
+}
+function cfgGuardar(){
+  const d = { nombre:v('cfg-nombre'), matricula:v('cfg-matricula'), sanitario:v('cfg-sanitario'), bomberos:v('cfg-bomberos'), sayco:v('cfg-sayco'), gas:v('cfg-gas'), extintores:v('cfg-extintores'), trabajadores:parseInt(v('cfg-trabajadores'))||5 };
+  localStorage.setItem(CFG_KEY, JSON.stringify(d));
+  fbCacheCumpl.cfg = d; fbSaveCumpl('cfg', d);
+  toast('✅ Configuración guardada'); init();
+}
+function cfgLoad(){
+  const d = cfgGet();
+  sv('cfg-nombre', d.nombre||'El Rincón del Barril');
+  sv('cfg-matricula', d.matricula||'');
+  sv('cfg-sanitario', d.sanitario||'');
+  sv('cfg-bomberos', d.bomberos||'');
+  sv('cfg-sayco', d.sayco||'');
+  sv('cfg-gas', d.gas||'');
+  sv('cfg-extintores', d.extintores||'');
+  sv('cfg-trabajadores', d.trabajadores||5);
+}
+
+// ── UTILIDADES ──────────────────────────────────────────────
+function v(id){ const e=document.getElementById(id); return e?e.value:''; }
+function sv(id,val){ const e=document.getElementById(id); if(e) e.value=val; }
+function txt(id,val){ const e=document.getElementById(id); if(e) e.textContent=val; }
+function html(id,val){ const e=document.getElementById(id); if(e) e.innerHTML=val; }
+function hoy(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
+function diasHasta(f){ if(!f) return null; const t=new Date(f); t.setHours(0,0,0,0); return Math.round((t-hoy())/86400000); }
+function addDays(f,n){ const d=new Date(f); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
+function addMonths(f,n){ const d=new Date(f); d.setMonth(d.getMonth()+n); return d.toISOString().split('T')[0]; }
+function semaforo(dias){
+  if(dias===null) return {cls:'gris',ico:'⚫',lbl:'Sin fecha'};
+  if(dias<0)      return {cls:'rojo',ico:'🔴',lbl:`Vencido ${Math.abs(dias)}d`};
+  if(dias<15)     return {cls:'rojo',ico:'🔴',lbl:`${dias}d`};
+  if(dias<60)     return {cls:'amarillo',ico:'🟡',lbl:`${dias}d`};
+  return           {cls:'verde',ico:'🟢',lbl:`${dias}d`};
+}
+function fmt(n){ return n?'$'+Math.round(n).toLocaleString('es-CO'):'—'; }
+function toast(msg){
+  let t=document.getElementById('cmp-toast');
+  if(!t){ t=document.createElement('div'); t.id='cmp-toast'; t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:20px;font-size:.85rem;z-index:9999;transition:opacity .3s'; document.body.appendChild(t); }
+  t.textContent=msg; t.style.opacity=1;
+  setTimeout(()=>t.style.opacity=0, 2500);
+}
+
+// ── TABS ────────────────────────────────────────────────────
+function showTab(name, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='topes') renderTopes();
+  if(name==='auditoria') renderAudit();
+}
+
+// ── NORMAS TOGGLE ───────────────────────────────────────────
+function toggleNorma(el){ el.classList.toggle('open'); }
+
+// ── ALERTAS ─────────────────────────────────────────────────
+function calcAlertas(){
+  const cfg = cfgGet();
+  const grupos = [];
+
+  // Legal
+  const legal = [];
+  const dMatricula = cfg.matricula ? diasHasta(addMonths(cfg.matricula,12)) : null;
+  legal.push({ lbl:'Matrícula mercantil', d: cfg.matricula ? dMatricula : null, pendiente: !cfg.matricula, nota:'Renovar en Cámara de Comercio Cúcuta' });
+  legal.push({ lbl:'SAYCO-ACINPRO',       d: cfg.sayco ? diasHasta(addMonths(cfg.sayco,12)) : null, pendiente: !cfg.sayco, nota:'osa.org.co — usar simulador de tarifas' });
+  legal.push({ lbl:'Licencia de alcohol',  d: null, pendiente: true, nota:'Verificar vigencia con Secretaría de Gobierno Cúcuta' });
+  grupos.push({ titulo:'🏛️ Legal', items: legal });
+
+  // Sanitario
+  const san = [];
+  san.push({ lbl:'Concepto sanitario', d: cfg.sanitario ? diasHasta(addMonths(cfg.sanitario,12)) : null, pendiente: !cfg.sanitario, nota:'Secretaría de Salud NS — visita gratuita' });
+  san.push({ lbl:'Certs. manipulación alimentos', d: null, pendiente: true, nota:'Verificar vigencia de todo el equipo' });
+  grupos.push({ titulo:'🏥 Sanitario', items: san });
+
+  // Seguridad
+  const seg = [];
+  seg.push({ lbl:'Concepto bomberos',  d: cfg.bomberos    ? diasHasta(addMonths(cfg.bomberos,12))  : null, pendiente: !cfg.bomberos,   nota:'Bomberos Cúcuta' });
+  seg.push({ lbl:'Extintores',         d: cfg.extintores  ? diasHasta(addMonths(cfg.extintores,12)): null, pendiente: !cfg.extintores, nota:'Empresa certificada' });
+  seg.push({ lbl:'Revisión técnica gas',d: cfg.gas        ? diasHasta(addMonths(cfg.gas,12))       : null, pendiente: !cfg.gas,        nota:'Técnico certificado' });
+  grupos.push({ titulo:'🚒 Seguridad', items: seg });
+
+  // Financiero/laboral
+  const fin = [];
+  const dia = new Date().getDate();
+  const mes = new Date().getMonth();
+  const anio = new Date().getFullYear();
+  const dia5 = new Date(anio, mes + (dia>5?1:0), 5);
+  fin.push({ lbl:'Pago seguridad social', d: Math.round((dia5-hoy())/86400000), pendiente: false });
+  const bim = [[2,28],[4,30],[6,30],[8,31],[10,31],[12,20]];
+  const proxBim = bim.find(b=>b[0]>=mes+1)||bim[0];
+  const anBim = proxBim[0]<mes+1 ? anio+1 : anio;
+  fin.push({ lbl:'Declaración ICA Cúcuta', d: diasHasta(`${anBim}-${String(proxBim[0]).padStart(2,'0')}-${proxBim[1]}`), pendiente: false, nota:'Confirmar fecha exacta con contador' });
+  // Autoevaluación SST en diciembre
+  const decFecha = `${anio}-12-15`;
+  fin.push({ lbl:'Autoevaluación SG-SST (diciembre)', d: diasHasta(decFecha), pendiente: false, nota:'sgrl.mintrabajo.gov.co' });
+  grupos.push({ titulo:'💰 Laboral y fiscal', items: fin });
+
+  return grupos;
+}
+
+function renderAlertas(){
+  const grupos = calcAlertas();
+  let allItems = [];
+  grupos.forEach(g => allItems = allItems.concat(g.items));
+
+  // Semáforos top
+  const legal  = grupos[0].items;
+  const san    = grupos[1].items;
+  const seg    = grupos[2].items;
+  const semLeg = worstSem(legal);
+  const semSan = worstSem(san);
+  const semSeg = worstSem(seg);
+
+  setSem('sem-legal',  semLeg, 'sv-legal',  'ss-legal',  'Legal');
+  setSem('sem-sanitario', semSan, 'sv-san', 'ss-san', 'Sanitario');
+  setSem('sem-laboral', semSeg, 'sv-lab', 'ss-lab', 'Seguridad');
+
+  // Audit sem
+  const audit = auditGetLast();
+  const sem4 = document.getElementById('sem-audit');
+  if(audit){
+    const pct = audit.pct;
+    sem4.className = 'sem ' + (pct>=80?'verde':pct>=60?'amarillo':'rojo');
+    txt('sv-audit', pct+'%');
+    txt('ss-audit', audit.fecha || '');
+  }
+
+  // Panel alertas
+  const cont = document.getElementById('alertas-content');
+  const critCount = allItems.filter(i=>{ const s=semaforo(i.pendiente?null:i.d); return s.cls==='rojo'||s.cls==='gris'; }).length;
+  const warnCount = allItems.filter(i=>{ const s=semaforo(i.pendiente?null:i.d); return s.cls==='amarillo'; }).length;
+
+  if(!critCount && !warnCount){ cont.innerHTML='<div style="color:#4CAF50;font-size:.9rem;padding:8px">✅ Todo al día — sin alertas críticas activas</div>'; }
+  else {
+    let h='';
+    grupos.forEach(g=>{
+      const relevantes = g.items.filter(i=>{ const s=semaforo(i.pendiente?null:i.d); return s.cls!=='verde'; });
+      if(!relevantes.length) return;
+      h+=`<div class="alert-grupo"><div class="alert-grupo-title">${g.titulo}</div><div class="alert-pills">`;
+      relevantes.forEach(i=>{
+        const s = semaforo(i.pendiente?null:i.d);
+        h+=`<div class="pill ${s.cls}" title="${i.nota||i.lbl}">${s.ico} ${i.lbl} <strong>${s.lbl}</strong></div>`;
+      });
+      h+='</div></div>';
+    });
+    cont.innerHTML=h;
+  }
+
+  // Urgente
+  const crit = allItems.filter(i=>{ const s=semaforo(i.pendiente?null:i.d); return s.cls==='rojo'; });
+  const urgEl = document.getElementById('urgente-content');
+  if(crit.length){
+    urgEl.innerHTML = crit.slice(0,4).map(i=>`<div style="margin-bottom:6px">🔴 <strong>${i.lbl}</strong>${i.nota?' — '+i.nota:''}</div>`).join('');
+  } else if(warnCount) {
+    urgEl.innerHTML='<div>🟡 No hay alertas críticas. Atender las advertencias amarillas antes de que venzan.</div>';
+  } else {
+    urgEl.innerHTML='<div>✅ Sin alertas urgentes. Mantener el ritmo de renovaciones.</div>';
+  }
+
+  // Estado reglamento en norma
+  try {
+    const rgl = localStorage.getItem('rincon_reglamento_v1');
+    const rglEl = document.getElementById('rgl-estado-norma');
+    if(rglEl){
+      if(rgl){ const d=JSON.parse(rgl); rglEl.innerHTML=`<span style="color:var(--verde)">✅ Versión ${d.version} — ${d.fecha}</span>`; }
+      else { rglEl.innerHTML='<span style="color:var(--amarillo)">⚠️ Aún sin versión guardada en el sistema. Ir a Central de Personal → Reglamento.</span>'; }
+    }
+  } catch(e){}
+}
+
+function worstSem(items){
+  let worst = 'verde';
+  items.forEach(i=>{
+    const s = semaforo(i.pendiente?null:i.d);
+    if(s.cls==='rojo') worst='rojo';
+    else if(s.cls==='gris' && worst!=='rojo') worst='rojo';
+    else if(s.cls==='amarillo' && worst==='verde') worst='amarillo';
+  });
+  return worst;
+}
+function setSem(semId, cls, valId, subId, label){
+  const el=document.getElementById(semId);
+  if(el) el.className='sem '+cls;
+  const msgs = {verde:'Al día',amarillo:'Revisar pronto',rojo:'Atención urgente',gris:'Sin datos'};
+  txt(valId, msgs[cls]||cls);
+  txt(subId, label);
+}
+
+// ── TOPES DE CRECIMIENTO ────────────────────────────────────
+function renderTopes(){
+  const cfg = cfgGet();
+  const trab = cfg.trabajadores || 5;
+
+  // Leer ventas anuales de finanzas
+  let ventasAnuales = 0;
+  try {
+    const meses = JSON.parse(localStorage.getItem('finanzas_meses')||'{}');
+    const anio = new Date().getFullYear();
+    Object.keys(meses).filter(k=>k.startsWith(anio)).forEach(k=>{ ventasAnuales += parseFloat(meses[k].ventas)||0; });
+  } catch(e){}
+
+  const SMMLV2025 = 1423500;
+  const umbralRNT = 500 * SMMLV2025; // ~$711.750.000
+  const pctRNT = Math.min(Math.round((ventasAnuales/umbralRNT)*100),100);
+  const pctTrab10 = Math.min(Math.round((trab/10)*100),100);
+  const pctTrab50 = Math.min(Math.round((trab/50)*100),100);
+
+  const topes = [
+    {
+      umbral:'> 500 SMMLV ventas/año (~$711M)',
+      activa:'Registro Nacional de Turismo (RNT)',
+      desc:'Obligatorio actualizar cada enero en el portal del Ministerio de Comercio.',
+      pct: pctRNT,
+      estado: ventasAnuales > umbralRNT ? 'rojo' : pctRNT > 70 ? 'amarillo' : 'verde',
+      label: ventasAnuales>0 ? `Llevas ${fmt(ventasAnuales)} de ${fmt(umbralRNT)} este año (${pctRNT}%)` : 'Ingresa ventas en Sistema Finanzas para ver el avance',
+      link: 'https://www.mincit.gov.co/minturismo/calidad-y-desarrollo-sostenible/registro-nacional-de-turismo'
+    },
+    {
+      umbral:'≥ 10 trabajadores activos',
+      activa:'COPASST + Comité de Convivencia Laboral',
+      desc:'El Comité Paritario SST requiere representantes del empleador y los trabajadores elegidos por votación. El Comité de Convivencia previene el acoso laboral.',
+      pct: pctTrab10,
+      estado: trab>=10 ? 'rojo' : trab>=8 ? 'amarillo' : 'verde',
+      label: `Tienes ${trab} trabajadores activos de 10 requeridos`,
+    },
+    {
+      umbral:'≥ 50 trabajadores',
+      activa:'62 estándares SST + Responsable SST con licencia',
+      desc:'El sistema completo del SG-SST con responsable dedicado y licencia vigente en SST.',
+      pct: pctTrab50,
+      estado: trab>=50 ? 'rojo' : trab>=40 ? 'amarillo' : 'verde',
+      label: `Tienes ${trab} trabajadores de 50 requeridos`,
+    },
+    {
+      umbral:'Apertura segunda sede',
+      activa:'ICA en cada municipio + nueva matrícula mercantil + SS independiente',
+      desc:'Cada sede en diferente municipio requiere matrícula, ICA local y estructura propia.',
+      pct: 0,
+      estado: 'gris',
+      label: 'Planear con antelación antes de firmar arrendamiento',
+    },
+    {
+      umbral:'Franquicia',
+      activa:'Registro de marca SIC (Clase 43) + Contrato de franquicia',
+      desc:'Sin marca registrada cualquiera puede usar el nombre "El Rincón del Barril". Registro en SIC cuesta ~$1.2M y dura 10 años.',
+      pct: 0,
+      estado: 'amarillo',
+      label: 'Recomendado antes de hablar de franquicia con alguien',
+      link: 'https://www.sic.gov.co/marcas'
+    },
+  ];
+
+  const colores = {verde:'var(--verde-l)',amarillo:'var(--amarillo-l)',rojo:'var(--rojo)',gris:'#bbb'};
+  html('topes-content', topes.map(t=>`
+    <div class="tope-card" style="border-color:${t.estado==='rojo'?'var(--rojo)':t.estado==='amarillo'?'var(--amarillo-l)':'var(--border)'}">
+      <div class="tope-hdr">
+        <div>
+          <div class="tope-num">${t.umbral}</div>
+          <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--rojo);margin-top:2px">Activa: ${t.activa}</div>
+        </div>
+        <span class="tope-activa ${t.estado}">${t.estado==='verde'?'Sin riesgo':t.estado==='amarillo'?'Vigilar':t.estado==='rojo'?'⚠️ Ya aplica':'—'}</span>
+      </div>
+      <div class="tope-desc">${t.desc}${t.link?` <a href="${t.link}" target="_blank" style="color:var(--azul);font-size:.78rem">Ver más →</a>`:''}</div>
+      ${t.pct>0?`<div class="progress-bar"><div class="progress-fill" style="width:${t.pct}%;background:${colores[t.estado]}"></div></div>`:''} 
+      <div style="font-size:.78rem;color:#888;margin-top:6px">${t.label}</div>
+    </div>
+  `).join(''));
+}
+
+// ── AUTOAUDITORÍA ───────────────────────────────────────────
+const AUDIT_ITEMS = [
+  { sec:'🏛️ Legal y mercantil', items:[
+    { id:'matricula',    lbl:'Matrícula mercantil renovada (antes del 31 de marzo)', sub:'Cámara de Comercio Cúcuta' },
+    { id:'rut',          lbl:'RUT actualizado con código 52 y actividad correcta',   sub:'DIAN · muisca.dian.gov.co' },
+    { id:'uso_suelo',    lbl:'Concepto de uso de suelo vigente para restaurante',    sub:'Planeación Cúcuta' },
+  ]},
+  { sec:'🏥 Sanitario', items:[
+    { id:'concepto_san', lbl:'Concepto sanitario del establecimiento vigente',       sub:'Secretaría de Salud NS — gratuito' },
+    { id:'certs_manip',  lbl:'TODO el equipo con certificado de manipulación vigente', sub:'Verificar fechas de vencimiento' },
+    { id:'plan_sanea',   lbl:'Plan de saneamiento documentado y actualizado',        sub:'Incluye limpieza, desinfección y plagas' },
+    { id:'fumigacion',   lbl:'Control de plagas y fumigación al día',               sub:'Cada 3 meses' },
+    { id:'bpm_practica', lbl:'BPM aplicadas: uniforme, higiene, temperatura',       sub:'Visible en cocina todos los días' },
+  ]},
+  { sec:'👥 Laboral y SST', items:[
+    { id:'ss_afiliacion',lbl:'TODOS los trabajadores afiliados a EPS + ARL + Pensión', sub:'Verificar en PILA este mes' },
+    { id:'ss_pago',      lbl:'Pago de seguridad social al día (día 5 del mes)',      sub:'Plataforma PILA' },
+    { id:'dotacion',     lbl:'Dotación entregada en las 3 fechas del año',          sub:'Abr 30 · Ago 31 · Dic 20 · Con acta firmada' },
+    { id:'reglamento',   lbl:'Reglamento Interno publicado y entregado al equipo',  sub:'Versión v2.0 en Central de Personal' },
+    { id:'sst_desig',    lbl:'Vigía SST designado formalmente por escrito',         sub:'Resolución 0312/2019 — con menos de 10 trabajadores' },
+    { id:'sst_capac',    lbl:'Capacitación en SST realizada este año',              sub:'Registrada en Central de Personal' },
+    { id:'sst_autoevaluar', lbl:'Autoevaluación SG-SST registrada en Mintrabajo (diciembre)', sub:'sgrl.mintrabajo.gov.co' },
+  ]},
+  { sec:'🚒 Seguridad', items:[
+    { id:'bomberos',     lbl:'Concepto técnico de Bomberos vigente',                sub:'Bomberos Cúcuta — anual' },
+    { id:'extintores',   lbl:'Extintores con recarga vigente y señalizados',        sub:'Empresa certificada — anual' },
+    { id:'gas_revision', lbl:'Revisión técnica de gas al día',                      sub:'Técnico certificado — anual' },
+    { id:'emergencias',  lbl:'Plan básico de emergencias en lugar visible',         sub:'Salidas, puntos de encuentro, qué hacer' },
+  ]},
+  { sec:'🧾 Tributario', items:[
+    { id:'ica_pagado',   lbl:'ICA Cúcuta declarado y pagado al día',                sub:'Bimestral — confirmar fecha con contador' },
+    { id:'factura_elec', lbl:'Facturación electrónica DIAN activa y funcionando',   sub:'Facturador gratuito DIAN habilitado' },
+    { id:'precios_vis',  lbl:'Lista de precios visible para el cliente (Ley 1480)', sub:'Menú físico o QR — obligatorio antes de entrar' },
+  ]},
+  { sec:'🎵 Especiales', items:[
+    { id:'sayco',        lbl:'Certificado SAYCO-ACINPRO vigente',                  sub:'osa.org.co — simular tarifa con datos del local' },
+    { id:'licor',        lbl:'Licencia de venta de alcohol vigente',               sub:'Secretaría de Gobierno Cúcuta' },
+    { id:'ruido_ok',     lbl:'Nivel de ruido dentro de límites zona Niza',         sub:'Max 65 dB día / 45 dB noche si hay residencial' },
+  ]},
+  { sec:'🌿 Ambiental', items:[
+    { id:'trampa_grasas',lbl:'Trampa de grasas instalada y con mantenimiento',     sub:'EMPOCÚCUTA / CORPONOR — obligatorio' },
+    { id:'aceite_gestor',lbl:'Aceite usado entregado a gestor ambiental certificado', sub:'Nunca al desagüe — puede venderse' },
+    { id:'residuos_sep', lbl:'Residuos separados correctamente (orgánicos/reciclable/no reciclable)', sub:'Canecas identificadas por color' },
+  ]},
+];
+
+let auditState = {}; // id -> 'si'|'no'|'na'
+
+function auditGetLast(){
+  try {
+    const d = (fbCacheCumpl.audit ? fbCacheCumpl.audit : JSON.parse(localStorage.getItem(AUDIT_KEY)||'{}'));
+    if(d.historial && d.historial.length) return d.historial[d.historial.length-1];
+  } catch(e){}
+  return null;
+}
+
+function renderAudit(){
+  // Load current state
+  try { const d=(fbCacheCumpl.audit ? fbCacheCumpl.audit : JSON.parse(localStorage.getItem(AUDIT_KEY)||'{}')); auditState=d.estado||{}; } catch(e){ auditState={}; }
+
+  let h='';
+  AUDIT_ITEMS.forEach(sec=>{
+    h+=`<div class="audit-section"><div class="audit-section-title">${sec.sec}</div>`;
+    sec.items.forEach(item=>{
+      const est = auditState[item.id]||'';
+      const cls = est==='si'?'ok':est==='no'?'fail':est==='na'?'na':'';
+      const ico = est==='si'?'✓':est==='no'?'✗':est==='na'?'—':'';
+      h+=`<div class="audit-item ${cls}" id="ai-${item.id}">
+        <div class="audit-check">${ico}</div>
+        <div class="audit-texto">${item.lbl}<small>${item.sub}</small></div>
+        <div class="audit-btns">
+          <button class="audit-btn si ${est==='si'?'sel':''}" onclick="auditSet(event,'${item.id}','si')">✓ Sí</button>
+          <button class="audit-btn no ${est==='no'?'sel':''}" onclick="auditSet(event,'${item.id}','no')">✗ No</button>
+          <button class="audit-btn na-btn ${est==='na'?'sel':''}" onclick="auditSet(event,'${item.id}','na')">N/A</button>
+        </div>
+      </div>`;
+    });
+    h+='</div>';
+  });
+  html('audit-checklist', h);
+  updateAuditScore();
+  renderAuditHistorial();
+}
+
+function auditSet(e, id, val){
+  e.stopPropagation();
+  auditState[id] = auditState[id]===val ? '' : val;
+  try { const d=(fbCacheCumpl.audit ? fbCacheCumpl.audit : JSON.parse(localStorage.getItem(AUDIT_KEY)||'{}')); d.estado=auditState; localStorage.setItem(AUDIT_KEY,JSON.stringify(d)); fbCacheCumpl.audit = d; fbSaveCumpl('audit', d);; } catch(err){}
+  renderAudit();
+}
+
+function updateAuditScore(){
+  const total = AUDIT_ITEMS.reduce((s,sec)=>s+sec.items.length,0);
+  const si = Object.values(auditState).filter(v=>v==='si').length;
+  const no = Object.values(auditState).filter(v=>v==='no').length;
+  const contestado = si + no + Object.values(auditState).filter(v=>v==='na').length;
+  const pct = contestado>0 ? Math.round((si/Math.max(si+no,1))*100) : 0;
+  const color = pct>=80?'var(--verde-l)':pct>=60?'var(--amarillo-l)':'var(--rojo)';
+
+  txt('audit-puntaje', contestado>0 ? si+'/'+Math.max(si+no,1) : '—');
+  txt('audit-puntaje-lbl', contestado>0 ? `${pct}% de cumplimiento (${total-contestado} sin contestar)` : 'Responde el checklist para ver tu puntaje');
+  const barra = document.getElementById('audit-barra');
+  if(barra){ barra.style.width=pct+'%'; barra.style.background=color; }
+
+  // Update semáforo top
+  const semAudit = document.getElementById('sem-audit');
+  if(semAudit && contestado>0){
+    semAudit.className = 'sem '+(pct>=80?'verde':pct>=60?'amarillo':'rojo');
+    txt('sv-audit', pct+'%');
+    txt('ss-audit', 'Última auditoría');
+  }
+}
+
+function auditGuardar(){
+  const total = AUDIT_ITEMS.reduce((s,sec)=>s+sec.items.length,0);
+  const si = Object.values(auditState).filter(v=>v==='si').length;
+  const no = Object.values(auditState).filter(v=>v==='no').length;
+  const pct = Math.round((si/Math.max(si+no,1))*100);
+  const fecha = new Date().toLocaleDateString('es-CO',{month:'long',year:'numeric'});
+  try {
+    let d = (fbCacheCumpl.audit ? fbCacheCumpl.audit : JSON.parse(localStorage.getItem(AUDIT_KEY)||'{}'));
+    d.estado = auditState;
+    if(!d.historial) d.historial=[];
+    d.historial.push({ fecha, si, no, total, pct });
+    if(d.historial.length>12) d.historial=d.historial.slice(-12);
+    localStorage.setItem(AUDIT_KEY, JSON.stringify(d)); fbCacheCumpl.audit = d; fbSaveCumpl('audit', d);;
+    toast('✅ Autoauditoría guardada — '+pct+'% de cumplimiento');
+    renderAuditHistorial();
+  } catch(e){ toast('⚠ Error al guardar'); }
+}
+
+function auditReset(){
+  if(!confirm('¿Reiniciar todas las respuestas? El historial se conserva.')) return;
+  auditState = {};
+  try { const d=(fbCacheCumpl.audit ? fbCacheCumpl.audit : JSON.parse(localStorage.getItem(AUDIT_KEY)||'{}')); d.estado={}; localStorage.setItem(AUDIT_KEY,JSON.stringify(d)); fbCacheCumpl.audit = d; fbSaveCumpl('audit', d);; } catch(e){}
+  renderAudit();
+}
+
+function renderAuditHistorial(){
+  try {
+    const d=(fbCacheCumpl.audit ? fbCacheCumpl.audit : JSON.parse(localStorage.getItem(AUDIT_KEY)||'{}'));
+    const hist=(d.historial||[]).slice(-6).reverse();
+    if(!hist.length){ txt('audit-fecha','Sin auditorías guardadas'); html('audit-historial',''); return; }
+    const last=hist[0];
+    txt('audit-fecha','Última: '+last.fecha);
+    html('audit-historial', hist.map(h=>{
+      const color=h.pct>=80?'#81C784':h.pct>=60?'#FFB74D':'#EF9A9A';
+      return `<div class="hist-item"><span>${h.fecha}</span><span style="color:${color};font-weight:700">${h.pct}%</span><span>${h.si}✓ / ${h.no}✗</span></div>`;
+    }).join(''));
+  } catch(e){}
+}
+
+// ── INIT ────────────────────────────────────────────────────
+function init(){
+  cfgLoad();
+  renderAlertas();
+  document.getElementById('hdr-nombre').textContent = (cfgGet().nombre||'El Rincón del Barril') + ' · Marco Normativo y Autoauditoría';
+}
+
+// Cargar Firebase primero
+cargarDesdeFirebaseCumpl().then(function() {
+  init();
+  // Guardar cfg inicial si no existe en Firebase
+  if (db_cumpl) {
+    db_cumpl.ref(FB_PATH_CUMPL + 'cfg').once('value').then(function(snap) {
+      if (!snap.exists()) fbSaveCumpl('cfg', cfgGet());
+    });
+  }
+}).catch(function() { init(); });
+</script>
+</body>
+</html>
