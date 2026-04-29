@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salud Financiera – El Rincón del Barril</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+:root {
+  --rojo: #C41E3A;
+  --rojo-dark: #9B1530;
+  --verde: #2E7D32;
+  --verde-light: #4CAF50;
+  --amarillo: #F57F17;
+  --amarillo-light: #FF9800;
+  --azul: #1565C0;
+  --bg: linear-gradient(145deg, #1a1a2e 0%, #2C1810 50%, #1a1a2e 100%);
+  --card: #ffffff;
+  --card-shadow: 0 4px 20px rgba(0,0,0,0.22);
+  --text: #222;
+  --text-light: #666;
+  --border: #e8e8e8;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 32px 20px 60px;
+}
+
+/* ── PIN OVERLAY ─────────────────────────────────────── */
+#pin-overlay {
+  position: fixed; inset: 0;
+  background: linear-gradient(145deg, #1a1a2e 0%, #2C1810 50%, #1a1a2e 100%);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.pin-box {
+  background: white; border-radius: 20px;
+  padding: 40px 36px; text-align: center;
+  max-width: 340px; width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.pin-box .logo { font-size: 2.8rem; margin-bottom: 10px; }
+.pin-box h2 { font-family: 'DM Serif Display', serif; color: var(--rojo); font-size: 1.5rem; margin-bottom: 6px; }
+.pin-box p { color: #888; font-size: .85rem; margin-bottom: 24px; }
+.pin-dots { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+.pin-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #e0e0e0; transition: background .2s;
+}
+.pin-dot.filled { background: var(--rojo); }
+.pin-pad { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.pin-btn {
+  padding: 14px; border: 2px solid #e8e8e8; border-radius: 12px;
+  background: white; font-family: 'DM Sans', sans-serif; font-size: 1.2rem; font-weight: 600;
+  cursor: pointer; transition: all .15s; color: var(--text);
+}
+.pin-btn:hover { border-color: var(--rojo); color: var(--rojo); background: #fef5f7; }
+.pin-btn.del { font-size: .9rem; color: #888; }
+.pin-error { color: var(--rojo); font-size: .82rem; margin-top: 10px; min-height: 18px; }
+
+/* ── HEADER ──────────────────────────────────────────── */
+header { text-align: center; color: white; margin-bottom: 28px; }
+.logo-txt { font-size: 3rem; margin-bottom: 10px; }
+header h1 { font-family: 'DM Serif Display', serif; font-size: 2.2rem; margin-bottom: 4px; text-shadow: 2px 2px 8px rgba(0,0,0,0.4); }
+header p { font-size: .95rem; opacity: .7; letter-spacing: .5px; }
+.back-link { display: inline-block; margin-top: 10px; color: rgba(255,255,255,.5); font-size: .82rem; text-decoration: none; }
+.back-link:hover { color: white; }
+
+/* ── CONTAINER ───────────────────────────────────────── */
+.container { max-width: 1100px; width: 100%; }
+
+/* ── SEMÁFORO TOP ────────────────────────────────────── */
+.semaforo-bar {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
+  margin-bottom: 20px;
+}
+.sem-card {
+  background: white; border-radius: 16px; padding: 18px 16px;
+  text-align: center; box-shadow: var(--card-shadow);
+  position: relative; overflow: hidden;
+}
+.sem-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; }
+.sem-card.verde::before { background: var(--verde-light); }
+.sem-card.amarillo::before { background: var(--amarillo-light); }
+.sem-card.rojo::before { background: var(--rojo); }
+.sem-card.gris::before { background: #bbb; }
+.sem-icon { font-size: 1.8rem; margin-bottom: 4px; }
+.sem-label { font-size: .72rem; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; }
+.sem-value { font-size: 1.25rem; font-weight: 700; color: var(--text); margin: 4px 0 2px; }
+.sem-sub { font-size: .75rem; color: #999; }
+
+/* ── TABS ────────────────────────────────────────────── */
+.tabs-wrap { margin-bottom: 20px; }
+.tabs {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  background: rgba(255,255,255,.08); padding: 6px; border-radius: 16px;
+}
+.tab-btn {
+  flex: 1; min-width: 110px; padding: 10px 8px;
+  background: transparent; border: none; border-radius: 10px;
+  color: rgba(255,255,255,.65); font-family: 'DM Sans', sans-serif;
+  font-size: .83rem; font-weight: 600; cursor: pointer; transition: all .2s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: white; background: rgba(255,255,255,.1); }
+.tab-btn.active { background: white; color: var(--rojo); box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+
+/* ── PANEL BASE ──────────────────────────────────────── */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ── CARD ────────────────────────────────────────────── */
+.card {
+  background: white; border-radius: 18px; padding: 26px 24px;
+  box-shadow: var(--card-shadow); margin-bottom: 18px;
+}
+.card-title {
+  font-family: 'DM Serif Display', serif; font-size: 1.25rem;
+  color: var(--rojo); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-subtitle { font-size: .8rem; color: #999; margin-top: 2px; font-family: 'DM Sans', sans-serif; font-weight: 400; }
+
+/* ── GRID 2 COL ──────────────────────────────────────── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+
+/* ── FORM FIELDS ─────────────────────────────────────── */
+.field-group { margin-bottom: 16px; }
+.field-group label { display: block; font-size: .8rem; font-weight: 600; color: #555; margin-bottom: 5px; }
+.field-group input, .field-group select, .field-group textarea {
+  width: 100%; padding: 10px 12px; border: 1.5px solid var(--border);
+  border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: .9rem;
+  color: var(--text); transition: border-color .2s;
+  background: #fafafa;
+}
+.field-group input:focus, .field-group select:focus {
+  border-color: var(--rojo); outline: none; background: white;
+}
+.field-hint { font-size: .73rem; color: #aaa; margin-top: 3px; }
+
+/* ── BOTONES ─────────────────────────────────────────── */
+.btn {
+  padding: 11px 20px; border-radius: 10px; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.btn-primary { background: var(--rojo); color: white; }
+.btn-primary:hover { background: var(--rojo-dark); }
+.btn-secondary { background: #f5f5f5; color: #555; }
+.btn-secondary:hover { background: #e8e8e8; }
+.btn-outline { background: transparent; border: 2px solid var(--rojo); color: var(--rojo); }
+.btn-outline:hover { background: var(--rojo); color: white; }
+.btn-sm { padding: 6px 14px; font-size: .78rem; }
+.btn-danger { background: transparent; border: 1.5px solid #e53935; color: #e53935; }
+.btn-danger:hover { background: #e53935; color: white; }
+.btn-verde { background: var(--verde); color: white; }
+.btn-verde:hover { background: var(--verde-dark, #1b5e20); }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+
+/* ── P&G RESULTADO ───────────────────────────────────── */
+.pyg-result {
+  background: linear-gradient(135deg, #1a1a2e, #2C1810);
+  border-radius: 16px; padding: 24px 22px; color: white;
+}
+.pyg-line {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.1);
+  font-size: .9rem;
+}
+.pyg-line:last-child { border-bottom: none; }
+.pyg-line.total { font-weight: 700; font-size: 1rem; padding-top: 12px; }
+.pyg-line.subtotal { font-weight: 600; }
+.pyg-line .lbl { opacity: .85; }
+.pyg-line .val { font-weight: 600; }
+.pyg-line .val.pos { color: #81C784; }
+.pyg-line .val.neg { color: #EF9A9A; }
+.pyg-line .val.warn { color: #FFB74D; }
+.pyg-sep { border: none; border-top: 1px solid rgba(255,255,255,.2); margin: 8px 0; }
+.margen-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: .72rem; font-weight: 700; margin-left: 8px;
+}
+.margen-verde { background: rgba(76,175,80,.25); color: #81C784; }
+.margen-amarillo { background: rgba(255,152,0,.25); color: #FFB74D; }
+.margen-rojo { background: rgba(196,30,58,.25); color: #EF9A9A; }
+
+/* ── PUNTO EQUILIBRIO ────────────────────────────────── */
+.eq-box {
+  background: #fff8f0; border: 2px solid #FFB74D; border-radius: 14px;
+  padding: 18px 20px; margin-top: 16px;
+}
+.eq-box h4 { color: var(--amarillo); font-size: .9rem; margin-bottom: 8px; }
+.eq-big { font-size: 1.6rem; font-weight: 700; color: var(--text); }
+.eq-sub { font-size: .8rem; color: #888; margin-top: 4px; }
+
+/* ── SEPARAR IMPUESTOS ───────────────────────────────── */
+.tax-box {
+  background: #f3f8ff; border: 2px solid #90CAF9; border-radius: 14px;
+  padding: 18px 20px; margin-top: 16px;
+}
+.tax-box h4 { color: var(--azul); font-size: .88rem; margin-bottom: 8px; }
+.tax-row { display: flex; justify-content: space-between; font-size: .85rem; padding: 4px 0; }
+.tax-note { font-size: .73rem; color: #888; margin-top: 8px; font-style: italic; }
+
+/* ── BALANCE ─────────────────────────────────────────── */
+.balance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.balance-col h3 { font-size: .95rem; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid; }
+.balance-col.activos h3 { color: var(--verde); border-color: var(--verde-light); }
+.balance-col.pasivos h3 { color: var(--rojo); border-color: var(--rojo); }
+.balance-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #f0f0f0; font-size: .87rem; }
+.balance-item .b-lbl { color: #555; }
+.balance-item .b-val { font-weight: 600; }
+.balance-item.auto .b-lbl::after { content: ' ⚡'; font-size: .7rem; opacity: .5; }
+.balance-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 1rem; padding-top: 12px; margin-top: 4px; }
+.patrimonio-box {
+  background: linear-gradient(135deg, #1a1a2e, #2C1810);
+  border-radius: 14px; padding: 20px; color: white; text-align: center; margin-top: 18px;
+}
+.patrimonio-box .pat-lbl { opacity: .7; font-size: .85rem; margin-bottom: 6px; }
+.patrimonio-box .pat-val { font-family: 'DM Serif Display', serif; font-size: 2rem; }
+.patrimonio-box .pat-sub { opacity: .6; font-size: .78rem; margin-top: 4px; }
+
+/* ── ACTIVOS TABLA ───────────────────────────────────── */
+.tabla-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+thead th {
+  background: #f8f8f8; padding: 10px 12px; text-align: left;
+  font-weight: 700; color: #444; font-size: .75rem; text-transform: uppercase; letter-spacing: .5px;
+  border-bottom: 2px solid #e8e8e8;
+}
+tbody td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; color: var(--text); }
+tbody tr:hover { background: #fafafa; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: .7rem; font-weight: 700; }
+.badge-verde { background: #E8F5E9; color: var(--verde); }
+.badge-amarillo { background: #FFF8E1; color: #F57F17; }
+.badge-rojo { background: #FFEBEE; color: #C62828; }
+.badge-gris { background: #F5F5F5; color: #757575; }
+.af-total { background: #f8f8f8; font-weight: 700; }
+
+/* ── HISTÓRICO ───────────────────────────────────────── */
+.hist-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.hist-table th { background: #f8f8f8; padding: 10px 12px; text-align: right; font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; color: #555; }
+.hist-table th:first-child { text-align: left; }
+.hist-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; text-align: right; }
+.hist-table td:first-child { text-align: left; font-weight: 600; }
+.hist-table tr.highlight { background: #fff5f5; }
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; margin: 16px 0 8px; }
+.bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.bar-fill { width: 100%; border-radius: 6px 6px 0 0; min-height: 4px; transition: height .5s; }
+.bar-lbl { font-size: .67rem; color: #888; text-align: center; }
+.chart-legend { display: flex; gap: 16px; margin-top: 6px; font-size: .75rem; color: #888; }
+.chart-legend span { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+/* ── FISCAL ──────────────────────────────────────────── */
+.fiscal-info {
+  background: #f3f8ff; border-left: 4px solid var(--azul);
+  border-radius: 0 12px 12px 0; padding: 14px 16px; margin-bottom: 16px;
+  font-size: .84rem; color: #444; line-height: 1.6;
+}
+.fiscal-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid #f0f0f0;
+}
+.fiscal-row:last-child { border-bottom: none; }
+.fiscal-row .f-lbl { font-weight: 600; font-size: .88rem; }
+.fiscal-row .f-sub { font-size: .76rem; color: #888; }
+.fiscal-row .f-val { font-size: 1.1rem; font-weight: 700; color: var(--azul); }
+.disclaimer {
+  background: #fffde7; border: 1.5px dashed #F9A825;
+  border-radius: 12px; padding: 14px 16px; margin-top: 16px;
+  font-size: .8rem; color: #5D4037; line-height: 1.6;
+}
+
+/* ── CONFIG ──────────────────────────────────────────── */
+.config-section { margin-bottom: 24px; }
+.config-section h3 { font-size: .95rem; font-weight: 700; color: #444; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1.5px solid #f0f0f0; }
+.gastos-config-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid #f8f8f8;
+}
+.gastos-config-item input[type=text] { flex: 1; }
+.gastos-config-item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--rojo); cursor: pointer; }
+
+/* ── MES SELECTOR ────────────────────────────────────── */
+.mes-nav {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  background: rgba(255,255,255,.08); padding: 10px 16px; border-radius: 14px;
+  color: white;
+}
+.mes-nav button { background: rgba(255,255,255,.15); border: none; color: white; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 1rem; }
+.mes-nav button:hover { background: rgba(255,255,255,.25); }
+.mes-nav .mes-lbl { font-weight: 600; font-size: 1rem; flex: 1; text-align: center; }
+.mes-nav .mes-status { font-size: .75rem; opacity: .6; }
+
+/* ── MODAL ───────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  display: none; align-items: center; justify-content: center; z-index: 1000;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: white; border-radius: 20px; padding: 32px 28px;
+  max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+.modal h3 { font-family: 'DM Serif Display', serif; color: var(--rojo); font-size: 1.3rem; margin-bottom: 20px; }
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+/* ── PRINT ───────────────────────────────────────────── */
+@media print {
+  body { background: white; padding: 0; }
+  #pin-overlay, .tabs-wrap, .mes-nav, .btn-row, .no-print { display: none !important; }
+  .container { max-width: 100%; }
+  .panel { display: block !important; }
+  .card { box-shadow: none; border: 1px solid #e0e0e0; break-inside: avoid; }
+  .pyg-result { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+@media (max-width: 680px) {
+  .grid2, .grid3, .balance-grid { grid-template-columns: 1fr; }
+  .semaforo-bar { grid-template-columns: 1fr; }
+  header h1 { font-size: 1.8rem; }
+  .tabs { gap: 4px; }
+  .tab-btn { font-size: .76rem; padding: 8px 6px; min-width: 80px; }
+}
+</style>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-app-compat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-database-compat.min.js"></script>
+</head>
+<body>
+
+<!-- PIN OVERLAY -->
+<div id="pin-overlay">
+  <div class="pin-box">
+    <div class="logo">🔥</div>
+    <h2>Salud Financiera</h2>
+    <p>Acceso exclusivo para el propietario</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-pad">
+      <button class="pin-btn" onclick="pinPress('1')">1</button>
+      <button class="pin-btn" onclick="pinPress('2')">2</button>
+      <button class="pin-btn" onclick="pinPress('3')">3</button>
+      <button class="pin-btn" onclick="pinPress('4')">4</button>
+      <button class="pin-btn" onclick="pinPress('5')">5</button>
+      <button class="pin-btn" onclick="pinPress('6')">6</button>
+      <button class="pin-btn" onclick="pinPress('7')">7</button>
+      <button class="pin-btn" onclick="pinPress('8')">8</button>
+      <button class="pin-btn" onclick="pinPress('9')">9</button>
+      <button class="pin-btn del" onclick="pinDel()">⌫</button>
+      <button class="pin-btn" onclick="pinPress('0')">0</button>
+      <button class="pin-btn del" onclick="pinClear()">✕</button>
+    </div>
+    <div class="pin-error" id="pin-error"></div>
+  </div>
+</div>
+
+<div class="container" id="app" style="display:none">
+
+  <header>
+    <div class="logo-txt">💰</div>
+    <h1>Salud Financiera</h1>
+    <p id="header-nombre">El Rincón del Barril · Módulo Financiero</p>
+    <a href="index.html" class="back-link">← Volver al inicio</a>
+  </header>
+
+  <!-- SEMÁFORO TOP -->
+  <div class="semaforo-bar" id="semaforo-bar">
+    <div class="sem-card gris" id="sem-ventas">
+      <div class="sem-icon">💵</div>
+      <div class="sem-label">Ventas del mes</div>
+      <div class="sem-value" id="sem-ventas-val">—</div>
+      <div class="sem-sub" id="sem-ventas-sub">Sin datos aún</div>
+    </div>
+    <div class="sem-card gris" id="sem-margen">
+      <div class="sem-icon">📊</div>
+      <div class="sem-label">Margen neto</div>
+      <div class="sem-value" id="sem-margen-val">—</div>
+      <div class="sem-sub" id="sem-margen-sub">Sin datos aún</div>
+    </div>
+    <div class="sem-card gris" id="sem-compromisos">
+      <div class="sem-icon">📅</div>
+      <div class="sem-label">Próximo compromiso</div>
+      <div class="sem-value" id="sem-comp-val">—</div>
+      <div class="sem-sub" id="sem-comp-sub">Revisando...</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-wrap">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('pyg')">💰 P&amp;G del Mes</button>
+      <button class="tab-btn" onclick="showTab('activos')">🏷️ Activos Fijos</button>
+      <button class="tab-btn" onclick="showTab('balance')">📊 Balance</button>
+      <button class="tab-btn" onclick="showTab('historico')">📅 Histórico</button>
+      <button class="tab-btn" onclick="showTab('fiscal')">🧾 Fiscal</button>
+      <button class="tab-btn" onclick="showTab('config')">⚙️ Configuración</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TAB 1: P&G DEL MES
+  ═══════════════════════════════════════════ -->
+  <div id="tab-pyg" class="panel active">
+    <div class="mes-nav">
+      <button onclick="cambiarMes(-1)">‹</button>
+      <span class="mes-lbl" id="mes-label">—</span>
+      <span class="mes-status" id="mes-status"></span>
+      <button onclick="cambiarMes(1)">›</button>
+    </div>
+
+    <div class="grid2">
+      <!-- INGRESOS -->
+      <div class="card">
+        <div class="card-title">💵 Ingresos <span class="card-subtitle">¿Cuánto vendiste?</span></div>
+        <div class="field-group">
+          <label>Ventas totales del mes ($)</label>
+          <input type="number" id="pyg-ventas" placeholder="Ej: 72000000" oninput="calcPyG()" min="0">
+          <div class="field-hint">Toma este número del resumen de ventas en Wahio</div>
+        </div>
+        <div class="field-group">
+          <label>Costo de ventas ($)</label>
+          <input type="number" id="pyg-costo-ventas" placeholder="Ej: 28800000" oninput="calcPyG()" min="0">
+          <div class="field-hint">Lo que te costó producir lo que vendiste (materia prima). Del consolidado semanal.</div>
+        </div>
+      </div>
+
+      <!-- GASTOS FIJOS -->
+      <div class="card">
+        <div class="card-title">📋 Gastos del Mes <span class="card-subtitle">¿Cuánto pagaste?</span></div>
+        <div id="gastos-inputs">
+          <!-- Se generan dinámicamente según configuración -->
+        </div>
+        <div class="field-group" style="margin-top:8px">
+          <label>Depreciación de equipos ($)</label>
+          <input type="number" id="pyg-depreciacion" placeholder="Calculado automático" readonly style="background:#f0f0f0; color:#888;">
+          <div class="field-hint">⚡ Calculado automáticamente desde Activos Fijos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTADO P&G -->
+    <div class="card">
+      <div class="card-title">📈 Estado de Resultados <span class="card-subtitle">Tu negocio este mes</span></div>
+      <div class="grid2">
+        <div class="pyg-result" id="pyg-resultado">
+          <div class="pyg-line">
+            <span class="lbl">Ventas</span>
+            <span class="val pos" id="res-ventas">$0</span>
+          </div>
+          <div class="pyg-line">
+            <span class="lbl">— Costo de ventas</span>
+            <span class="val neg" id="res-costo">$0</span>
+          </div>
+          <hr class="pyg-sep">
+          <div class="pyg-line subtotal">
+            <span class="lbl">UTILIDAD BRUTA</span>
+            <span class="val" id="res-util-bruta">$0 <span class="margen-badge" id="badge-bruta">0%</span></span>
+          </div>
+          <div class="pyg-line" style="margin-top:8px">
+            <span class="lbl" style="opacity:.7; font-size:.82rem">Gastos operativos</span>
+            <span class="val neg" id="res-gastos">$0</span>
+          </div>
+          <div class="pyg-line" style="font-size:.8rem; opacity:.7;">
+            <span class="lbl">— Depreciación equipos</span>
+            <span class="val" id="res-deprec">$0</span>
+          </div>
+          <hr class="pyg-sep">
+          <div class="pyg-line total">
+            <span class="lbl">✅ UTILIDAD NETA</span>
+            <span class="val" id="res-util-neta">$0 <span class="margen-badge" id="badge-neta">0%</span></span>
+          </div>
+        </div>
+
+        <div>
+          <!-- Punto de equilibrio -->
+          <div class="eq-box">
+            <h4>⚖️ Punto de Equilibrio</h4>
+            <div class="eq-big" id="eq-valor">$—</div>
+            <div class="eq-sub">Debes vender al menos esto para no perder plata</div>
+            <div style="margin-top:10px; font-size:.82rem; color:#888;" id="eq-avance">—</div>
+          </div>
+
+          <!-- Separar impuestos -->
+          <div class="tax-box" id="tax-box" style="margin-top:14px">
+            <h4>🧾 Separa para impuestos</h4>
+            <div class="tax-row">
+              <span>ICA estimado (~1%)</span>
+              <strong id="tax-ica">$—</strong>
+            </div>
+            <div class="tax-row">
+              <span>Anticipo renta (~3.5%)</span>
+              <strong id="tax-renta">$—</strong>
+            </div>
+            <div class="tax-row" style="font-weight:700; font-size:.95rem; border-top: 1.5px solid #bee3f8; padding-top:8px; margin-top:4px;">
+              <span>Total a separar</span>
+              <strong id="tax-total" style="color:var(--azul)">$—</strong>
+            </div>
+            <div class="tax-note">Orientativo — confirma con tu contador</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row no-print" style="margin-top:20px">
+        <button class="btn btn-primary" onclick="guardarMes()">💾 Guardar mes</button>
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir P&G</button>
+        <button class="btn btn-outline" onclick="exportarExcel()">📊 Exportar Excel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TAB 2: ACTIVOS FIJOS
+  ═══════════════════════════════════════════ -->
+  <div id="tab-activos" class="panel">
+    <div class="card">
+      <div class="card-title">🏷️ Registro de Activos Fijos
+        <button class="btn btn-primary btn-sm no-print" onclick="abrirModalActivo()" style="margin-left:auto">+ Agregar activo</button>
+      </div>
+
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Descripción</th>
+              <th>Categoría</th>
+              <th>Fecha compra</th>
+              <th>Valor compra</th>
+              <th>Vida útil</th>
+              <th>Deprec./mes</th>
+              <th>Valor actual</th>
+              <th>Estado</th>
+              <th class="no-print">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="activos-tbody">
+            <tr><td colspan="10" style="text-align:center; color:#aaa; padding:24px;">Sin activos registrados. Agrega tu primero equipo.</td></tr>
+          </tbody>
+          <tfoot>
+            <tr class="af-total">
+              <td colspan="7" style="text-align:right; padding:10px 12px; font-size:.82rem; color:#666;">TOTAL ACTIVOS (valor actual):</td>
+              <td id="af-total-val" style="padding:10px 12px; font-weight:700; color:var(--verde);">$0</td>
+              <td colspan="2"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div style="margin-top:16px; padding:12px 14px; background:#f9f9f9; border-radius:10px; font-size:.8rem; color:#888;">
+        ⚡ El <strong>valor actual</strong> y la <strong>depreciación mensual</strong> se calculan automáticamente con base en la fecha de compra y la vida útil que defines. Este total alimenta el Balance automáticamente.
+      </div>
+
+      <div class="btn-row no-print" style="margin-top:14px">
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir listado</button>
+        <button class="btn btn-outline" onclick="exportarActivosExcel()">📊 Exportar Excel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TAB 3: BALANCE BÁSICO
+  ═══════════════════════════════════════════ -->
+  <div id="tab-balance" class="panel">
+    <div class="mes-nav">
+      <button onclick="cambiarMes(-1)">‹</button>
+      <span class="mes-lbl" id="mes-label-bal">—</span>
+      <button onclick="cambiarMes(1)">›</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Balance Básico <span class="card-subtitle">¿Cuánto vale tu negocio hoy?</span></div>
+
+      <div class="balance-grid">
+        <!-- ACTIVOS -->
+        <div class="balance-col activos">
+          <h3>✅ LO QUE TENGO (Activos)</h3>
+          <div class="balance-item">
+            <div>
+              <div class="b-lbl">Caja y bancos disponible</div>
+              <input type="number" id="bal-caja" placeholder="$0" oninput="calcBalance()" style="width:140px; padding:5px 8px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:.85rem; margin-top:4px;">
+            </div>
+          </div>
+          <div class="balance-item">
+            <div>
+              <div class="b-lbl">Inventario estimado en bodega</div>
+              <input type="number" id="bal-inventario" placeholder="$0" oninput="calcBalance()" style="width:140px; padding:5px 8px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:.85rem; margin-top:4px;">
+            </div>
+          </div>
+          <div class="balance-item auto">
+            <div>
+              <div class="b-lbl">Equipos y activos fijos</div>
+              <div style="font-size:.75rem; color:#aaa;">⚡ Automático desde Activos Fijos</div>
+            </div>
+            <div class="b-val" id="bal-af-auto">$0</div>
+          </div>
+          <div class="balance-item">
+            <div>
+              <div class="b-lbl">Otros activos</div>
+              <input type="number" id="bal-otros-activos" placeholder="$0" oninput="calcBalance()" style="width:140px; padding:5px 8px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:.85rem; margin-top:4px;">
+            </div>
+          </div>
+          <div class="balance-total">
+            <span>TOTAL ACTIVOS</span>
+            <span id="bal-total-activos" style="color:var(--verde)">$0</span>
+          </div>
+        </div>
+
+        <!-- PASIVOS -->
+        <div class="balance-col pasivos">
+          <h3>❌ LO QUE DEBO (Pasivos)</h3>
+          <div class="balance-item">
+            <div>
+              <div class="b-lbl">Deudas con proveedores</div>
+              <input type="number" id="bal-proveedores" placeholder="$0" oninput="calcBalance()" style="width:140px; padding:5px 8px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:.85rem; margin-top:4px;">
+            </div>
+          </div>
+          <div class="balance-item">
+            <div>
+              <div class="b-lbl">Préstamos o créditos</div>
+              <input type="number" id="bal-prestamos" placeholder="$0" oninput="calcBalance()" style="width:140px; padding:5px 8px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:.85rem; margin-top:4px;">
+            </div>
+          </div>
+          <div class="balance-item">
+            <div>
+              <div class="b-lbl">Impuestos pendientes</div>
+              <input type="number" id="bal-impuestos" placeholder="$0" oninput="calcBalance()" style="width:140px; padding:5px 8px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:.85rem; margin-top:4px;">
+            </div>
+          </div>
+          <div class="balance-item">
+            <div>
+              <div class="b-lbl">Otros pasivos</div>
+              <input type="number" id="bal-otros-pasivos" placeholder="$0" oninput="calcBalance()" style="width:140px; padding:5px 8px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:.85rem; margin-top:4px;">
+            </div>
+          </div>
+          <div class="balance-total">
+            <span>TOTAL PASIVOS</span>
+            <span id="bal-total-pasivos" style="color:var(--rojo)">$0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATRIMONIO -->
+      <div class="patrimonio-box">
+        <div class="pat-lbl">LO QUE ES TUYO (Patrimonio neto)</div>
+        <div class="pat-val" id="bal-patrimonio">$0</div>
+        <div class="pat-sub" id="bal-patrimonio-sub">Activos − Pasivos</div>
+      </div>
+
+      <div class="btn-row no-print" style="margin-top:20px">
+        <button class="btn btn-primary" onclick="guardarBalance()">💾 Guardar balance</button>
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TAB 4: HISTÓRICO
+  ═══════════════════════════════════════════ -->
+  <div id="tab-historico" class="panel">
+    <div class="card">
+      <div class="card-title">📅 Histórico de los últimos 12 meses</div>
+
+      <!-- Gráfica de barras -->
+      <div style="margin-bottom:8px; font-size:.8rem; color:#888;">Ventas vs. Utilidad neta (últimos meses registrados)</div>
+      <div class="bar-chart" id="bar-chart"></div>
+      <div class="chart-legend">
+        <span><span class="legend-dot" style="background:#C41E3A"></span> Ventas</span>
+        <span><span class="legend-dot" style="background:#4CAF50"></span> Utilidad neta</span>
+      </div>
+
+      <div class="tabla-wrap" style="margin-top:20px">
+        <table class="hist-table">
+          <thead>
+            <tr>
+              <th>Mes</th>
+              <th>Ventas</th>
+              <th>Costo ventas</th>
+              <th>Utilidad bruta</th>
+              <th>Margen bruto</th>
+              <th>Gastos</th>
+              <th>Utilidad neta</th>
+              <th>Margen neto</th>
+            </tr>
+          </thead>
+          <tbody id="hist-tbody">
+            <tr><td colspan="8" style="text-align:center; color:#aaa; padding:24px;">Sin historial aún. Guarda el primer mes en P&amp;G.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="btn-row no-print" style="margin-top:16px">
+        <button class="btn btn-outline" onclick="exportarExcel()">📊 Exportar Excel completo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TAB 5: FISCAL
+  ═══════════════════════════════════════════ -->
+  <div id="tab-fiscal" class="panel">
+    <div class="card">
+      <div class="card-title">🧾 Orientación Fiscal</div>
+
+      <div class="fiscal-info">
+        Esta sección te da <strong>estimados orientativos</strong> para que no te sorprenda la cuenta de impuestos. Los números exactos los confirma tu contador.
+      </div>
+
+      <div class="config-section">
+        <h3>📅 Acumulado del año</h3>
+        <div id="fiscal-acumulado"></div>
+      </div>
+
+      <div class="config-section">
+        <h3>💡 ¿Cuánto separar para impuestos?</h3>
+        <div id="fiscal-separar"></div>
+      </div>
+
+      <div class="config-section">
+        <h3>📆 Próximas obligaciones</h3>
+        <div id="fiscal-obligaciones"></div>
+      </div>
+
+      <div class="disclaimer">
+        ⚠️ <strong>Aviso importante:</strong> Los valores mostrados aquí son estimados con base en porcentajes orientativos para el régimen ordinario. No reemplazan la declaración oficial ni la asesoría de tu contador. Úsalos para planificar y conversar con tu asesor, no para declarar.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TAB 6: CONFIGURACIÓN
+  ═══════════════════════════════════════════ -->
+  <div id="tab-config" class="panel">
+    <div class="card">
+      <div class="card-title">⚙️ Configuración del Negocio</div>
+
+      <div class="config-section">
+        <h3>🏪 Datos del negocio</h3>
+        <div class="grid2">
+          <div class="field-group">
+            <label>Nombre del negocio</label>
+            <input type="text" id="cfg-nombre" placeholder="El Rincón del Barril">
+          </div>
+          <div class="field-group">
+            <label>Régimen tributario</label>
+            <select id="cfg-regimen">
+              <option value="ordinario">Ordinario</option>
+              <option value="simplificado">Simplificado</option>
+              <option value="simple">SIMPLE (unificado)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>🎯 Objetivos mensuales</h3>
+        <div class="grid3">
+          <div class="field-group">
+            <label>Objetivo ventas ($)</label>
+            <input type="number" id="cfg-obj-ventas" placeholder="70000000">
+            <div class="field-hint">Meta mensual de ventas</div>
+          </div>
+          <div class="field-group">
+            <label>Objetivo margen bruto (%)</label>
+            <input type="number" id="cfg-obj-bruto" placeholder="45" min="0" max="100">
+            <div class="field-hint">% de utilidad bruta sano</div>
+          </div>
+          <div class="field-group">
+            <label>Objetivo margen neto (%)</label>
+            <input type="number" id="cfg-obj-neto" placeholder="20" min="0" max="100">
+            <div class="field-hint">% de utilidad neta sano</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>📋 Categorías de gastos</h3>
+        <div style="font-size:.8rem; color:#888; margin-bottom:12px;">Personaliza los gastos que quieres registrar cada mes. Activa o desactiva según aplique a tu negocio.</div>
+        <div id="gastos-config-list"></div>
+        <button class="btn btn-outline btn-sm" onclick="agregarCategoriaGasto()" style="margin-top:12px">+ Agregar categoría</button>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="guardarConfig()">💾 Guardar configuración</button>
+        <button class="btn btn-secondary" onclick="cargarConfig()">↺ Restablecer</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- MODAL ACTIVO FIJO -->
+<div class="modal-overlay" id="modal-activo">
+  <div class="modal">
+    <h3 id="modal-activo-title">➕ Agregar Activo Fijo</h3>
+    <input type="hidden" id="activo-edit-id">
+    <div class="grid2">
+      <div class="field-group">
+        <label>Descripción *</label>
+        <input type="text" id="act-desc" placeholder="Ej: Parrilla carbón industrial">
+      </div>
+      <div class="field-group">
+        <label>Categoría *</label>
+        <select id="act-cat">
+          <option value="Equipo cocina">Equipo cocina</option>
+          <option value="Equipo bar">Equipo bar</option>
+          <option value="Mueble">Mueble / Silla / Mesa</option>
+          <option value="Tecnología">Tecnología</option>
+          <option value="Vehículo">Vehículo</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>Fecha de compra *</label>
+        <input type="date" id="act-fecha">
+      </div>
+      <div class="field-group">
+        <label>Valor de compra ($) *</label>
+        <input type="number" id="act-valor" placeholder="Ej: 4500000" min="0">
+      </div>
+      <div class="field-group">
+        <label>Vida útil estimada (meses) *</label>
+        <input type="number" id="act-vida" placeholder="Ej: 60 (5 años)" min="1">
+        <div class="field-hint">Estufas: 60-120 | Neveras: 120 | Mesas: 60 | Computador: 36</div>
+      </div>
+      <div class="field-group">
+        <label>Estado</label>
+        <select id="act-estado">
+          <option value="activo">Activo</option>
+          <option value="mantenimiento">En mantenimiento</option>
+          <option value="baja">Dado de baja</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Observaciones</label>
+      <input type="text" id="act-obs" placeholder="Ej: Marca, modelo, proveedor...">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-activo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarActivo()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ── FIREBASE ─────────────────────────────────────────────────
+const _FB_FIN = {
+  apiKey:"AIzaSyB-dBPWbqt9pOnxGNGSRzwjciZI7HjbHi8",
+  authDomain:"rincon-del-barril-c7d7e.firebaseapp.com",
+  databaseURL:"https://rincon-del-barril-c7d7e-default-rtdb.firebaseio.com",
+  projectId:"rincon-del-barril-c7d7e",
+  storageBucket:"rincon-del-barril-c7d7e.firebasestorage.app",
+  messagingSenderId:"156157399571",
+  appId:"1:156157399571:web:320fd8758f38e9d413e5e6"
+};
+let db_fin = null;
+try {
+  if (typeof firebase !== 'undefined') {
+    if (!firebase.apps.length) firebase.initializeApp(_FB_FIN);
+    db_fin = firebase.database();
+  }
+} catch(e) { console.error('Firebase Finanzas error:', e); }
+const FB_PATH_FIN = 'rincon-barril/finanzas/';
+const fbCacheFin = { config: null, meses: null, activos: null };
+function fbSaveFin(sub, val) {
+  if (!db_fin) return;
+  db_fin.ref(FB_PATH_FIN + sub).set(val).catch(e => console.warn('FB fin write:', e));
+}
+// Cargar Firebase ANTES de que el usuario ingrese el PIN
+(async function() {
+  if (!db_fin) return;
+  try {
+    const snap = await db_fin.ref(FB_PATH_FIN).get();
+    if (snap.exists()) {
+      const d = snap.val();
+      if (d.config)  fbCacheFin.config  = d.config;
+      if (d.meses)   fbCacheFin.meses   = d.meses;
+      if (d.activos) fbCacheFin.activos = d.activos;
+    }
+  } catch(e) {}
+})();
+// ─────────────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════
+//  SISTEMA FINANCIERO — El Rincón del Barril
+//  Desarrollado por TodoPosibleMD
+//  Versión 1.0 — Marzo 2026
+// ═══════════════════════════════════════════════════════════
+
+// ── STORAGE KEYS ─────────────────────────────────────────
+const KEY_CONFIG   = 'finanzas_config';
+const KEY_MESES    = 'finanzas_meses';
+const KEY_ACTIVOS  = 'finanzas_activos';
+const PIN_CORRECTO = '2604';
+
+// ── ESTADO GLOBAL ─────────────────────────────────────────
+let pinActual = '';
+let mesActual = '';   // "2026-03"
+let config = {};
+let meses = {};       // { "2026-03": { ventas, costoVentas, gastos:{}, caja, inventario, ... } }
+let activos = [];
+
+// ── PIN ───────────────────────────────────────────────────
+function pinPress(d) {
+  if (pinActual.length >= 4) return;
+  pinActual += d;
+  document.getElementById('d' + (pinActual.length - 1)).classList.add('filled');
+  if (pinActual.length === 4) {
+    setTimeout(() => {
+      if (pinActual === PIN_CORRECTO) {
+        document.getElementById('pin-overlay').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        init();
+        // Guardar siempre en Firebase al entrar con PIN correcto
+        if (db_fin) {
+          try {
+            fbSaveFin('config', config);
+            fbSaveFin('meses', meses);
+            var activosActuales = JSON.parse(localStorage.getItem(KEY_ACTIVOS) || '[]');
+            if (activosActuales.length > 0) fbSaveFin('activos', activosActuales);
+            console.log('✅ Finanzas: guardado en Firebase — config, meses, activos');
+          } catch(eGuardar) {
+            console.error('❌ Error guardando en Firebase:', eGuardar);
+          }
+        } else {
+          console.warn('⚠️ db_fin es null — no se pudo guardar');
+        }
+      } else {
+        document.getElementById('pin-error').textContent = 'PIN incorrecto. Intenta de nuevo.';
+        pinClear();
+      }
+    }, 200);
+  }
+}
+function pinDel() {
+  if (!pinActual.length) return;
+  pinActual = pinActual.slice(0, -1);
+  for (let i = 0; i < 4; i++) document.getElementById('d' + i).classList.toggle('filled', i < pinActual.length);
+  document.getElementById('pin-error').textContent = '';
+}
+function pinClear() {
+  pinActual = '';
+  for (let i = 0; i < 4; i++) document.getElementById('d' + i).classList.remove('filled');
+  document.getElementById('pin-error').textContent = '';
+}
+
+// ── INIT ──────────────────────────────────────────────────
+function precargarActivosSergio() {
+  // Activos precargados desde Excel de Sergio Barrera — El Rincón del Barril
+  // Si ya existen activos guardados, NO sobreescribir
+  const existentes = fbCacheFin.activos ? JSON.stringify(fbCacheFin.activos) : localStorage.getItem(KEY_ACTIVOS);
+  if (existentes) {
+    const arr = JSON.parse(existentes);
+    if (arr.length > 0) return; // ya tiene activos, no tocar
+  }
+  const activos = [
+  {
+    "consecutivo": "AF-001",
+    "descripcion": "Parrilla / asador carbón",
+    "categoria": "Equipo cocina",
+    "fechaCompra": "2025-02-15",
+    "valorCompra": 800000,
+    "vidaUtil": 120,
+    "estado": "activo",
+    "observaciones": "x2 unidades — sin factura"
+  },
+  {
+    "consecutivo": "AF-002",
+    "descripcion": "Estufa industrial",
+    "categoria": "Equipo cocina",
+    "fechaCompra": "2025-02-16",
+    "valorCompra": 1200000,
+    "vidaUtil": 96,
+    "estado": "activo",
+    "observaciones": "x2 unidades — sin factura"
+  },
+  {
+    "consecutivo": "AF-003",
+    "descripcion": "Freidora industrial",
+    "categoria": "Equipo cocina",
+    "fechaCompra": "2025-02-17",
+    "valorCompra": 4000000,
+    "vidaUtil": 84,
+    "estado": "activo",
+    "observaciones": "x1 unidad — sin factura"
+  },
+  {
+    "consecutivo": "AF-004",
+    "descripcion": "Barril 69 libras",
+    "categoria": "Equipo cocina",
+    "fechaCompra": "2023-11-15",
+    "valorCompra": 3000000,
+    "vidaUtil": 84,
+    "estado": "activo",
+    "observaciones": "x2 unidades — sin factura"
+  },
+  {
+    "consecutivo": "AF-005",
+    "descripcion": "Nevera / refrigerador",
+    "categoria": "Refrigeración",
+    "fechaCompra": "2024-06-16",
+    "valorCompra": 3000000,
+    "vidaUtil": 120,
+    "estado": "activo",
+    "observaciones": "x1 unidad — con factura"
+  },
+  {
+    "consecutivo": "AF-006",
+    "descripcion": "Congelador horizontal",
+    "categoria": "Refrigeración",
+    "fechaCompra": "2024-06-16",
+    "valorCompra": 2000000,
+    "vidaUtil": 120,
+    "estado": "activo",
+    "observaciones": "x1 unidad — sin factura"
+  },
+  {
+    "consecutivo": "AF-007",
+    "descripcion": "Congelador vertical",
+    "categoria": "Refrigeración",
+    "fechaCompra": "2024-06-16",
+    "valorCompra": 1500000,
+    "vidaUtil": 120,
+    "estado": "activo",
+    "observaciones": "x1 unidad — con factura"
+  },
+  {
+    "consecutivo": "AF-008",
+    "descripcion": "Extractor de humo campana",
+    "categoria": "Equipo cocina",
+    "fechaCompra": "2025-02-16",
+    "valorCompra": 4000000,
+    "vidaUtil": 84,
+    "estado": "activo",
+    "observaciones": "x1 unidad — sin factura"
+  },
+  {
+    "consecutivo": "AF-009",
+    "descripcion": "Extractor de humo motor 12\"",
+    "categoria": "Equipo cocina",
+    "fechaCompra": "2025-02-16",
+    "valorCompra": 4500000,
+    "vidaUtil": 84,
+    "estado": "activo",
+    "observaciones": "x3 unidades — sin factura"
+  },
+  {
+    "consecutivo": "AF-010",
+    "descripcion": "Plancha / chapa",
+    "categoria": "Equipo cocina",
+    "fechaCompra": "2025-02-16",
+    "valorCompra": 600000,
+    "vidaUtil": 72,
+    "estado": "activo",
+    "observaciones": "x2 unidades — sin factura"
+  },
+  {
+    "consecutivo": "AF-011",
+    "descripcion": "Licuadora industrial",
+    "categoria": "Equipo cocina",
+    "fechaCompra": "2023-11-15",
+    "valorCompra": 400000,
+    "vidaUtil": 60,
+    "estado": "activo",
+    "observaciones": "x2 unidades — sin factura"
+  },
+  {
+    "consecutivo": "AF-012",
+    "descripcion": "Congelador de bar",
+    "categoria": "Refrigeración",
+    "fechaCompra": "2026-02-10",
+    "valorCompra": 800000,
+    "vidaUtil": 84,
+    "estado": "activo",
+    "observaciones": "x1 unidad — con factura"
+  },
+  {
+    "consecutivo": "AF-013",
+    "descripcion": "Silla",
+    "categoria": "Mueble / Silla / Mesa",
+    "fechaCompra": "2025-11-11",
+    "valorCompra": 10500000,
+    "vidaUtil": 60,
+    "estado": "activo",
+    "observaciones": "x70 unidades — sin factura"
+  },
+  {
+    "consecutivo": "AF-014",
+    "descripcion": "Mesa comedor",
+    "categoria": "Mueble / Silla / Mesa",
+    "fechaCompra": "2025-11-11",
+    "valorCompra": 5400000,
+    "vidaUtil": 72,
+    "estado": "activo",
+    "observaciones": "x18 unidades — sin factura"
+  },
+  {
+    "consecutivo": "AF-015",
+    "descripcion": "Mostrador / caja",
+    "categoria": "Mueble / Silla / Mesa",
+    "fechaCompra": "2026-04-01",
+    "valorCompra": 1000000,
+    "vidaUtil": 84,
+    "estado": "activo",
+    "observaciones": "x1 unidad — sin factura"
+  },
+  {
+    "consecutivo": "AF-016",
+    "descripcion": "Computador / tablet",
+    "categoria": "Tecnología",
+    "fechaCompra": "2026-04-01",
+    "valorCompra": 4000000,
+    "vidaUtil": 36,
+    "estado": "activo",
+    "observaciones": "x2 unidades — sin factura"
+  },
+  {
+    "consecutivo": "AF-017",
+    "descripcion": "Impresora / POS",
+    "categoria": "Tecnología",
+    "fechaCompra": "2025-02-16",
+    "valorCompra": 600000,
+    "vidaUtil": 48,
+    "estado": "activo",
+    "observaciones": "x2 unidades — sin factura"
+  },
+  {
+    "consecutivo": "AF-018",
+    "descripcion": "Cámara de seguridad",
+    "categoria": "Tecnología",
+    "fechaCompra": "2025-02-16",
+    "valorCompra": 300000,
+    "vidaUtil": 60,
+    "estado": "activo",
+    "observaciones": "x3 unidades — sin factura"
+  },
+  {
+    "consecutivo": "AF-019",
+    "descripcion": "Parlantes ambientales",
+    "categoria": "Tecnología",
+    "fechaCompra": "2026-04-01",
+    "valorCompra": 2000000,
+    "vidaUtil": 60,
+    "estado": "activo",
+    "observaciones": "x4 unidades — con factura"
+  },
+  {
+    "consecutivo": "AF-020",
+    "descripcion": "Extintor",
+    "categoria": "Seguridad / Extintor",
+    "fechaCompra": "2026-04-01",
+    "valorCompra": 100000,
+    "vidaUtil": 60,
+    "estado": "activo",
+    "observaciones": "x1 unidad — sin factura"
+  },
+  {
+    "consecutivo": "AF-021",
+    "descripcion": "Aire acondicionado split",
+    "categoria": "Equipo cocina",
+    "fechaCompra": "2026-04-01",
+    "valorCompra": 8000000,
+    "vidaUtil": 120,
+    "estado": "activo",
+    "observaciones": "x2 unidades — con factura"
+  },
+  {
+    "consecutivo": "AF-022",
+    "descripcion": "Horno microondas",
+    "categoria": "Equipo cocina",
+    "fechaCompra": "2026-04-01",
+    "valorCompra": 600000,
+    "vidaUtil": 60,
+    "estado": "activo",
+    "observaciones": "x1 unidad — con factura"
+  },
+  {
+    "consecutivo": "AF-023",
+    "descripcion": "Utensilios de cocina",
+    "categoria": "Equipo cocina",
+    "fechaCompra": "2023-11-15",
+    "valorCompra": 2000000,
+    "vidaUtil": 36,
+    "estado": "activo",
+    "observaciones": "Reponer nov 2026 — sin factura"
+  },
+  {
+    "consecutivo": "AF-024",
+    "descripcion": "Carpa / toldo exterior",
+    "categoria": "Mueble / Silla / Mesa",
+    "fechaCompra": "2023-11-15",
+    "valorCompra": 300000,
+    "vidaUtil": 60,
+    "estado": "activo",
+    "observaciones": "x1 unidad — sin factura"
+  }
+];
+  localStorage.setItem(KEY_ACTIVOS, JSON.stringify(activos)); fbCacheFin.activos = activos; fbSaveFin('activos', activos);
+  console.log('✅ 24 activos de El Rincón del Barril precargados');
+}
+
+function init() {
+  precargarActivosSergio();
+  cargarConfig();
+  cargarMeses();
+  cargarActivos();
+
+  // Mes actual por defecto
+  const hoy = new Date();
+  mesActual = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+
+  actualizarMesLabel();
+  cargarDatosMes();
+  renderActivos();
+  renderHistorico();
+  renderFiscal();
+  calcBalance();
+  actualizarSemaforo();
+  calcPyG();
+  cargarBalanceMes();
+}
+
+// ── CONFIG ────────────────────────────────────────────────
+const CONFIG_DEFAULT = {
+  nombreNegocio: 'El Rincón del Barril',
+  regimen: 'ordinario',
+  objVentas: 70000000,
+  objMargenBruto: 45,
+  objMargenNeto: 20,
+  gastos: [
+    { id: 'nomina',    label: 'Nómina y prestaciones', activo: true },
+    { id: 'arriendo',  label: 'Arriendo',              activo: true },
+    { id: 'servicios', label: 'Servicios públicos',    activo: true },
+    { id: 'gas',       label: 'Gas',                   activo: true },
+    { id: 'mkt',       label: 'Marketing / domicilios',activo: true },
+    { id: 'mant',      label: 'Mantenimiento',         activo: false },
+    { id: 'otros',     label: 'Otros gastos',          activo: true },
+  ]
+};
+
+function cargarConfig() {
+  const raw = fbCacheFin.config ? JSON.stringify(fbCacheFin.config) : localStorage.getItem(KEY_CONFIG);
+  config = raw ? JSON.parse(raw) : { ...CONFIG_DEFAULT };
+  // Render en UI
+  const cn = document.getElementById('cfg-nombre');
+  if (cn) cn.value = config.nombreNegocio || '';
+  const cr = document.getElementById('cfg-regimen');
+  if (cr) cr.value = config.regimen || 'ordinario';
+  const ov = document.getElementById('cfg-obj-ventas');
+  if (ov) ov.value = config.objVentas || '';
+  const ob = document.getElementById('cfg-obj-bruto');
+  if (ob) ob.value = config.objMargenBruto || '';
+  const on = document.getElementById('cfg-obj-neto');
+  if (on) on.value = config.objMargenNeto || '';
+
+  document.getElementById('header-nombre').textContent = (config.nombreNegocio || 'El Rincón del Barril') + ' · Módulo Financiero';
+
+  renderGastosConfig();
+  renderGastosInputs();
+}
+
+function guardarConfig() {
+  config.nombreNegocio = document.getElementById('cfg-nombre').value || 'El Rincón del Barril';
+  config.regimen = document.getElementById('cfg-regimen').value;
+  config.objVentas = parseFloat(document.getElementById('cfg-obj-ventas').value) || 70000000;
+  config.objMargenBruto = parseFloat(document.getElementById('cfg-obj-bruto').value) || 45;
+  config.objMargenNeto = parseFloat(document.getElementById('cfg-obj-neto').value) || 20;
+
+  // Leer gastos config
+  config.gastos = config.gastos.map(g => {
+    const el = document.getElementById('gcfg-label-' + g.id);
+    const ch = document.getElementById('gcfg-check-' + g.id);
+    if (el) g.label = el.value;
+    if (ch) g.activo = ch.checked;
+    return g;
+  });
+
+  localStorage.setItem(KEY_CONFIG, JSON.stringify(config));
+  fbCacheFin.config = config; fbSaveFin('config', config);
+  document.getElementById('header-nombre').textContent = config.nombreNegocio + ' · Módulo Financiero';
+  renderGastosInputs();
+  alert('✅ Configuración guardada correctamente.');
+}
+
+function renderGastosConfig() {
+  const cont = document.getElementById('gastos-config-list');
+  if (!cont) return;
+  cont.innerHTML = '';
+  (config.gastos || []).forEach(g => {
+    const row = document.createElement('div');
+    row.className = 'gastos-config-item';
+    row.innerHTML = `
+      <input type="checkbox" id="gcfg-check-${g.id}" ${g.activo ? 'checked' : ''}>
+      <input type="text" id="gcfg-label-${g.id}" value="${g.label}" placeholder="Nombre del gasto">
+    `;
+    cont.appendChild(row);
+  });
+}
+
+function agregarCategoriaGasto() {
+  const id = 'extra_' + Date.now();
+  config.gastos.push({ id, label: 'Nuevo gasto', activo: true });
+  renderGastosConfig();
+  renderGastosInputs();
+}
+
+function renderGastosInputs() {
+  const cont = document.getElementById('gastos-inputs');
+  if (!cont) return;
+  cont.innerHTML = '';
+  (config.gastos || []).filter(g => g.activo).forEach(g => {
+    const mes = meses[mesActual] || {};
+    const val = (mes.gastos || {})[g.id] || '';
+    const div = document.createElement('div');
+    div.className = 'field-group';
+    div.innerHTML = `
+      <label>${g.label} ($)</label>
+      <input type="number" id="gasto-${g.id}" placeholder="$0" value="${val}" oninput="calcPyG()" min="0">
+    `;
+    cont.appendChild(div);
+  });
+}
+
+// ── MESES ─────────────────────────────────────────────────
+function cargarMeses() {
+  const rawM = fbCacheFin.meses ? JSON.stringify(fbCacheFin.meses) : localStorage.getItem(KEY_MESES);
+  meses = rawM ? JSON.parse(rawM) : {};
+}
+
+function cambiarMes(delta) {
+  const [y, m] = mesActual.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  mesActual = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  actualizarMesLabel();
+  cargarDatosMes();
+  cargarBalanceMes();
+  calcPyG();
+  calcBalance();
+  actualizarSemaforo();
+}
+
+function actualizarMesLabel() {
+  const meses_nombres = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const [y, m] = mesActual.split('-').map(Number);
+  const label = `${meses_nombres[m-1]} ${y}`;
+  const hoyMes = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; })();
+  const el = document.getElementById('mes-label');
+  const elb = document.getElementById('mes-label-bal');
+  if (el) el.textContent = label;
+  if (elb) elb.textContent = label;
+  const st = document.getElementById('mes-status');
+  if (st) st.textContent = mesActual === hoyMes ? '(mes actual)' : '';
+}
+
+function cargarDatosMes() {
+  const d = meses[mesActual] || {};
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('pyg-ventas', d.ventas);
+  set('pyg-costo-ventas', d.costoVentas);
+  renderGastosInputs();
+}
+
+function cargarBalanceMes() {
+  const d = meses[mesActual] || {};
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('bal-caja', d.caja);
+  set('bal-inventario', d.inventario);
+  set('bal-otros-activos', d.otrosActivos);
+  set('bal-proveedores', d.proveedores);
+  set('bal-prestamos', d.prestamos);
+  set('bal-impuestos', d.impuestos);
+  set('bal-otros-pasivos', d.otrosPasivos);
+  calcBalance();
+}
+
+function guardarMes() {
+  const ventas = parseFloat(document.getElementById('pyg-ventas').value) || 0;
+  const costoVentas = parseFloat(document.getElementById('pyg-costo-ventas').value) || 0;
+  const gastos = {};
+  (config.gastos || []).filter(g => g.activo).forEach(g => {
+    const el = document.getElementById('gasto-' + g.id);
+    if (el) gastos[g.id] = parseFloat(el.value) || 0;
+  });
+  const deprec = calcDepreciacionTotal();
+
+  meses[mesActual] = { ...( meses[mesActual] || {} ), ventas, costoVentas, gastos, deprec };
+  localStorage.setItem(KEY_MESES, JSON.stringify(meses)); fbCacheFin.meses = meses; fbSaveFin('meses', meses);
+  renderHistorico();
+  renderFiscal();
+  actualizarSemaforo();
+  alert('✅ Mes guardado correctamente.');
+}
+
+function guardarBalance() {
+  meses[mesActual] = {
+    ...(meses[mesActual] || {}),
+    caja: parseFloat(document.getElementById('bal-caja').value) || 0,
+    inventario: parseFloat(document.getElementById('bal-inventario').value) || 0,
+    otrosActivos: parseFloat(document.getElementById('bal-otros-activos').value) || 0,
+    proveedores: parseFloat(document.getElementById('bal-proveedores').value) || 0,
+    prestamos: parseFloat(document.getElementById('bal-prestamos').value) || 0,
+    impuestos: parseFloat(document.getElementById('bal-impuestos').value) || 0,
+    otrosPasivos: parseFloat(document.getElementById('bal-otros-pasivos').value) || 0,
+  };
+  localStorage.setItem(KEY_MESES, JSON.stringify(meses)); fbCacheFin.meses = meses; fbSaveFin('meses', meses);
+  alert('✅ Balance guardado correctamente.');
+}
+
+// ── CÁLCULO P&G ───────────────────────────────────────────
+function calcPyG() {
+  const ventas = parseFloat(document.getElementById('pyg-ventas').value) || 0;
+  const costoV = parseFloat(document.getElementById('pyg-costo-ventas').value) || 0;
+  const deprec = calcDepreciacionTotal();
+  const el_dep = document.getElementById('pyg-depreciacion');
+  if (el_dep) el_dep.value = fmt(deprec);
+
+  let totalGastos = 0;
+  (config.gastos || []).filter(g => g.activo).forEach(g => {
+    const el = document.getElementById('gasto-' + g.id);
+    if (el) totalGastos += parseFloat(el.value) || 0;
+  });
+
+  const utilBruta = ventas - costoV;
+  const utilNeta = utilBruta - totalGastos - deprec;
+  const margenBruto = ventas ? Math.round((utilBruta / ventas) * 100) : 0;
+  const margenNeto  = ventas ? Math.round((utilNeta  / ventas) * 100) : 0;
+
+  // Render resultado
+  const cls = v => v >= 0 ? 'pos' : 'neg';
+  setText('res-ventas', fmt(ventas), cls(ventas));
+  setText('res-costo', fmt(costoV), 'neg');
+  setText('res-gastos', fmt(totalGastos), 'neg');
+  setText('res-deprec', fmt(deprec), '');
+  setTextRaw('res-util-bruta', `${fmt(utilBruta)} <span class="margen-badge ${margenClass(margenBruto, config.objMargenBruto || 45)}">${margenBruto}%</span>`);
+  setTextRaw('res-util-neta', `${fmt(utilNeta)} <span class="margen-badge ${margenClass(margenNeto, config.objMargenNeto || 20)}">${margenNeto}%</span>`);
+
+  // Punto de equilibrio: gastos fijos / margen bruto %
+  const margenBrutoDecimal = ventas ? (utilBruta / ventas) : 0;
+  const eq = margenBrutoDecimal > 0 ? Math.round((totalGastos + deprec) / margenBrutoDecimal) : 0;
+  setText('eq-valor', eq > 0 ? fmt(eq) : '—', '');
+  if (eq > 0 && ventas > 0) {
+    const pct = Math.min(Math.round((ventas / eq) * 100), 200);
+    const color = pct >= 100 ? '#2E7D32' : pct >= 70 ? '#F57F17' : '#C41E3A';
+    document.getElementById('eq-avance').innerHTML = `<span style="color:${color}; font-weight:600">${pct}%</span> del punto de equilibrio alcanzado`;
+  }
+
+  // Impuestos estimados
+  const ica = Math.round(ventas * 0.01);
+  const renta = Math.round(ventas * 0.035);
+  setText('tax-ica', fmt(ica), '');
+  setText('tax-renta', fmt(renta), '');
+  setText('tax-total', fmt(ica + renta), '');
+
+  actualizarSemaforo(ventas, margenNeto);
+}
+
+function margenClass(actual, objetivo) {
+  if (actual >= objetivo) return 'margen-verde';
+  if (actual >= objetivo * 0.7) return 'margen-amarillo';
+  return 'margen-rojo';
+}
+
+// ── BALANCE ───────────────────────────────────────────────
+function calcBalance() {
+  const g = id => parseFloat(document.getElementById(id)?.value) || 0;
+  const afTotal = calcActivosFijosTotal();
+  const totalActivos = g('bal-caja') + g('bal-inventario') + afTotal + g('bal-otros-activos');
+  const totalPasivos = g('bal-proveedores') + g('bal-prestamos') + g('bal-impuestos') + g('bal-otros-pasivos');
+  const patrimonio = totalActivos - totalPasivos;
+
+  const el = id => document.getElementById(id);
+  el('bal-af-auto').textContent = fmt(afTotal);
+  el('bal-total-activos').textContent = fmt(totalActivos);
+  el('bal-total-pasivos').textContent = fmt(totalPasivos);
+  el('bal-patrimonio').textContent = fmt(patrimonio);
+  el('bal-patrimonio').style.color = patrimonio >= 0 ? '#81C784' : '#EF9A9A';
+  el('bal-patrimonio-sub').textContent = patrimonio >= 0
+    ? `El negocio vale ${fmt(patrimonio)} más de lo que debe ✅`
+    : `El negocio debe ${fmt(Math.abs(patrimonio))} más de lo que tiene ⚠️`;
+}
+
+// ── ACTIVOS FIJOS ─────────────────────────────────────────
+function cargarActivos() {
+  const raw = fbCacheFin.activos ? JSON.stringify(fbCacheFin.activos) : localStorage.getItem(KEY_ACTIVOS);
+  activos = raw ? JSON.parse(raw) : [];
+}
+
+function calcActivosFijosTotal() {
+  const hoy = new Date();
+  return activos.filter(a => a.estado === 'activo').reduce((sum, a) => {
+    return sum + calcValorActual(a, hoy);
+  }, 0);
+}
+
+function calcDepreciacionTotal() {
+  return activos.filter(a => a.estado === 'activo').reduce((sum, a) => {
+    return sum + Math.round(a.valorCompra / a.vidaUtil);
+  }, 0);
+}
+
+function calcValorActual(activo, hoy = new Date()) {
+  const compra = new Date(activo.fechaCompra);
+  const mesesPasados = Math.max(0,
+    (hoy.getFullYear() - compra.getFullYear()) * 12 +
+    (hoy.getMonth() - compra.getMonth())
+  );
+  const deprecAcum = Math.round(activo.valorCompra / activo.vidaUtil) * mesesPasados;
+  return Math.max(0, activo.valorCompra - deprecAcum);
+}
+
+function renderActivos() {
+  const tbody = document.getElementById('activos-tbody');
+  if (!tbody) return;
+  const hoy = new Date();
+
+  if (!activos.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:#aaa; padding:24px;">Sin activos registrados. Agrega tu primer equipo.</td></tr>';
+    document.getElementById('af-total-val').textContent = '$0';
+    calcBalance();
+    calcPyG();
+    return;
+  }
+
+  let totalVal = 0;
+  tbody.innerHTML = activos.map((a, i) => {
+    const deprecMes = Math.round(a.valorCompra / a.vidaUtil);
+    const valActual = calcValorActual(a, hoy);
+    if (a.estado === 'activo') totalVal += valActual;
+    const badgeCls = { activo: 'badge-verde', mantenimiento: 'badge-amarillo', baja: 'badge-rojo' }[a.estado] || 'badge-gris';
+    const badgeTxt = { activo: 'Activo', mantenimiento: 'En mant.', baja: 'Dado de baja' }[a.estado] || a.estado;
+    return `<tr>
+      <td><strong>${a.consecutivo}</strong></td>
+      <td>${a.descripcion}</td>
+      <td><span class="badge badge-gris">${a.categoria}</span></td>
+      <td>${fmtFecha(a.fechaCompra)}</td>
+      <td>${fmt(a.valorCompra)}</td>
+      <td>${a.vidaUtil} meses</td>
+      <td style="color:#888">${fmt(deprecMes)}/mes</td>
+      <td style="font-weight:600; color:var(--verde)">${fmt(valActual)}</td>
+      <td><span class="badge ${badgeCls}">${badgeTxt}</span></td>
+      <td class="no-print">
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-secondary btn-sm" onclick="editarActivo(${i})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="eliminarActivo(${i})">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('af-total-val').textContent = fmt(totalVal);
+  calcBalance();
+  calcPyG();
+}
+
+function abrirModalActivo() {
+  document.getElementById('modal-activo-title').textContent = '➕ Agregar Activo Fijo';
+  document.getElementById('activo-edit-id').value = '';
+  ['act-desc','act-obs'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('act-cat').value = 'Equipo cocina';
+  document.getElementById('act-estado').value = 'activo';
+  document.getElementById('act-fecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('act-valor').value = '';
+  document.getElementById('act-vida').value = '';
+  document.getElementById('modal-activo').classList.add('open');
+}
+
+function editarActivo(i) {
+  const a = activos[i];
+  document.getElementById('modal-activo-title').textContent = '✏️ Editar Activo Fijo';
+  document.getElementById('activo-edit-id').value = i;
+  document.getElementById('act-desc').value = a.descripcion;
+  document.getElementById('act-cat').value = a.categoria;
+  document.getElementById('act-fecha').value = a.fechaCompra;
+  document.getElementById('act-valor').value = a.valorCompra;
+  document.getElementById('act-vida').value = a.vidaUtil;
+  document.getElementById('act-estado').value = a.estado;
+  document.getElementById('act-obs').value = a.observaciones || '';
+  document.getElementById('modal-activo').classList.add('open');
+}
+
+function guardarActivo() {
+  const desc  = document.getElementById('act-desc').value.trim();
+  const valor = parseFloat(document.getElementById('act-valor').value) || 0;
+  const vida  = parseInt(document.getElementById('act-vida').value) || 0;
+  const fecha = document.getElementById('act-fecha').value;
+  if (!desc || !valor || !vida || !fecha) { alert('Por favor completa los campos obligatorios (*)'); return; }
+
+  const editId = document.getElementById('activo-edit-id').value;
+  const activo = {
+    consecutivo: editId !== '' ? activos[parseInt(editId)].consecutivo : 'AF-' + String(activos.length + 1).padStart(3,'0'),
+    descripcion: desc,
+    categoria: document.getElementById('act-cat').value,
+    fechaCompra: fecha,
+    valorCompra: valor,
+    vidaUtil: vida,
+    estado: document.getElementById('act-estado').value,
+    observaciones: document.getElementById('act-obs').value.trim(),
+  };
+
+  if (editId !== '') {
+    activos[parseInt(editId)] = activo;
+  } else {
+    activos.push(activo);
+  }
+
+  localStorage.setItem(KEY_ACTIVOS, JSON.stringify(activos)); fbCacheFin.activos = activos; fbSaveFin('activos', activos);
+  cerrarModal('modal-activo');
+  renderActivos();
+}
+
+function eliminarActivo(i) {
+  if (!confirm(`¿Eliminar "${activos[i].descripcion}"?`)) return;
+  activos.splice(i, 1);
+  // Recalcular consecutivos
+  activos.forEach((a, idx) => a.consecutivo = 'AF-' + String(idx+1).padStart(3,'0'));
+  localStorage.setItem(KEY_ACTIVOS, JSON.stringify(activos)); fbCacheFin.activos = activos; fbSaveFin('activos', activos);
+  renderActivos();
+}
+
+// ── HISTÓRICO ─────────────────────────────────────────────
+function renderHistorico() {
+  const tbody = document.getElementById('hist-tbody');
+  const chart = document.getElementById('bar-chart');
+  if (!tbody) return;
+
+  const meses_nombres = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const claves = Object.keys(meses).sort().slice(-12);
+
+  if (!claves.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#aaa; padding:24px;">Sin historial. Guarda el primer mes en P&G.</td></tr>';
+    if (chart) chart.innerHTML = '';
+    return;
+  }
+
+  // Tabla
+  tbody.innerHTML = claves.map(k => {
+    const d = meses[k];
+    if (!d.ventas) return '';
+    const [y, m] = k.split('-').map(Number);
+    const totalGastos = Object.values(d.gastos || {}).reduce((s,v) => s+v, 0);
+    const deprec = d.deprec || 0;
+    const uBruta = d.ventas - (d.costoVentas || 0);
+    const uNeta  = uBruta - totalGastos - deprec;
+    const mBruto = d.ventas ? Math.round((uBruta / d.ventas)*100) : 0;
+    const mNeto  = d.ventas ? Math.round((uNeta  / d.ventas)*100) : 0;
+    const esMesActual = k === mesActual;
+    return `<tr ${esMesActual ? 'class="highlight"' : ''}>
+      <td>${meses_nombres[m-1]} ${y} ${esMesActual ? '🔵' : ''}</td>
+      <td>${fmt(d.ventas)}</td>
+      <td>${fmt(d.costoVentas||0)}</td>
+      <td>${fmt(uBruta)}</td>
+      <td><span class="badge ${margenClass(mBruto, config.objMargenBruto||45)}">${mBruto}%</span></td>
+      <td>${fmt(totalGastos + deprec)}</td>
+      <td>${fmt(uNeta)}</td>
+      <td><span class="badge ${margenClass(mNeto, config.objMargenNeto||20)}">${mNeto}%</span></td>
+    </tr>`;
+  }).join('');
+
+  // Gráfica
+  if (chart) {
+    const maxVal = Math.max(...claves.map(k => meses[k]?.ventas || 0), 1);
+    chart.innerHTML = claves.map(k => {
+      const d = meses[k] || {};
+      const [y, m] = k.split('-').map(Number);
+      const ventas = d.ventas || 0;
+      const totalG = Object.values(d.gastos || {}).reduce((s,v) => s+v, 0);
+      const uNeta  = Math.max(0, ventas - (d.costoVentas||0) - totalG - (d.deprec||0));
+      const hV = Math.round((ventas / maxVal) * 100);
+      const hN = Math.round((uNeta  / maxVal) * 100);
+      return `<div class="bar-wrap">
+        <div style="display:flex; gap:2px; align-items:flex-end; height:100px">
+          <div class="bar-fill" style="height:${hV}px; background:var(--rojo); width:16px;" title="Ventas: ${fmt(ventas)}"></div>
+          <div class="bar-fill" style="height:${hN}px; background:var(--verde-light); width:16px;" title="Utilidad: ${fmt(uNeta)}"></div>
+        </div>
+        <div class="bar-lbl">${meses_nombres[m-1]}</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── FISCAL ────────────────────────────────────────────────
+function renderFiscal() {
+  const anio = new Date().getFullYear();
+  const clavesAnio = Object.keys(meses).filter(k => k.startsWith(anio.toString())).sort();
+  let totalVentas = 0, totalNeta = 0;
+  clavesAnio.forEach(k => {
+    const d = meses[k] || {};
+    if (!d.ventas) return;
+    const tg = Object.values(d.gastos || {}).reduce((s,v) => s+v, 0);
+    totalVentas += d.ventas;
+    totalNeta += d.ventas - (d.costoVentas||0) - tg - (d.deprec||0);
+  });
+
+  const ica = Math.round(totalVentas * 0.01);
+  const renta = Math.round(totalVentas * 0.035);
+  const retencion = Math.round(totalNeta > 0 ? totalNeta * 0.03 : 0);
+
+  const acum = document.getElementById('fiscal-acumulado');
+  if (acum) acum.innerHTML = `
+    <div class="fiscal-row"><div><div class="f-lbl">Ventas acumuladas ${anio}</div><div class="f-sub">${clavesAnio.length} meses registrados</div></div><div class="f-val">${fmt(totalVentas)}</div></div>
+    <div class="fiscal-row"><div><div class="f-lbl">Utilidad neta acumulada</div></div><div class="f-val" style="color:${totalNeta>=0?'var(--verde)':'var(--rojo)'};">${fmt(totalNeta)}</div></div>
+  `;
+
+  const sep = document.getElementById('fiscal-separar');
+  if (sep) sep.innerHTML = `
+    <div class="fiscal-row"><div><div class="f-lbl">ICA acumulado (~1% ventas)</div><div class="f-sub">Impuesto de industria y comercio</div></div><div class="f-val">${fmt(ica)}</div></div>
+    <div class="fiscal-row"><div><div class="f-lbl">Anticipo renta (~3.5% ventas)</div><div class="f-sub">Orientativo régimen ordinario</div></div><div class="f-val">${fmt(renta)}</div></div>
+    <div class="fiscal-row" style="font-weight:700;"><div><div class="f-lbl">TOTAL ESTIMADO A SEPARAR</div></div><div class="f-val" style="font-size:1.3rem;">${fmt(ica+renta)}</div></div>
+  `;
+
+  const obl = document.getElementById('fiscal-obligaciones');
+  if (obl) {
+    const hoy = new Date();
+    const dia = hoy.getDate();
+    const mes = hoy.getMonth();
+    const anioH = hoy.getFullYear();
+    // ICA bimestral — últimos días del bimestre siguiente
+    const bimestres = [[2,28],[4,31],[6,30],[8,31],[10,30],[12,20]];
+    const proxBim = bimestres.find(b => b[0] > mes+1) || bimestres[0];
+    const fechaBim = `${anioH}-${String(proxBim[0]).padStart(2,'0')}-${proxBim[1]}`;
+    // Seguridad social — día 5 del mes siguiente
+    const ss = new Date(anioH, mes + (dia > 5 ? 1 : 0), 5);
+    obl.innerHTML = `
+      <div class="fiscal-row"><div><div class="f-lbl">📅 Pago ICA (bimestral)</div><div class="f-sub">Confírmalo con tu contador — varía por municipio</div></div><div class="f-val" style="font-size:.95rem;">${fmtFecha(fechaBim)}</div></div>
+      <div class="fiscal-row"><div><div class="f-lbl">👥 Seguridad social</div><div class="f-sub">Día 5 del mes siguiente</div></div><div class="f-val" style="font-size:.95rem;">${fmtFecha(ss.toISOString().split('T')[0])}</div></div>
+      <div class="fiscal-row"><div><div class="f-lbl">🏛️ Cámara de Comercio</div><div class="f-sub">Renovación anual — verificar fecha</div></div><div class="f-val" style="font-size:.95rem;">Mar 31</div></div>
+    `;
+  }
+}
+
+// ── SEMÁFORO ──────────────────────────────────────────────
+function actualizarSemaforo(ventas, margenNeto) {
+  const d = meses[mesActual] || {};
+  const v = ventas !== undefined ? ventas : (d.ventas || 0);
+  const mn = margenNeto !== undefined ? margenNeto : (() => {
+    const tg = Object.values(d.gastos || {}).reduce((s,val) => s+val, 0);
+    const un = v - (d.costoVentas||0) - tg - (d.deprec||0);
+    return v ? Math.round((un/v)*100) : 0;
+  })();
+  const objV = config.objVentas || 70000000;
+  const objN = config.objMargenNeto || 20;
+
+  // Ventas
+  const semV = document.getElementById('sem-ventas');
+  const pctV = v ? Math.round((v/objV)*100) : 0;
+  if (semV) {
+    semV.className = 'sem-card ' + (v === 0 ? 'gris' : pctV >= 100 ? 'verde' : pctV >= 70 ? 'amarillo' : 'rojo');
+    document.getElementById('sem-ventas-val').textContent = v ? fmt(v) : '—';
+    document.getElementById('sem-ventas-sub').textContent = v ? `${pctV}% del objetivo (${fmt(objV)})` : 'Sin datos aún';
+  }
+
+  // Margen
+  const semM = document.getElementById('sem-margen');
+  if (semM) {
+    semM.className = 'sem-card ' + (v === 0 ? 'gris' : mn >= objN ? 'verde' : mn >= objN*0.7 ? 'amarillo' : 'rojo');
+    document.getElementById('sem-margen-val').textContent = v ? mn + '%' : '—';
+    document.getElementById('sem-margen-sub').textContent = v ? `Objetivo: ${objN}%` : 'Sin datos aún';
+  }
+
+  // Compromisos — leer del módulo legal
+  try {
+    const hoy = new Date();
+    const dia = hoy.getDate();
+    const mes = hoy.getMonth();
+    const anio = hoy.getFullYear();
+    const dia5 = new Date(anio, mes + (dia > 5 ? 1 : 0), 5);
+    const dias = Math.round((dia5 - hoy) / 86400000);
+    const semC = document.getElementById('sem-compromisos');
+    if (semC) {
+      semC.className = 'sem-card ' + (dias <= 3 ? 'rojo' : dias <= 10 ? 'amarillo' : 'verde');
+      document.getElementById('sem-comp-val').textContent = `En ${dias} días`;
+      document.getElementById('sem-comp-sub').textContent = 'Seguridad social';
+    }
+  } catch(e) {}
+}
+
+// ── EXPORTAR ──────────────────────────────────────────────
+function exportarExcel() {
+  const meses_nombres = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const claves = Object.keys(meses).sort();
+
+  let csv = `P&G HISTÓRICO - ${config.nombreNegocio || 'El Rincón del Barril'}\n`;
+  csv += `Generado: ${new Date().toLocaleDateString('es-CO')}\n\n`;
+  csv += `Mes;Ventas;Costo Ventas;Utilidad Bruta;Margen Bruto %;`;
+  const gastoCols = (config.gastos || []).filter(g => g.activo).map(g => g.label);
+  csv += gastoCols.join(';') + ';Depreciación;Total Gastos;Utilidad Neta;Margen Neto %\n';
+
+  claves.forEach(k => {
+    const d = meses[k] || {};
+    if (!d.ventas) return;
+    const [y, m] = k.split('-').map(Number);
+    const tg = Object.values(d.gastos || {}).reduce((s,v) => s+v, 0);
+    const uB = d.ventas - (d.costoVentas||0);
+    const uN = uB - tg - (d.deprec||0);
+    const mB = d.ventas ? Math.round((uB/d.ventas)*100) : 0;
+    const mN = d.ventas ? Math.round((uN/d.ventas)*100) : 0;
+    const gastosRow = (config.gastos || []).filter(g => g.activo).map(g => (d.gastos||{})[g.id]||0).join(';');
+    csv += `${meses_nombres[m-1]} ${y};${d.ventas};${d.costoVentas||0};${uB};${mB}%;${gastosRow};${d.deprec||0};${tg+(d.deprec||0)};${uN};${mN}%\n`;
+  });
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `PyG_${(config.nombreNegocio||'negocio').replace(/\s/g,'_')}_${new Date().getFullYear()}.csv`;
+  a.click();
+}
+
+function exportarActivosExcel() {
+  let csv = `ACTIVOS FIJOS - ${config.nombreNegocio || 'El Rincón del Barril'}\n`;
+  csv += `Generado: ${new Date().toLocaleDateString('es-CO')}\n\n`;
+  csv += `N°;Descripción;Categoría;Fecha Compra;Valor Compra;Vida Útil (meses);Deprec./mes;Valor Actual;Estado;Observaciones\n`;
+  const hoy = new Date();
+  activos.forEach(a => {
+    const deprec = Math.round(a.valorCompra / a.vidaUtil);
+    const val = calcValorActual(a, hoy);
+    csv += `${a.consecutivo};${a.descripcion};${a.categoria};${a.fechaCompra};${a.valorCompra};${a.vidaUtil};${deprec};${val};${a.estado};${a.observaciones||''}\n`;
+  });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `Activos_Fijos_${(config.nombreNegocio||'negocio').replace(/\s/g,'_')}.csv`;
+  a.click();
+}
+
+// ── MODAL ─────────────────────────────────────────────────
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+window.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
+});
+
+// ── TABS ──────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'historico') renderHistorico();
+  if (name === 'fiscal') renderFiscal();
+  if (name === 'balance') { cargarBalanceMes(); calcBalance(); }
+  if (name === 'config') { renderGastosConfig(); }
+}
+
+// ── UTILIDADES ────────────────────────────────────────────
+function fmt(n) {
+  if (!n && n !== 0) return '—';
+  const abs = Math.abs(Math.round(n));
+  const s = '$' + abs.toLocaleString('es-CO');
+  return n < 0 ? '-' + s : s;
+}
+function fmtFecha(str) {
+  if (!str) return '—';
+  const [y,m,d] = str.split('-');
+  return `${d}/${m}/${y}`;
+}
+function setText(id, val, cls) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = val;
+  if (cls) { el.className = 'val ' + cls; }
+}
+function setTextRaw(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+}
+</script>
+</body>
+</html>
