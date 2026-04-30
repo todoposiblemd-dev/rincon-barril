@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Plan de Turno — El Rincón del Barril</title>
+<style>
+:root {
+  --rojo:#C0392B; --rojo2:#a93226; --fondo:#0e0e0e; --fondo2:#181818;
+  --fondo3:#222; --borde:#2c2c2c; --txt:#f0f0f0; --txt2:#888;
+  --verde:#27ae60; --ambar:#e67e22; --azul:#2980b9; --rosa:#c0392b;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--fondo);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding-bottom:70px;font-size:15px}
+/* HEADER */
+.hdr{background:var(--fondo2);border-bottom:2px solid var(--rojo);padding:10px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50}
+.hdr-logo{font-size:24px}
+.hdr-info{flex:1}
+.hdr-title{font-size:17px;font-weight:800;letter-spacing:-.3px}
+.hdr-sub{font-size:11px;color:var(--txt2)}
+.hdr-fecha{font-size:11px;color:var(--txt2);text-align:right;line-height:1.5}
+/* AREA TABS */
+.area-row{background:var(--fondo2);border-bottom:1px solid var(--borde);display:flex;overflow-x:auto;padding:0 8px;gap:2px;scrollbar-width:none}
+.area-row::-webkit-scrollbar{display:none}
+.atab{padding:10px 14px;font-size:13px;font-weight:700;color:var(--txt2);cursor:pointer;white-space:nowrap;border:none;background:none;border-bottom:3px solid transparent;transition:.2s}
+.atab.on{color:var(--txt);border-bottom-color:var(--rojo)}
+.atab.add{opacity:.5;font-size:12px}
+/* PERSON CHIPS */
+.prow{padding:8px 12px;display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--borde);scrollbar-width:none;background:var(--fondo)}
+.prow::-webkit-scrollbar{display:none}
+.pchip{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--fondo3);color:var(--txt2);border:1px solid var(--borde);white-space:nowrap;transition:.15s}
+.pchip.on{background:var(--rojo);color:#fff;border-color:var(--rojo)}
+/* DAY TABS */
+.drow{display:flex;border-bottom:1px solid var(--borde);background:var(--fondo2)}
+.dtab{flex:1;padding:9px 4px;text-align:center;font-size:11px;font-weight:800;color:var(--txt2);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;letter-spacing:.5px;transition:.2s}
+.dtab.on{color:var(--txt);border-bottom-color:var(--rojo)}
+.dtab.today{color:var(--ambar)}
+.dtab.today.on{border-bottom-color:var(--ambar)}
+.dtab.off{opacity:.3}
+/* SHIFT TABS */
+.srow{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--borde);background:var(--fondo)}
+.stab{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;background:var(--fondo3);color:var(--txt2);border:1px solid var(--borde);transition:.15s;white-space:nowrap}
+.stab.on{background:var(--fondo2);color:var(--txt);border-color:#444}
+/* CONTENT */
+.content{padding:12px;max-width:600px;margin:0 auto}
+/* TASK */
+.tlist{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.titem{background:var(--fondo2);border:1px solid var(--borde);border-radius:10px;padding:12px 13px;transition:.2s}
+.titem.done{border-color:rgba(39,174,96,.4);background:rgba(39,174,96,.04)}
+.titem.novedad{border-left:3px solid var(--ambar)}
+.ttop{display:flex;align-items:flex-start;gap:10px}
+.tcheck{width:26px;height:26px;min-width:26px;border-radius:50%;border:2px solid var(--borde);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:.2s;background:none;color:transparent}
+.tcheck.done{background:var(--verde);border-color:var(--verde);color:#fff}
+.tinfo{flex:1}
+.tnombre{font-size:14px;font-weight:500;line-height:1.4}
+.titem.done .tnombre{text-decoration:line-through;color:var(--txt2)}
+.tbadges{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.badge{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:800;letter-spacing:.3px}
+.br{background:rgba(192,57,43,.18);color:#e07070;border:1px solid rgba(192,57,43,.25)}
+.ba{background:rgba(41,128,185,.18);color:#70b0e0;border:1px solid rgba(41,128,185,.25)}
+.bsin{background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--borde)}
+.thora{font-size:11px;color:var(--verde);margin-top:3px}
+.tnovtxt{font-size:12px;color:var(--ambar);margin-top:4px;padding:4px 8px;background:rgba(230,126,34,.1);border-radius:4px;border-left:2px solid var(--ambar)}
+.tacts{display:flex;gap:6px;margin-top:8px}
+.tbtn{padding:4px 10px;font-size:11px;font-weight:700;border-radius:5px;cursor:pointer;border:1px solid var(--borde);background:var(--fondo3);color:var(--txt2)}
+.tbtn.nov{border-color:rgba(230,126,34,.4);color:var(--ambar)}
+.tbtn.del{border-color:rgba(192,57,43,.3);color:#e07070}
+.novform{display:none;gap:6px;margin-top:7px}
+.novform.open{display:flex}
+.novinput{flex:1;background:var(--fondo3);border:1px solid var(--ambar);border-radius:6px;padding:6px 10px;color:var(--txt);font-size:13px;outline:none}
+.novok{padding:6px 12px;background:var(--ambar);color:#000;border:none;border-radius:6px;font-weight:800;font-size:12px;cursor:pointer}
+/* BOTTOM BAR */
+.bbar{position:fixed;bottom:0;left:0;right:0;background:rgba(14,14,14,.97);border-top:1px solid var(--borde);padding:10px 10px;display:flex;gap:7px;z-index:50;backdrop-filter:blur(8px)}
+.bbar button{flex:1;padding:11px 6px;border-radius:10px;font-weight:800;font-size:12px;cursor:pointer;border:1px solid}
+.btn-aus{background:rgba(230,126,34,.12);border-color:rgba(230,126,34,.4);color:var(--ambar)}
+.btn-wa{background:rgba(37,211,102,.12);border-color:rgba(37,211,102,.35);color:#25d366}
+.btn-adm{background:rgba(255,255,255,.04);border-color:var(--borde);color:var(--txt2);flex:0 0 46px!important}
+/* OVERLAY */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;overflow-y:auto}
+.ov.open{display:block}
+.panel{background:var(--fondo2);border-radius:16px 16px 0 0;margin-top:48px;min-height:calc(100vh - 48px);padding:18px 14px}
+.pnl-hdr{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.pnl-title{font-size:18px;font-weight:800;flex:1}
+.btn-close{width:32px;height:32px;border-radius:50%;background:var(--fondo3);border:1px solid var(--borde);color:var(--txt);font-size:14px;cursor:pointer}
+/* PIN */
+.pin-wrap{text-align:center;padding:30px 20px}
+.pin-sub{font-size:13px;color:var(--txt2);margin-bottom:20px}
+.pin-dots{display:flex;gap:12px;justify-content:center;margin-bottom:24px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--borde);background:transparent;transition:.15s}
+.pin-dot.on{background:var(--rojo);border-color:var(--rojo)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:270px;margin:0 auto}
+.pkey{padding:15px;background:var(--fondo3);border:1px solid var(--borde);border-radius:10px;font-size:20px;font-weight:700;color:var(--txt);cursor:pointer;user-select:none;transition:.1s}
+.pkey:active{background:var(--rojo);transform:scale(.94)}
+.pkey.del{font-size:14px;color:var(--txt2)}
+.pin-err{color:var(--rojo);font-size:13px;margin-top:10px;min-height:18px}
+/* ADMIN SECTIONS */
+.adm-sec{margin-bottom:18px}
+.adm-sec-title{font-size:11px;font-weight:800;color:var(--txt2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--borde)}
+.adm-row{display:flex;align-items:center;gap:8px;padding:9px 10px;background:var(--fondo3);border-radius:8px;margin-bottom:5px}
+.adm-input{flex:1;background:var(--fondo);border:1px solid var(--borde);border-radius:6px;padding:8px 10px;color:var(--txt);font-size:14px;outline:none}
+.adm-input:focus{border-color:var(--rojo)}
+.btn-save{padding:8px 14px;background:var(--rojo);color:#fff;border:none;border-radius:6px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn-sec{padding:8px 12px;background:var(--fondo3);color:var(--txt);border:1px solid var(--borde);border-radius:6px;font-weight:700;font-size:12px;cursor:pointer}
+.btn-danger{padding:7px 12px;background:transparent;color:#e07070;border:1px solid rgba(192,57,43,.4);border-radius:6px;font-weight:700;font-size:12px;cursor:pointer}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat-card{background:var(--fondo3);border-radius:8px;padding:11px 8px;text-align:center}
+.stat-n{font-size:26px;font-weight:900}
+.stat-l{font-size:10px;color:var(--txt2);margin-top:2px}
+/* TASK EDIT ROW */
+.te-row{display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid var(--borde)}
+.te-name{flex:1;font-size:13px}
+.ab-btn{padding:3px 8px;font-size:11px;font-weight:800;border-radius:4px;cursor:pointer;border:1px solid var(--borde);background:var(--fondo3);color:var(--txt2);min-width:30px;text-align:center;transition:.1s}
+.ab-btn.r{background:rgba(192,57,43,.2);color:#e07070;border-color:rgba(192,57,43,.3)}
+.ab-btn.a{background:rgba(41,128,185,.2);color:#70b0e0;border-color:rgba(41,128,185,.3)}
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.mbox{background:var(--fondo2);border-radius:14px;padding:22px 18px;width:100%;max-width:360px;border:1px solid var(--borde)}
+.mtitle{font-size:16px;font-weight:800;margin-bottom:14px}
+.msel,.mtxt,.minput{width:100%;background:var(--fondo3);border:1px solid var(--borde);border-radius:8px;padding:10px 12px;color:var(--txt);font-size:14px;margin-bottom:9px;outline:none}
+.msel:focus,.mtxt:focus,.minput:focus{border-color:var(--rojo)}
+.mtxt{resize:vertical;min-height:72px}
+.mbtns{display:flex;gap:8px;margin-top:2px}
+.mbtns button{flex:1;padding:12px;border-radius:8px;font-weight:800;font-size:14px;cursor:pointer}
+.mconfirm{background:var(--ambar);color:#000;border:none}
+.mcancel{background:var(--fondo3);color:var(--txt2);border:1px solid var(--borde)}
+.mconfirm-r{background:var(--rojo);color:#fff;border:none}
+/* TOAST */
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(16px);background:#1e1e1e;color:var(--txt);padding:9px 18px;border-radius:20px;font-size:13px;font-weight:700;border:1px solid var(--borde);opacity:0;transition:.3s;z-index:400;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* MENU */
+.menu-day{background:var(--fondo3);border:1px solid var(--borde);border-radius:10px;padding:12px 13px;margin-bottom:8px}
+.menu-day.hoy{border-color:var(--rojo);background:rgba(192,57,43,.06)}
+.menu-day-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.menu-day-label{font-size:11px;font-weight:800;color:var(--txt2);letter-spacing:.5px;text-transform:uppercase}
+.menu-day-label.hoy{color:var(--ambar)}
+.menu-plato{font-size:15px;font-weight:700;flex:1;margin-bottom:6px}
+.menu-porciones{display:flex;align-items:center;gap:6px;margin-bottom:7px;flex-wrap:wrap}
+.por-est{background:rgba(41,128,185,.18);color:#70b0e0;border:1px solid rgba(41,128,185,.25);padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800}
+.por-real{background:rgba(39,174,96,.18);color:#7de0a0;border:1px solid rgba(39,174,96,.25);padding:3px 10px;border-radius:6px;font-size:12px;font-weight:800}
+.por-real-inp{width:60px;background:var(--fondo);border:1px solid var(--verde);border-radius:6px;padding:4px 8px;color:var(--txt);font-size:13px;outline:none;text-align:center}
+.menu-bebidas{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
+.beb-tag{padding:2px 9px;background:rgba(155,89,182,.18);color:#c39be0;border:1px solid rgba(155,89,182,.25);border-radius:12px;font-size:11px;font-weight:700}
+.ing-list{display:flex;flex-direction:column;gap:4px;margin-bottom:7px}
+.ing-item{display:flex;align-items:center;gap:8px;padding:5px 8px;background:var(--fondo2);border-radius:6px;border:1px solid var(--borde)}
+.ing-check{width:22px;height:22px;min-width:22px;border-radius:50%;border:2px solid var(--borde);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;background:none;transition:.15s;color:transparent}
+.ing-check.ok{background:var(--verde);border-color:var(--verde);color:#fff}
+.ing-check.falta{background:rgba(192,57,43,.25);border-color:var(--rojo);color:#e07070}
+.ing-nombre{flex:1;font-size:13px}
+.ing-nombre.falta{text-decoration:line-through;color:var(--txt2)}
+.menu-obs-inp{width:100%;background:var(--fondo);border:1px solid var(--borde);border-radius:6px;padding:7px 10px;color:var(--txt);font-size:13px;outline:none;resize:none;min-height:52px;margin-top:4px}
+.menu-obs-inp:focus{border-color:var(--ambar)}
+.sem-obs-box{background:rgba(41,128,185,.08);border:1px solid rgba(41,128,185,.2);border-radius:8px;padding:9px 11px;font-size:12px;color:#90c0e0;margin-bottom:10px;line-height:1.5}
+.menu-sec-label{font-size:11px;font-weight:800;color:var(--txt2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.sem-selector{display:flex;gap:5px;margin-bottom:12px}
+.sem-btn{flex:1;padding:8px 4px;text-align:center;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;background:var(--fondo3);color:var(--txt2);border:1px solid var(--borde)}
+.sem-btn.on{background:var(--rojo);color:#fff;border-color:var(--rojo)}
+/* MISC */
+.empty{text-align:center;padding:40px 20px;color:var(--txt2);font-size:14px}
+.empty .ico{font-size:38px;margin-bottom:10px}
+.aus-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:rgba(230,126,34,.08);border-radius:8px;border:1px solid rgba(230,126,34,.25);margin-bottom:5px}
+.aus-nom{font-weight:800;font-size:13px;color:var(--ambar)}
+.aus-mot{font-size:12px;color:var(--txt2);flex:1}
+.aus-hora{font-size:11px;color:var(--txt2);white-space:nowrap}
+.persona-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--fondo3);border:1px solid var(--borde);border-radius:20px;font-size:12px;margin:3px}
+.persona-tag button{background:none;border:none;color:var(--txt2);cursor:pointer;font-size:13px;padding:0;line-height:1}
+/* ADD TASK INPUT */
+.add-task-row{display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--borde)}
+.add-task-row input{flex:1;background:var(--fondo3);border:1px solid var(--borde);border-radius:6px;padding:8px 10px;color:var(--txt);font-size:13px;outline:none}
+.add-task-row input:focus{border-color:var(--verde)}
+.add-task-row button{padding:8px 12px;background:var(--verde);border:none;border-radius:6px;color:#fff;font-weight:800;font-size:13px;cursor:pointer}
+.adm-area-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.adm-area-chip{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;background:var(--fondo3);color:var(--txt2);border:1px solid var(--borde)}
+.adm-area-chip.on{background:var(--rojo);color:#fff;border-color:var(--rojo)}
+.adm-sub-tabs{display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap}
+.adm-sub-tab{padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;background:var(--fondo3);color:var(--txt2);border:1px solid var(--borde)}
+.adm-sub-tab.on{background:#333;color:var(--txt);border-color:#555}
+</style>
+    <!-- Firebase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-app-compat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-database-compat.min.js"></script>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">🔥</div>
+  <div class="hdr-info">
+    <div class="hdr-title">Plan de Turno</div>
+    <div class="hdr-sub">El Rincón del Barril · TodoPosibleMD</div>
+  </div>
+  <div class="hdr-fecha" id="hdr-fecha"></div>
+</div>
+
+<div class="area-row" id="area-row"></div>
+<div class="prow" id="prow"></div>
+<div class="drow" id="drow"></div>
+<div class="srow" id="srow"></div>
+<div class="content" id="content"></div>
+
+<div class="bbar">
+  <button class="btn-aus" onclick="openAusencia()">🙋 Reportar ausencia</button>
+  <button class="btn-wa" onclick="sendWA()">📲 Enviar a Sergio</button>
+  <button class="btn-adm" onclick="openMenu()" style="flex:0 0 46px;background:rgba(155,89,182,.12);border-color:rgba(155,89,182,.35);color:#c39be0">🍽️</button>
+  <button class="btn-adm" onclick="openAdmin()">⚙️</button>
+</div>
+
+<!-- ADMIN OVERLAY -->
+<div class="ov" id="adm-ov">
+  <div class="panel">
+    <div id="pin-sec">
+      <div class="pnl-hdr">
+        <div class="pnl-title">🔐 Acceso Admin</div>
+        <button class="btn-close" onclick="closeAdmin()">✕</button>
+      </div>
+      <div class="pin-wrap">
+        <div class="pin-sub">Ingresa el PIN de administrador</div>
+        <div class="pin-dots" id="pin-dots">
+          <div class="pin-dot" id="pd0"></div>
+          <div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div>
+          <div class="pin-dot" id="pd3"></div>
+        </div>
+        <div class="pin-pad">
+          <div class="pkey" onclick="pinKey('1')">1</div><div class="pkey" onclick="pinKey('2')">2</div><div class="pkey" onclick="pinKey('3')">3</div>
+          <div class="pkey" onclick="pinKey('4')">4</div><div class="pkey" onclick="pinKey('5')">5</div><div class="pkey" onclick="pinKey('6')">6</div>
+          <div class="pkey" onclick="pinKey('7')">7</div><div class="pkey" onclick="pinKey('8')">8</div><div class="pkey" onclick="pinKey('9')">9</div>
+          <div class="pkey" style="opacity:.3"></div><div class="pkey" onclick="pinKey('0')">0</div><div class="pkey del" onclick="pinDel()">⌫</div>
+        </div>
+        <div class="pin-err" id="pin-err"></div>
+      </div>
+    </div>
+    <div id="adm-sec" style="display:none"></div>
+  </div>
+</div>
+
+<!-- AUSENCIA MODAL -->
+<div class="modal" id="aus-modal">
+  <div class="mbox">
+    <div class="mtitle">🙋 Reportar ausencia</div>
+    <select class="msel" id="aus-persona"></select>
+    <textarea class="mtxt" id="aus-motivo" placeholder="Motivo de la ausencia..."></textarea>
+    <div class="mbtns">
+      <button class="mcancel" onclick="closeModal('aus-modal')">Cancelar</button>
+      <button class="mconfirm" onclick="submitAusencia()">Reportar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD AREA MODAL -->
+<div class="modal" id="add-area-modal">
+  <div class="mbox">
+    <div class="mtitle">➕ Nueva área</div>
+    <input class="minput" id="new-area-nombre" placeholder="Nombre (ej: Bar, Bodega...)">
+    <input class="minput" id="new-area-emoji" placeholder="Emoji (ej: 🍺)">
+    <input class="minput" id="new-area-personas" placeholder="Personas separadas por coma">
+    <div class="mbtns">
+      <button class="mcancel" onclick="closeModal('add-area-modal')">Cancelar</button>
+      <button class="mconfirm-r" onclick="submitAddArea()">Crear</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal" id="confirm-modal">
+  <div class="mbox">
+    <div class="mtitle" id="confirm-title">¿Confirmar?</div>
+    <p style="font-size:13px;color:var(--txt2);margin-bottom:16px" id="confirm-msg"></p>
+    <div class="mbtns">
+      <button class="mcancel" onclick="closeModal('confirm-modal')">Cancelar</button>
+      <button class="mconfirm-r" id="confirm-ok" onclick="">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MENU OVERLAY -->
+<div class="ov" id="menu-ov">
+  <div class="panel">
+    <div class="pnl-hdr">
+      <div class="pnl-title">🍽️ Menú del personal</div>
+      <button class="btn-close" onclick="closeMenu()">✕</button>
+    </div>
+    <div id="menu-content"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const TL = {manana:'☀️ Mañana', tarde:'🌤️ Tarde', noche:'🌙 Noche'};
+const TO = ['manana','tarde','noche'];
+const DL = {mie:'MIÉ',jue:'JUE',vie:'VIE',sab:'SÁB',dom:'DOM'};
+const DO_FULL = {mie:'Miércoles',jue:'Jueves',vie:'Viernes',sab:'Sábado',dom:'Domingo'};
+const DIAS = ['mie','jue','vie','sab','dom'];
+const DOW = {0:'dom',3:'mie',4:'jue',5:'vie',6:'sab'};
+
+// ─── FIREBASE ─────────────────────────────────────────────────────────────────
+const FB_CONFIG_TURNO = {
+  apiKey: "AIzaSyB-dBPWbqt9pOnxGNGSRzwjciZI7HjbHi8",
+  authDomain: "rincon-del-barril-c7d7e.firebaseapp.com",
+  databaseURL: "https://rincon-del-barril-c7d7e-default-rtdb.firebaseio.com",
+  projectId: "rincon-del-barril-c7d7e",
+  storageBucket: "rincon-del-barril-c7d7e.firebasestorage.app",
+  messagingSenderId: "156157399571",
+  appId: "1:156157399571:web:320fd8758f38e9d413e5e6"
+};
+let db_turno = null;
+try {
+  if (typeof firebase !== 'undefined') {
+    if (!firebase.apps.length) firebase.initializeApp(FB_CONFIG_TURNO);
+    db_turno = firebase.database();
+  }
+} catch(e) { console.warn('Firebase turno init error:', e); }
+
+const FB_PATH_TURNO = 'rincon-barril/turno/';
+
+// Cache en memoria
+let fbCache_turno = { data: null, cfg: null, menu: null, reg: {}, menuReg: {} };
+
+// Guardar en Firebase de forma async
+function fbSaveTurno(subkey, value) {
+  if (!db_turno) return;
+  // Antes de guardar, proteger arrays vacíos con marcador para que Firebase no los elimine
+  var valorProtegido = protegerArraysVacios(value);
+  db_turno.ref(FB_PATH_TURNO + subkey).set(valorProtegido)
+    .catch(e => console.warn('FB turno write error:', subkey, e));
+}
+
+// Reemplaza [] por '__EMPTY_ARRAY__' para que Firebase no los elimine
+function protegerArraysVacios(obj) {
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) {
+    if (obj.length === 0) return '__EMPTY_ARRAY__';
+    return obj.map(function(item) { return protegerArraysVacios(item); });
+  }
+  if (typeof obj === 'object') {
+    var result = {};
+    Object.keys(obj).forEach(function(k) {
+      result[k] = protegerArraysVacios(obj[k]);
+    });
+    return result;
+  }
+  return obj;
+}
+
+// Convierte '__EMPTY_ARRAY__' de vuelta a []
+function restaurarArraysVacios(obj) {
+  if (obj === '__EMPTY_ARRAY__') return [];
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) {
+    return obj.map(function(item) { return restaurarArraysVacios(item); });
+  }
+  if (typeof obj === 'object') {
+    var result = {};
+    Object.keys(obj).forEach(function(k) {
+      result[k] = restaurarArraysVacios(obj[k]);
+    });
+    return result;
+  }
+  return obj;
+}
+
+// Cargar todo desde Firebase antes de init
+async function cargarDesdeFirebaseTurno() {
+  if (!db_turno) return;
+  try {
+    const snap = await db_turno.ref(FB_PATH_TURNO).get();
+    if (snap.exists()) {
+      const d = snap.val();
+      if (d.data)    fbCache_turno.data    = restaurarArraysVacios(d.data);
+      if (d.cfg)     fbCache_turno.cfg     = d.cfg;
+      if (d.menu)    fbCache_turno.menu    = d.menu;
+      if (d.reg)     fbCache_turno.reg     = d.reg;
+      if (d.menuReg) fbCache_turno.menuReg = d.menuReg;
+    }
+  } catch(e) { console.warn('FB turno load error:', e); }
+}
+// ─── FIN FIREBASE ─────────────────────────────────────────────────────────────
+
+const STORAGE_DATA = 'rbTurno_data';
+const STORAGE_REG = 'rbTurno_reg_';
+const STORAGE_CFG = 'rbTurno_cfg';
+
+// ─── DEFAULT DATA ─────────────────────────────────────────────────────────────
+function t(id,tarea,asigs){return{id,tarea,asignaciones:asigs||[]}}
+function R(p){return{persona:p,rol:'R'}}
+function A(p){return{persona:p,rol:'A'}}
+function emptyDias(){
+  return{
+    mie:{label:'Miércoles',turnos:{tarde:{tareas:[]},noche:{tareas:[]}}},
+    jue:{label:'Jueves',turnos:{tarde:{tareas:[]},noche:{tareas:[]}}},
+    vie:{label:'Viernes',turnos:{tarde:{tareas:[]},noche:{tareas:[]}}},
+    sab:{label:'Sábado',turnos:{manana:{tareas:[]},tarde:{tareas:[]},noche:{tareas:[]}}},
+    dom:{label:'Domingo',turnos:{manana:{tareas:[]},tarde:{tareas:[]},noche:{tareas:[]}}}
+  };
+}
+// Servicio weekday tarde tasks (no assignments yet)
+function svcTarde(p){
+  const tt = ['Barrer parte interna (zona 1)','Barrer parte interna (zona 2)','Barrer parte externa',
+    'Sacar mesas, sillas y parasoles','Cargar nevera de Coca-Cola','Alistamiento de mesas','Trapear',
+    'Lavar baños y lavamanos','Llenar salseros de mesas','Hacer salseros para domicilios',
+    'Alistar vasos y cubiertos','Alistar mesa de servicio y barra de bebidas',
+    'Limpiar polvo, telaraña — ventanas, puertas y vidrios','Limpiar filtros de aires acondicionados',
+    'Exprimir limón y derretir panela','Comprar hielo','Armar cajas','Abrir base caja',
+    'Hacer listado de faltantes para compra','Postear historias en redes sociales',
+    'Revisar que todo esté listo antes del servicio'];
+  return tt.map((tarea,i)=>t(p+'_t'+i,tarea,[]));
+}
+function svcNoche(p){
+  const tt = ['Limpiar mesas y entrar salseros y servilleteros','Entrar mesas, sillas y parasoles',
+    'Barrer parte externa y salón','Trapear','Regar las matas','Cuadrar caja',
+    'Llenar cuadro de informe mensual','Sacar basura','Cargar nevera de Coca-Cola'];
+  return tt.map((tarea,i)=>t(p+'_n'+i,tarea,[]));
+}
+function svcSabManana(){
+  const tt = ['Barrer parte interna','Barrer parte externa','Trapear','Sacar mesas, sillas y parasoles',
+    'Alistamiento de mesas','Alistar vasos, tablas y cubiertos','Hacer listado de faltantes para compra',
+    'Sacar base de caja','Postear historias en redes sociales','Cuadrar caja',
+    'Revisar que todo esté listo antes del servicio'];
+  return tt.map((tarea,i)=>t('ssm_'+i,tarea,[]));
+}
+function svcSabTarde(){
+  const tt = ['Barrer parte interna','Barrer parte externa','Cargar nevera de Coca-Cola',
+    'Alistamiento de mesas','Trapear','Lavar baños y lavamanos','Lavar piso escaleras',
+    'Llenar salseros de mesas','Hacer salseros para domicilios','Alistar vasos y cubiertos',
+    'Limpiar polvo, telaraña — ventanas, puertas y vidrios','Exprimir limón y derretir panela',
+    'Comprar hielo','Armar cajas','Abrir base caja','Postear historias en redes sociales',
+    'Revisar que todo esté listo antes del servicio'];
+  return tt.map((tarea,i)=>t('sst_'+i,tarea,[]));
+}
+function svcDomManana(){
+  const tt = ['Barrer parte interna','Barrer parte externa','Cargar nevera de Coca-Cola',
+    'Alistamiento de mesas','Trapear','Lavar baños y lavamanos',
+    'Hacer pichaques y ensaladas de llevar','Alistar vasos y cubiertos',
+    'Limpiar polvo, telaraña — ventanas, puertas y vidrios',
+    'Exprimir limón y derretir panela — hacer limonada de panela',
+    'Comprar hielo','Armar cajas','Abrir base caja','Postear historias en redes sociales',
+    'Revisar que todo esté listo antes del servicio'];
+  return tt.map((tarea,i)=>t('sdm_'+i,tarea,[]));
+}
+function svcDomTarde(){
+  const tt = ['Barrer parte interna','Barrer parte externa','Cargar nevera de Coca-Cola',
+    'Alistamiento de mesas','Trapear','Lavar baños y lavamanos','Llenar salseros de mesas',
+    'Hacer salseros para domicilios','Alistar vasos y cubiertos',
+    'Limpiar polvo, telaraña — ventanas, puertas y vidrios','Exprimir limón y derretir panela',
+    'Comprar hielo','Armar cajas','Abrir y cerrar base caja','Postear historias en redes sociales',
+    'Revisar que todo esté listo antes del servicio'];
+  return tt.map((tarea,i)=>t('sdt_'+i,tarea,[]));
+}
+function svcDomNoche(){
+  const tt = ['Limpiar mesas y entrar salseros y servilleteros','Entrar mesas, sillas y parasoles',
+    'Barrer parte externa y salón','Trapear','Lavar piso escaleras','Regar las matas',
+    'Cuadrar caja','Llenar cuadro de informe mensual','Sacar basura','Lavar tanque de hielo'];
+  return tt.map((tarea,i)=>t('sdn_'+i,tarea,[]));
+}
+
+const DEFAULT_DATA = {areas:[
+  {id:'cocina',nombre:'Cocina',emoji:'🔥',lider:'Eloy Chacón',
+   personas:['Eloy','Oscar','Nuevo','César'],
+   dias:{
+    mie:{label:'Miércoles',turnos:{
+      tarde:{tareas:[
+        t('cm_t0','Recibir pedidos (Cenabastos, Nicolás, Atlantic)',[R('Eloy')]),
+        t('cm_t1','Listado de faltantes para compra',[R('Eloy')]),
+        t('cm_t2','Preparar tártara',[R('Eloy')]),
+        t('cm_t3','Preparar piña',[R('Eloy')]),
+        t('cm_t4','Montar carne al barril',[R('Oscar')]),
+        t('cm_t5','Porcionado de lomo de cerdo y carne de res',[R('Oscar'),R('Nuevo')]),
+        t('cm_t6','Limpiar y preparar parrilla',[R('Oscar')]),
+        t('cm_t7','Alistamiento de cava',[R('Nuevo')]),
+        t('cm_t8','Preparación de vegetales y mise en place',[R('Nuevo')]),
+        t('cm_t9','Aseo cocina',[R('Eloy'),R('Oscar'),R('Nuevo')]),
+      ]},
+      noche:{tareas:[
+        t('cm_n0','Lavar platos, tablas y aseo lavaplatos',[R('Nuevo')]),
+        t('cm_n1','Lavar cavas y utensilios grandes',[R('Nuevo')]),
+        t('cm_n2','Sacar basura',[R('Eloy'),R('Oscar')]),
+        t('cm_n3','Barrido de área de parrilla y cocina',[R('Eloy'),R('Oscar'),R('Nuevo')]),
+        t('cm_n4','Lavar área de parrilla, cocina y paredes',[R('Oscar'),R('Nuevo')]),
+        t('cm_n5','Alistamiento de insumos que se lleva Selene',[R('Eloy')]),
+        t('cm_n6','Limpieza de barra',[R('Eloy')]),
+        t('cm_n7','Organización de utensilios, ollas y platos',[R('Nuevo')]),
+        t('cm_n8','Ingreso de datos a herramienta digital',[R('Eloy'),R('Oscar')]),
+      ]}
+    }},
+    jue:{label:'Jueves',turnos:{
+      tarde:{tareas:[
+        t('cj_t0','Recibir pedidos (McCormick)',[R('Eloy')]),
+        t('cj_t1','Preparar tártara',[R('Eloy')]),
+        t('cj_t2','Montar carne al barril',[R('Oscar')]),
+        t('cj_t3','Elaboración de croquetas de hamburguesa',[R('Eloy'),R('Oscar')]),
+        t('cj_t4','Limpiar y preparar parrilla',[R('César')]),
+        t('cj_t5','Alistamiento de cava',[R('Nuevo')]),
+        t('cj_t6','Preparación de vegetales y mise en place',[R('César')]),
+        t('cj_t7','Aseo cocina',[R('Eloy'),R('Oscar'),R('Nuevo')]),
+      ]},
+      noche:{tareas:[
+        t('cj_n0','Lavar platos, tablas y aseo lavaplatos',[R('Nuevo')]),
+        t('cj_n1','Lavar cavas y utensilios grandes',[R('César')]),
+        t('cj_n2','Sacar basura',[R('Oscar'),R('César')]),
+        t('cj_n3','Barrido de área de parrilla y cocina',[R('Oscar'),R('Nuevo'),R('César')]),
+        t('cj_n4','Lavar área de parrilla, cocina y paredes',[R('Oscar'),R('Nuevo'),R('César')]),
+        t('cj_n5','Alistamiento de insumos que se lleva Selene',[R('Eloy')]),
+        t('cj_n6','Limpieza de barra',[R('Eloy')]),
+        t('cj_n7','Organización de utensilios, ollas y platos',[R('Nuevo')]),
+      ]}
+    }},
+    vie:{label:'Viernes',turnos:{
+      tarde:{tareas:[
+        t('cv_t0','Recibir pedidos (Novillón)',[R('Eloy')]),
+        t('cv_t1','Preparar tártara',[R('Eloy')]),
+        t('cv_t2','Montar carne al barril',[R('Oscar')]),
+        t('cv_t3','Abrir y porcionar pechugas de pollo',[R('Eloy'),R('Oscar')]),
+        t('cv_t4','Limpiar y preparar parrilla',[R('César')]),
+        t('cv_t5','Alistamiento de cava',[R('Nuevo')]),
+        t('cv_t6','Preparación de vegetales y mise en place',[R('César')]),
+        t('cv_t7','Aseo cocina',[R('Eloy'),R('Oscar'),R('Nuevo')]),
+      ]},
+      noche:{tareas:[
+        t('cv_n0','Lavar platos, tablas y aseo lavaplatos',[R('Nuevo')]),
+        t('cv_n1','Lavar cavas y utensilios grandes',[R('César')]),
+        t('cv_n2','Sacar basura',[R('Oscar'),R('César')]),
+        t('cv_n3','Barrido de área de parrilla y cocina',[R('Oscar'),R('Nuevo'),R('César')]),
+        t('cv_n4','Lavar área de parrilla, cocina y paredes',[R('Oscar'),R('Nuevo'),R('César')]),
+        t('cv_n5','Alistamiento de insumos que se lleva Selene',[R('Eloy')]),
+        t('cv_n6','Limpieza de barra',[R('Eloy')]),
+        t('cv_n7','Organización de utensilios, ollas y platos',[R('Nuevo')]),
+      ]}
+    }},
+    sab:{label:'Sábado',turnos:{
+      manana:{tareas:[
+        t('cs_m0','Listado de faltantes para compra',[R('Eloy')]),
+        t('cs_m1','Preparar ensalada',[R('Oscar')]),
+        t('cs_m2','Preparar pichaque',[R('Oscar')]),
+        t('cs_m3','Montar carne al barril',[R('Eloy')]),
+        t('cs_m4','Preparar arroz',[R('Oscar')]),
+        t('cs_m5','Pelar y cocinar papa y yuca',[R('Eloy')]),
+        t('cs_m6','Preparar frijoles',[R('Oscar')]),
+        t('cs_m7','Limpiar y preparar parrilla',[R('Eloy')]),
+        t('cs_m8','Alistamiento de utensilios',[R('Oscar')]),
+        t('cs_m9','Explotar chicharrón',[R('Eloy')]),
+        t('cs_m10','Aseo cocina y parrilla',[R('Eloy'),R('Oscar')]),
+        t('cs_m11','Preparación de sancocho',[R('Oscar')]),
+        t('cs_m12','Preparar tártara',[R('Eloy')]),
+      ]},
+      tarde:{tareas:[
+        t('cs_t0','Limpiar y preparar parrilla y mise en place',[R('Nuevo')]),
+        t('cs_t1','Alistamiento de cava',[R('César')]),
+        t('cs_t2','Alistamiento de utensilios',[R('César')]),
+        t('cs_t3','Preparación de vegetales y mise en place',[R('Nuevo')]),
+        t('cs_t4','Limpiar ventilador, techo de neveras y pared',[R('Nuevo')]),
+        t('cs_t5','Aseo cocina',[R('Nuevo'),R('César')]),
+        t('cs_t6','Filtrar aceite',[R('Nuevo'),R('César')]),
+      ]},
+      noche:{tareas:[
+        t('cs_n0','Lavar platos, tablas y aseo lavaplatos',[R('Nuevo')]),
+        t('cs_n1','Lavar cavas y utensilios grandes',[R('César')]),
+        t('cs_n2','Sacar basura',[R('Oscar'),R('César')]),
+        t('cs_n3','Barrido de área de parrilla y cocina',[R('Oscar'),R('Nuevo'),R('César')]),
+        t('cs_n4','Lavar área de parrilla, cocina y paredes',[R('Oscar'),R('Nuevo'),R('César')]),
+        t('cs_n5','Alistamiento de insumos que se lleva Selene',[R('Eloy')]),
+        t('cs_n6','Limpieza de barra',[R('Eloy')]),
+        t('cs_n7','Organización de utensilios, ollas y platos',[R('Nuevo')]),
+      ]}
+    }},
+    dom:{label:'Domingo',turnos:{
+      manana:{tareas:[
+        t('cd_m0','Preparar ensalada',[R('Nuevo')]),
+        t('cd_m1','Preparar pichaque',[R('Oscar')]),
+        t('cd_m2','Montar carne al barril',[R('Eloy')]),
+        t('cd_m3','Preparar arroz',[R('Oscar')]),
+        t('cd_m4','Pelar y cocinar papa y yuca',[R('César')]),
+        t('cd_m5','Preparar frijoles',[R('Oscar')]),
+        t('cd_m6','Limpiar y preparar parrilla',[R('Eloy')]),
+        t('cd_m7','Alistamiento de utensilios',[R('Nuevo')]),
+        t('cd_m8','Explotar chicharrón',[R('Eloy')]),
+        t('cd_m9','Aseo cocina y parrilla',[R('Eloy'),R('Oscar'),R('Nuevo'),R('César')]),
+        t('cd_m10','Preparación de sancocho',[R('Oscar')]),
+      ]},
+      tarde:{tareas:[
+        t('cd_t0','Limpiar y preparar parrilla',[]),
+        t('cd_t1','Alistamiento de cava',[R('Nuevo')]),
+        t('cd_t2','Alistamiento de utensilios',[R('César')]),
+        t('cd_t3','Preparación de vegetales y mise en place',[R('Nuevo')]),
+        t('cd_t4','Aseo cocina',[R('Eloy'),R('Oscar'),R('Nuevo'),R('César')]),
+      ]},
+      noche:{tareas:[
+        t('cd_n0','Lavar platos, tablas y aseo lavaplatos',[R('Nuevo')]),
+        t('cd_n1','Lavar cavas y utensilios grandes',[R('César')]),
+        t('cd_n2','Sacar basura',[R('Oscar'),R('César')]),
+        t('cd_n3','Barrido de área de parrilla y cocina',[A('Eloy'),R('Oscar'),R('Nuevo'),R('César')]),
+        t('cd_n4','Lavar área de parrilla, cocina y paredes',[R('Oscar'),R('Nuevo'),R('César')]),
+        t('cd_n5','Alistamiento de insumos que se lleva Selene',[R('Eloy')]),
+        t('cd_n6','Limpieza de barra',[R('Eloy')]),
+        t('cd_n7','Organización de utensilios, ollas y platos',[R('Nuevo')]),
+        t('cd_n8','Limpiar tanques y neveras',[R('Nuevo'),R('César')]),
+      ]}
+    }}
+  }},
+  {id:'servicio',nombre:'Servicio',emoji:'🍽️',lider:'',
+   personas:['Pedro Mendoza','Nazarteth','Gabriela','Selene'],
+   dias:{
+    mie:{label:'Miércoles',turnos:{
+      tarde:{tareas:[
+        t('sm_t0','Aseo segundo piso y afuera',[R('Nazarteth')]),
+        t('sm_t1','Aseo salón',[R('Pedro Mendoza')]),
+        t('sm_t2','Sacar mesas, sillas y parasoles',[R('Nazarteth')]),
+        t('sm_t3','Cargar nevera de Coca-Cola',[R('Pedro Mendoza')]),
+        t('sm_t4','Alistamiento de mesas afuera',[R('Nazarteth')]),
+        t('sm_t5','Alistamiento de mesas salón',[R('Pedro Mendoza')]),
+        t('sm_t6','Lavar baños y lavamanos',[R('Pedro Mendoza')]),
+        t('sm_t7','Llenar salseros de mesas',[R('Nazarteth')]),
+        t('sm_t8','Hacer salseros para domicilios',[R('Nazarteth')]),
+        t('sm_t9','Alistar vasos y cubiertos',[R('Pedro Mendoza')]),
+        t('sm_t10','Alistar mesa de servicio y barra de bebidas',[R('Pedro Mendoza')]),
+        t('sm_t11','Limpiar polvo y telaraña — ventanas, puertas y vidrios',[R('Nazarteth')]),
+        t('sm_t12','Limpiar filtros de los aires acondicionados',[]),
+        t('sm_t13','Exprimir limón y derretir panela',[R('Pedro Mendoza')]),
+        t('sm_t14','Comprar hielo',[R('Pedro Mendoza')]),
+        t('sm_t15','Armar cajas',[R('Pedro Mendoza'),R('Nazarteth')]),
+        t('sm_t16','Abrir base caja',[R('Nazarteth')]),
+        t('sm_t17','Hacer listado de faltantes para compra',[R('Pedro Mendoza'),R('Nazarteth')]),
+        t('sm_t18','Postear historias en redes sociales',[R('Nazarteth')]),
+        t('sm_t19','Revisar que todo esté listo antes del servicio',[R('Pedro Mendoza'),R('Nazarteth')]),
+        t('sm_t20','Registro de clientes en el software',[R('Selene')]),
+        t('sm_t21','Gestión de pedidos en plataformas digitales',[R('Selene')]),
+        t('sm_t22','Enviar y lograr respuestas de encuestas',[R('Selene')]),
+        t('sm_t23','Crear ideas de contenido, editar videos y publicar en redes',[R('Selene')]),
+        t('sm_t24','Envío de promociones de cumpleaños',[R('Selene')]),
+        t('sm_t25','Cotizar y gestionar eventos de catering',[R('Selene')]),
+      ]},
+      noche:{tareas:[
+        t('sm_n0','Limpiar mesas y entrar salseros, servilleteros',[R('Pedro Mendoza')]),
+        t('sm_n1','Entrar mesas, sillas y parasoles',[R('Pedro Mendoza')]),
+        t('sm_n2','Barrer parte externa',[R('Pedro Mendoza')]),
+        t('sm_n3','Aseo salón',[R('Nazarteth')]),
+        t('sm_n4','Regar las matas',[R('Nazarteth')]),
+        t('sm_n5','Cuadrar caja',[R('Nazarteth')]),
+        t('sm_n6','Llenar cuadro de informe mensual',[R('Nazarteth')]),
+        t('sm_n7','Sacar basura',[R('Pedro Mendoza')]),
+        t('sm_n8','Cargar nevera de Coca-Cola',[R('Pedro Mendoza')]),
+      ]}
+    }},
+    jue:{label:'Jueves',turnos:{
+      tarde:{tareas:[
+        t('sj_t0','Aseo segundo piso y afuera',[R('Nazarteth')]),
+        t('sj_t1','Aseo salón',[R('Pedro Mendoza')]),
+        t('sj_t2','Sacar mesas, sillas y parasoles',[R('Nazarteth')]),
+        t('sj_t3','Cargar nevera de Coca-Cola',[R('Pedro Mendoza')]),
+        t('sj_t4','Alistamiento de mesas afuera',[R('Nazarteth')]),
+        t('sj_t5','Alistamiento de mesas salón',[R('Pedro Mendoza')]),
+        t('sj_t6','Lavar baños y lavamanos',[R('Pedro Mendoza')]),
+        t('sj_t7','Llenar salseros de mesas',[R('Nazarteth')]),
+        t('sj_t8','Hacer salseros para domicilios',[R('Nazarteth')]),
+        t('sj_t9','Alistar vasos y cubiertos',[R('Pedro Mendoza')]),
+        t('sj_t10','Alistar mesa de servicio y barra de bebidas',[R('Pedro Mendoza')]),
+        t('sj_t11','Limpiar polvo y telaraña — ventanas, puertas y vidrios',[R('Nazarteth')]),
+        t('sj_t12','Limpiar filtros de los aires acondicionados',[]),
+        t('sj_t13','Exprimir limón y derretir panela',[R('Pedro Mendoza')]),
+        t('sj_t14','Comprar hielo',[R('Pedro Mendoza')]),
+        t('sj_t15','Armar cajas',[R('Pedro Mendoza'),R('Nazarteth')]),
+        t('sj_t16','Abrir base caja',[R('Nazarteth')]),
+        t('sj_t17','Hacer listado de faltantes para compra',[R('Pedro Mendoza'),R('Nazarteth')]),
+        t('sj_t18','Postear historias en redes sociales',[R('Nazarteth')]),
+        t('sj_t19','Revisar que todo esté listo antes del servicio',[R('Pedro Mendoza'),R('Nazarteth')]),
+        t('sj_t20','Registro de clientes en el software',[R('Selene')]),
+        t('sj_t21','Gestión de pedidos en plataformas digitales',[R('Selene')]),
+        t('sj_t22','Enviar y lograr respuestas de encuestas',[R('Selene')]),
+        t('sj_t23','Crear ideas de contenido, editar videos y publicar en redes',[R('Selene')]),
+        t('sj_t24','Envío de promociones de cumpleaños',[R('Selene')]),
+        t('sj_t25','Cotizar y gestionar eventos de catering',[R('Selene')]),
+      ]},
+      noche:{tareas:[
+        t('sj_n0','Limpiar mesas y entrar salseros, servilleteros',[R('Pedro Mendoza')]),
+        t('sj_n1','Entrar mesas, sillas y parasoles',[R('Pedro Mendoza')]),
+        t('sj_n2','Barrer parte externa',[R('Pedro Mendoza')]),
+        t('sj_n3','Aseo salón',[R('Nazarteth')]),
+        t('sj_n4','Regar las matas',[R('Nazarteth')]),
+        t('sj_n5','Cuadrar caja',[R('Nazarteth')]),
+        t('sj_n6','Llenar cuadro de informe mensual',[R('Nazarteth')]),
+        t('sj_n7','Sacar basura',[R('Pedro Mendoza')]),
+        t('sj_n8','Cargar nevera de Coca-Cola',[R('Pedro Mendoza')]),
+      ]}
+    }},
+    vie:{label:'Viernes',turnos:{
+      tarde:{tareas:[
+        t('sv_t0','Aseo segundo piso y afuera',[R('Nazarteth')]),
+        t('sv_t1','Aseo salón',[R('Pedro Mendoza')]),
+        t('sv_t2','Sacar mesas, sillas y parasoles',[R('Nazarteth')]),
+        t('sv_t3','Cargar nevera de Coca-Cola',[R('Pedro Mendoza')]),
+        t('sv_t4','Alistamiento de mesas afuera',[R('Nazarteth')]),
+        t('sv_t5','Alistamiento de mesas salón',[R('Pedro Mendoza')]),
+        t('sv_t6','Lavar baños y lavamanos',[R('Pedro Mendoza')]),
+        t('sv_t7','Llenar salseros de mesas',[R('Nazarteth')]),
+        t('sv_t8','Hacer salseros para domicilios',[R('Nazarteth')]),
+        t('sv_t9','Alistar vasos y cubiertos',[R('Pedro Mendoza')]),
+        t('sv_t10','Alistar mesa de servicio y barra de bebidas',[R('Pedro Mendoza')]),
+        t('sv_t11','Limpiar polvo y telaraña — ventanas, puertas y vidrios',[R('Nazarteth')]),
+        t('sv_t12','Limpiar filtros de los aires acondicionados',[]),
+        t('sv_t13','Exprimir limón y derretir panela',[R('Pedro Mendoza')]),
+        t('sv_t14','Comprar hielo',[R('Pedro Mendoza')]),
+        t('sv_t15','Armar cajas',[R('Pedro Mendoza'),R('Nazarteth')]),
+        t('sv_t16','Abrir base caja',[R('Nazarteth')]),
+        t('sv_t17','Hacer listado de faltantes para compra',[R('Pedro Mendoza'),R('Nazarteth')]),
+        t('sv_t18','Postear historias en redes sociales',[R('Nazarteth')]),
+        t('sv_t19','Revisar que todo esté listo antes del servicio',[R('Pedro Mendoza'),R('Nazarteth')]),
+        t('sv_t20','Registro de clientes en el software',[R('Selene')]),
+        t('sv_t21','Gestión de pedidos en plataformas digitales',[R('Selene')]),
+        t('sv_t22','Enviar y lograr respuestas de encuestas',[R('Selene')]),
+        t('sv_t23','Crear ideas de contenido, editar videos y publicar en redes',[R('Selene')]),
+        t('sv_t24','Envío de promociones de cumpleaños',[R('Selene')]),
+        t('sv_t25','Cotizar y gestionar eventos de catering',[R('Selene')]),
+      ]},
+      noche:{tareas:[
+        t('sv_n0','Limpiar mesas y entrar salseros, servilleteros',[R('Pedro Mendoza')]),
+        t('sv_n1','Entrar mesas, sillas y parasoles',[R('Pedro Mendoza')]),
+        t('sv_n2','Barrer parte externa',[R('Pedro Mendoza')]),
+        t('sv_n3','Aseo salón',[R('Nazarteth')]),
+        t('sv_n4','Regar las matas',[R('Nazarteth')]),
+        t('sv_n5','Cuadrar caja',[R('Nazarteth')]),
+        t('sv_n6','Llenar cuadro de informe mensual',[R('Nazarteth')]),
+        t('sv_n7','Sacar basura',[R('Pedro Mendoza')]),
+        t('sv_n8','Cargar nevera de Coca-Cola',[R('Pedro Mendoza')]),
+      ]}
+    }},
+    sab:{label:'Sábado',turnos:{
+      manana:{tareas:[
+        t('ssm_0','Barrer parte interna',[R('Nazarteth')]),
+        t('ssm_1','Barrer parte externa',[R('Nazarteth')]),
+        t('ssm_2','Trapear',[R('Nazarteth')]),
+        t('ssm_3','Sacar mesas, sillas y parasoles',[R('Nazarteth')]),
+        t('ssm_4','Alistamiento de mesas',[R('Nazarteth')]),
+        t('ssm_5','Alistar vasos, tablas y cubiertos',[R('Nazarteth')]),
+        t('ssm_6','Exprimir limón y derretir panela',[R('Nazarteth')]),
+        t('ssm_7','Hacer listado de faltantes para compra',[R('Nazarteth')]),
+        t('ssm_8','Sacar base de caja',[R('Nazarteth')]),
+        t('ssm_9','Postear historias en redes sociales',[R('Nazarteth')]),
+        t('ssm_10','Cuadrar caja',[R('Nazarteth')]),
+        t('ssm_11','Revisar que todo esté listo antes del servicio',[R('Nazarteth')]),
+      ]},
+      tarde:{tareas:[
+        t('sst_0','Aseo segundo piso y afuera',[R('Gabriela')]),
+        t('sst_1','Aseo salón',[R('Pedro Mendoza')]),
+        t('sst_2','Cargar nevera de Coca-Cola',[R('Pedro Mendoza')]),
+        t('sst_3','Alistamiento de mesas',[R('Pedro Mendoza'),R('Gabriela')]),
+        t('sst_4','Trapear',[R('Pedro Mendoza')]),
+        t('sst_5','Lavar baños y lavamanos',[R('Pedro Mendoza')]),
+        t('sst_6','Lavar piso escaleras',[R('Gabriela')]),
+        t('sst_7','Llenar salseros de mesas',[R('Gabriela')]),
+        t('sst_8','Hacer salseros para domicilios',[R('Pedro Mendoza'),R('Gabriela')]),
+        t('sst_9','Limpiar filtros de los aires acondicionados',[R('Pedro Mendoza')]),
+        t('sst_10','Alistar vasos y cubiertos',[R('Pedro Mendoza')]),
+        t('sst_11','Limpiar polvo y telaraña — ventanas, puertas y vidrios',[R('Gabriela')]),
+        t('sst_12','Comprar hielo',[R('Pedro Mendoza')]),
+        t('sst_13','Armar cajas',[R('Gabriela')]),
+        t('sst_14','Abrir base caja',[R('Nazarteth')]),
+        t('sst_15','Postear historias en redes sociales',[R('Nazarteth')]),
+        t('sst_16','Revisar que todo esté listo antes del servicio',[R('Nazarteth')]),
+      ]},
+      noche:{tareas:[
+        t('ss_n0','Limpiar mesas y entrar salseros, servilleteros',[R('Pedro Mendoza'),R('Gabriela')]),
+        t('ss_n1','Entrar mesas, sillas y parasoles',[R('Pedro Mendoza')]),
+        t('ss_n2','Barrer parte externa',[R('Gabriela')]),
+        t('ss_n3','Aseo salón',[R('Gabriela')]),
+        t('ss_n4','Regar las matas',[R('Nazarteth')]),
+        t('ss_n5','Cuadrar caja',[R('Nazarteth')]),
+        t('ss_n6','Llenar cuadro de informe mensual',[R('Nazarteth')]),
+        t('ss_n7','Sacar basura',[R('Pedro Mendoza')]),
+        t('ss_n8','Cargar nevera de Coca-Cola',[R('Pedro Mendoza')]),
+      ]}
+    }},
+    dom:{label:'Domingo',turnos:{
+      manana:{tareas:[
+        t('sdm_0','Aseo segundo piso y afuera',[R('Gabriela')]),
+        t('sdm_1','Aseo salón',[R('Nazarteth')]),
+        t('sdm_2','Alistamiento de mesas',[R('Pedro Mendoza')]),
+        t('sdm_3','Lavar baños y lavamanos',[R('Nazarteth')]),
+        t('sdm_4','Hacer pichaques y ensaladas de llevar',[R('Pedro Mendoza')]),
+        t('sdm_5','Hacer salseros para domicilios',[R('Gabriela')]),
+        t('sdm_6','Alistar vasos y cubiertos',[R('Pedro Mendoza')]),
+        t('sdm_7','Limpiar polvo y telaraña — ventanas, puertas y vidrios',[R('Gabriela')]),
+        t('sdm_8','Exprimir limón y derretir panela — hacer limonada de panela',[R('Pedro Mendoza')]),
+        t('sdm_9','Comprar hielo',[R('Pedro Mendoza')]),
+        t('sdm_10','Armar cajas',[R('Nazarteth'),R('Gabriela')]),
+        t('sdm_11','Abrir base caja',[R('Nazarteth')]),
+        t('sdm_12','Postear historias en redes sociales',[R('Nazarteth')]),
+        t('sdm_13','Revisar que todo esté listo antes del servicio',[R('Nazarteth')]),
+      ]},
+      tarde:{tareas:[
+        t('sdt_0','Aseo segundo piso y afuera',[R('Selene')]),
+        t('sdt_1','Aseo salón',[R('Selene')]),
+        t('sdt_2','Alistamiento de mesas',[R('Selene')]),
+        t('sdt_3','Lavar baños y lavamanos',[R('Selene')]),
+        t('sdt_4','Alistar vasos y cubiertos',[R('Pedro Mendoza')]),
+        t('sdt_5','Armar cajas',[R('Nazarteth')]),
+        t('sdt_6','Abrir y cerrar base caja',[R('Nazarteth')]),
+        t('sdt_7','Postear historias en redes sociales',[R('Nazarteth')]),
+        t('sdt_8','Revisar que todo esté listo antes del servicio',[R('Nazarteth')]),
+      ]},
+      noche:{tareas:[
+        t('sdn_0','Limpiar mesas y entrar salseros, servilleteros',[R('Pedro Mendoza'),R('Selene')]),
+        t('sdn_1','Entrar mesas, sillas y parasoles',[R('Pedro Mendoza')]),
+        t('sdn_2','Barrer parte externa y salón',[R('Selene')]),
+        t('sdn_3','Aseo salón',[R('Nazarteth')]),
+        t('sdn_4','Lavar piso escaleras',[R('Pedro Mendoza'),R('Nazarteth'),R('Selene')]),
+        t('sdn_5','Regar las matas',[R('Nazarteth')]),
+        t('sdn_6','Cuadrar caja',[R('Nazarteth')]),
+        t('sdn_7','Llenar cuadro de informe mensual',[R('Nazarteth')]),
+        t('sdn_8','Sacar basura',[R('Pedro Mendoza')]),
+        t('sdn_9','Lavar tanque de hielo',[R('Pedro Mendoza')]),
+      ]}
+    }}
+  }}
+]};
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let data, cfg, reg;
+let curArea=0, curDia='mie', curTurno='tarde', curPersona='Todos';
+let adminUnlocked=false, pinBuf='';
+let admEditArea=0, admEditDia='mie', admEditTurno='tarde';
+
+// ─── STORAGE ──────────────────────────────────────────────────────────────────
+function todayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function loadAll(){
+  // Priorizar Firebase cache, fallback a localStorage
+  try{data = fbCache_turno.data || JSON.parse(localStorage.getItem(STORAGE_DATA)) || JSON.parse(JSON.stringify(DEFAULT_DATA));}
+  catch{data=JSON.parse(JSON.stringify(DEFAULT_DATA));}
+  // Reconstruir turnos que Firebase pudo haber eliminado por tener tareas vacías
+  if(data && data.areas){
+    data.areas.forEach(function(area){
+      if(!area.dias) return;
+      Object.keys(area.dias).forEach(function(dKey){
+        var dia = area.dias[dKey];
+        if(!dia.turnos) dia.turnos = {};
+        TO.forEach(function(tr){
+          if(!dia.turnos[tr]) dia.turnos[tr] = {tareas:[]};
+          else if(!dia.turnos[tr].tareas) dia.turnos[tr].tareas = [];
+          else if(typeof dia.turnos[tr].tareas === 'object' && !Array.isArray(dia.turnos[tr].tareas)){
+            // Firebase convirtió array a objeto — revertir
+            var keys = Object.keys(dia.turnos[tr].tareas);
+            dia.turnos[tr].tareas = keys.map(function(k){ return dia.turnos[tr].tareas[k]; });
+          }
+        });
+      });
+    });
+  }
+  try{cfg = fbCache_turno.cfg || JSON.parse(localStorage.getItem(STORAGE_CFG)) || {whatsapp:'573118483339',pin:'2604'};}
+  catch{cfg={whatsapp:'573118483339',pin:'2604'};}
+  const tk = todayKey();
+  try{reg = (fbCache_turno.reg && fbCache_turno.reg[tk]) || JSON.parse(localStorage.getItem(STORAGE_REG+tk)) || {done:{},novedades:{},ausencias:[]};}
+  catch{reg={done:{},novedades:{},ausencias:[]};}
+}
+function saveData(){
+  localStorage.setItem(STORAGE_DATA,JSON.stringify(data));
+  fbCache_turno.data = data;
+  fbSaveTurno('data', data);
+}
+function saveCfg(){
+  localStorage.setItem(STORAGE_CFG,JSON.stringify(cfg));
+  fbCache_turno.cfg = cfg;
+  fbSaveTurno('cfg', cfg);
+}
+function saveReg(){
+  const tk = todayKey();
+  localStorage.setItem(STORAGE_REG+tk,JSON.stringify(reg));
+  if (!fbCache_turno.reg) fbCache_turno.reg = {};
+  fbCache_turno.reg[tk] = reg;
+  fbSaveTurno('reg/' + tk, reg);
+}
+function hora(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function init(){
+  loadAll();
+  loadMenu();
+  // Auto-detect today
+  const dow=new Date().getDay();
+  if(DOW[dow]) curDia=DOW[dow]; else curDia='mie';
+  // Auto-detect shift
+  const h=new Date().getHours();
+  if(h<14) curTurno='manana'; else if(h<19) curTurno='tarde'; else curTurno='noche';
+  // Ensure valid turno for dia
+  const area=data.areas[curArea];
+  const dia=area&&area.dias[curDia];
+  if(dia&&!dia.turnos[curTurno]){
+    const available=TO.filter(tr=>dia.turnos[tr]);
+    if(available.length) curTurno=available[0];
+  }
+  // Update header date
+  const days=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const months=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const now=new Date();
+  document.getElementById('hdr-fecha').innerHTML=days[now.getDay()]+'<br>'+now.getDate()+' '+months[now.getMonth()];
+  renderAll();
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function renderAll(){renderAreaTabs();renderPersonFilter();renderDayTabs();renderShiftTabs();renderTasks();}
+
+function renderAreaTabs(){
+  const el=document.getElementById('area-row');
+  el.innerHTML=data.areas.map((a,i)=>`<button class="atab${i===curArea?' on':''}" onclick="selArea(${i})">${a.emoji} ${a.nombre}</button>`).join('')
+    +'<button class="atab add" onclick="openModal(\'add-area-modal\')">＋ Área</button>';
+}
+
+function renderPersonFilter(){
+  const area=data.areas[curArea];
+  const el=document.getElementById('prow');
+  el.innerHTML=`<div class="pchip${curPersona==='Todos'?' on':''}" onclick="selPersona('Todos')">Todos</div>`
+    +area.personas.map(p=>`<div class="pchip${curPersona===p?' on':''}" onclick="selPersona('${p.replace(/'/g,"\\'")}')">${p}</div>`).join('');
+}
+
+function renderDayTabs(){
+  const el=document.getElementById('drow');
+  const dow=new Date().getDay(); const today=DOW[dow];
+  el.innerHTML=DIAS.map(d=>{
+    const isToday=d===today;
+    const on=d===curDia?' on':'';
+    const tod=isToday?' today':'';
+    return`<button class="dtab${on}${tod}" onclick="selDia('${d}')">${DL[d]}${isToday?'<br><span style="font-size:9px;color:inherit">●</span>':''}</button>`;
+  }).join('');
+}
+
+function renderShiftTabs(){
+  const area=data.areas[curArea];
+  const dia=area.dias[curDia];
+  const el=document.getElementById('srow');
+  if(!dia){el.innerHTML='';return;}
+  // Mostrar siempre los 3 turnos — si no existe en data, se muestra vacío
+  el.innerHTML=TO.map(tr=>`<button class="stab${curTurno===tr?' on':''}" onclick="selTurno('${tr}')">${TL[tr]}</button>`).join('');
+}
+
+function renderTasks(){
+  const area=data.areas[curArea];
+  const dia=area&&area.dias[curDia];
+  // Asegurar que el turno existe en memoria
+  if(dia){
+    if(!dia.turnos) dia.turnos={};
+    if(!dia.turnos[curTurno]) dia.turnos[curTurno]={tareas:[]};
+    normalizarTareas(dia.turnos[curTurno]);
+  }
+  const turno=dia&&dia.turnos[curTurno];
+  const el=document.getElementById('content');
+  if(!turno){
+    // Crear el turno vacío en memoria si no existe
+    if(dia && !dia.turnos) dia.turnos = {};
+    if(dia && !dia.turnos[curTurno]) dia.turnos[curTurno] = {tareas:[]};
+    el.innerHTML=`<div class="empty"><div class="ico">📋</div>Este turno no tiene tareas aún.<br><span style="font-size:12px">Entra en ⚙️ Admin para agregar tareas.</span></div>`;
+    return;
+  }
+  normalizarTareas(turno);
+  let tareas=turno.tareas;
+  if(curPersona!=='Todos') tareas=tareas.filter(ta=>ta.asignaciones.some(a=>a.persona===curPersona));
+  if(tareas.length===0){
+    el.innerHTML=`<div class="empty"><div class="ico">👤</div>No hay tareas asignadas a <strong>${curPersona}</strong> en este turno.<br><span style="font-size:12px;margin-top:6px;display:block">Sergio puede asignar tareas desde ⚙️ Admin.</span></div>`;
+    return;
+  }
+  const ausencias=reg.ausencias||[];
+  let html='';
+  if(ausencias.length){
+    html+=`<div style="background:rgba(230,126,34,.1);border:1px solid rgba(230,126,34,.3);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px">
+      <span style="font-weight:800;color:var(--ambar)">🙋 Ausencias hoy:</span> `
+      +ausencias.map(a=>`<strong>${a.persona}</strong>${a.motivo?' — '+a.motivo:''}`).join(' · ')+'</div>';
+  }
+  html+=`<div class="tlist">${tareas.map(ta=>renderTask(ta)).join('')}</div>`;
+  el.innerHTML=html;
+}
+
+function renderTask(ta){
+  const d=reg.done[ta.id];
+  const nov=reg.novedades[ta.id];
+  const isDone=d&&d.done;
+  const badges=ta.asignaciones
+    .filter(a=>curPersona==='Todos'||a.persona!==curPersona)
+    .map(a=>`<span class="badge b${a.rol.toLowerCase()}">${a.persona} — ${a.rol}</span>`).join('');
+  const sinAsig=ta.asignaciones.length===0?`<span class="badge bsin">Sin asignar</span>`:'';
+  return`<div class="titem${isDone?' done':''}${nov?' novedad':''}" id="ti_${ta.id}">
+    <div class="ttop">
+      <button class="tcheck${isDone?' done':''}" onclick="toggleDone('${ta.id}')">${isDone?'✓':''}</button>
+      <div class="tinfo">
+        <div class="tnombre">${ta.tarea}</div>
+        <div class="tbadges">${badges}${sinAsig}</div>
+        ${isDone?`<div class="thora">✓ Hecho ${d.hora}${d.persona&&d.persona!=='Todos'?' — '+d.persona:''}</div>`:''}
+        ${nov?`<div class="tnovtxt">⚠️ ${nov}</div>`:''}
+      </div>
+    </div>
+    <div class="tacts">
+      <button class="tbtn nov" onclick="toggleNovForm('${ta.id}')">⚠️ Novedad</button>
+    </div>
+    <div class="novform" id="nf_${ta.id}">
+      <input class="novinput" id="ni_${ta.id}" placeholder="Describe la novedad..." value="${nov||''}">
+      <button class="novok" onclick="saveNov('${ta.id}')">OK</button>
+    </div>
+  </div>`;
+}
+
+// ─── ACTIONS ──────────────────────────────────────────────────────────────────
+function selArea(i){curArea=i;curPersona='Todos';const area=data.areas[i];const dia=area.dias[curDia];if(dia){const avail=TO.filter(tr=>dia.turnos[tr]);if(avail.length&&!dia.turnos[curTurno])curTurno=avail[0];}renderAll();}
+function selPersona(p){curPersona=p;renderPersonFilter();renderTasks();}
+function selDia(d){curDia=d;const area=data.areas[curArea];const dia=area.dias[d];if(dia){const avail=TO.filter(tr=>dia.turnos[tr]);if(avail.length&&!dia.turnos[curTurno])curTurno=avail[0];}renderShiftTabs();renderTasks();}
+function selTurno(tr){
+  curTurno=tr;
+  // Asegurar que el turno existe en data
+  const area=data.areas[curArea];
+  if(area && area.dias[curDia]){
+    if(!area.dias[curDia].turnos) area.dias[curDia].turnos={};
+    if(!area.dias[curDia].turnos[tr]) area.dias[curDia].turnos[tr]={tareas:[]};
+  }
+  renderShiftTabs();
+  renderTasks();
+}
+
+function toggleDone(id){
+  if(!reg.done[id]||!reg.done[id].done){
+    reg.done[id]={done:true,hora:hora(),persona:curPersona};
+    toast('✓ Marcado como hecho');
+  } else {
+    delete reg.done[id];
+  }
+  saveReg();renderTasks();
+}
+
+function toggleNovForm(id){
+  const f=document.getElementById('nf_'+id);
+  if(f){f.classList.toggle('open');if(f.classList.contains('open'))document.getElementById('ni_'+id).focus();}
+}
+
+function saveNov(id){
+  const v=document.getElementById('ni_'+id).value.trim();
+  if(v)reg.novedades[id]=v; else delete reg.novedades[id];
+  saveReg();toast('⚠️ Novedad guardada');renderTasks();
+}
+
+// ─── AUSENCIA ─────────────────────────────────────────────────────────────────
+function openAusencia(){
+  const area=data.areas[curArea];
+  const sel=document.getElementById('aus-persona');
+  sel.innerHTML=area.personas.map(p=>`<option value="${p}">${p}</option>`).join('');
+  document.getElementById('aus-motivo').value='';
+  openModal('aus-modal');
+}
+
+function submitAusencia(){
+  const persona=document.getElementById('aus-persona').value;
+  const motivo=document.getElementById('aus-motivo').value.trim();
+  if(!reg.ausencias)reg.ausencias=[];
+  // Avoid duplicates
+  reg.ausencias=reg.ausencias.filter(a=>a.persona!==persona);
+  reg.ausencias.push({persona,motivo,hora:hora()});
+  saveReg();closeModal('aus-modal');toast('🙋 Ausencia registrada');renderTasks();
+}
+
+// ─── WHATSAPP ─────────────────────────────────────────────────────────────────
+function sendWA(){
+  const area=data.areas[curArea];
+  const dia=area.dias[curDia];
+  const turno=dia&&dia.turnos[curTurno];
+  if(!turno){toast('No hay tareas en este turno');return;}
+  normalizarTareas(turno);
+  let tareas=turno.tareas;
+  if(curPersona!=='Todos') tareas=tareas.filter(ta=>ta.asignaciones.some(a=>a.persona===curPersona));
+  const hechas=tareas.filter(ta=>reg.done[ta.id]&&reg.done[ta.id].done);
+  const conNov=tareas.filter(ta=>reg.novedades[ta.id]);
+  const pendientes=tareas.filter(ta=>!reg.done[ta.id]||!reg.done[ta.id].done);
+  const now=new Date();
+  let msg=`📋 *REPORTE — El Rincón del Barril*\n`;
+  msg+=`📍 Área: ${area.emoji} ${area.nombre}\n`;
+  msg+=`📅 ${DO_FULL[curDia]} · ${TL[curTurno].replace(/[☀️🌤️🌙]/g,'').trim()}\n`;
+  if(curPersona!=='Todos') msg+=`👤 Reporta: ${curPersona}\n`;
+  msg+=`🕐 Enviado: ${hora()}\n\n`;
+  if(reg.ausencias&&reg.ausencias.length){
+    msg+=`🙋 *AUSENCIAS:*\n`;
+    reg.ausencias.forEach(a=>msg+=`• ${a.persona}${a.motivo?' — '+a.motivo:''}\n`);
+    msg+='\n';
+  }
+  if(hechas.length){
+    msg+=`✅ *COMPLETADO (${hechas.length}):*\n`;
+    hechas.forEach(ta=>{const d=reg.done[ta.id];msg+=`• ${ta.tarea}${d.hora?' — '+d.hora:''}\n`;});
+    msg+='\n';
+  }
+  if(conNov.length){
+    msg+=`⚠️ *CON NOVEDAD:*\n`;
+    conNov.forEach(ta=>msg+=`• ${ta.tarea}\n  → ${reg.novedades[ta.id]}\n`);
+    msg+='\n';
+  }
+  const sinHacer=pendientes.filter(ta=>!reg.novedades[ta.id]);
+  if(sinHacer.length){
+    msg+=`❌ *PENDIENTE (${sinHacer.length}):*\n`;
+    sinHacer.forEach(ta=>msg+=`• ${ta.tarea}\n`);
+  }
+  // Menu info
+  const sem=menuData.semanaActiva; const diaMenuObj=menuData.semanas[sem]&&menuData.semanas[sem][curDia];
+  const mreg=menuReg[curDia]||{};
+  if(diaMenuObj){
+    msg+='\n🍽️ *MENÚ PERSONAL:*\n';
+    msg+=`• ${diaMenuObj.plato}\n`;
+    msg+=`• Porciones estimadas: ${diaMenuObj.estimado}`;
+    if(mreg.real!=null) msg+=` | Preparadas: ${mreg.real}`;
+    msg+='\n';
+    const faltantes=(mreg.ing||[]).filter(x=>x.falta).map(x=>x.nombre);
+    if(faltantes.length) msg+=`⚠️ Ingredientes faltantes: ${faltantes.join(', ')}\n`;
+    if(mreg.obs) msg+=`📝 Obs. menú: ${mreg.obs}\n`;
+  }
+  const url=`https://wa.me/${cfg.whatsapp}?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+}
+
+// ─── ADMIN ────────────────────────────────────────────────────────────────────
+function openAdmin(){
+  if(!adminUnlocked){pinBuf='';updatePinDots();document.getElementById('pin-sec').style.display='';document.getElementById('adm-sec').style.display='none';document.getElementById('pin-err').textContent='';}
+  else renderAdminPanel();
+  document.getElementById('adm-ov').classList.add('open');
+}
+function closeAdmin(){document.getElementById('adm-ov').classList.remove('open');}
+
+function pinKey(k){
+  if(pinBuf.length>=4)return;
+  pinBuf+=k;updatePinDots();
+  if(pinBuf.length===4){
+    if(pinBuf===cfg.pin){
+      adminUnlocked=true;
+      document.getElementById('pin-sec').style.display='none';
+      document.getElementById('adm-sec').style.display='';
+      admEditArea=curArea;admEditDia=curDia;admEditTurno=curTurno;
+      renderAdminPanel();
+    } else {
+      document.getElementById('pin-err').textContent='PIN incorrecto. Intenta de nuevo.';
+      pinBuf='';updatePinDots();
+    }
+  }
+}
+function pinDel(){pinBuf=pinBuf.slice(0,-1);updatePinDots();}
+function updatePinDots(){for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.toggle('on',i<pinBuf.length);}
+
+
+// Normaliza tareas y asignaciones que Firebase convirtió de array a objeto
+function normalizarTareas(turno) {
+  if (!turno) return;
+  if (!turno.tareas) { turno.tareas = []; return; }
+  // Convertir objeto Firebase a array si es necesario
+  if (!Array.isArray(turno.tareas)) {
+    var keys = Object.keys(turno.tareas);
+    if (keys.length === 0) { turno.tareas = []; return; }
+    turno.tareas = keys.sort(function(a,b){return parseInt(a)-parseInt(b);}).map(function(k){ return turno.tareas[k]; });
+  }
+  // Normalizar asignaciones dentro de cada tarea
+  turno.tareas.forEach(function(ta) {
+    if (!ta) return;
+    if (!ta.asignaciones) { ta.asignaciones = []; return; }
+    if (!Array.isArray(ta.asignaciones)) {
+      var aKeys = Object.keys(ta.asignaciones);
+      if (aKeys.length === 0) { ta.asignaciones = []; return; }
+      ta.asignaciones = aKeys.sort(function(a,b){return parseInt(a)-parseInt(b);}).map(function(k){ return ta.asignaciones[k]; });
+    }
+  });
+}
+
+function renderAdminPanel(){
+  const area=data.areas[admEditArea];
+  const dia=area&&area.dias[admEditDia];
+  // Asegurar que el turno activo existe en memoria antes de renderizar
+  if(dia){
+    if(!dia.turnos) dia.turnos={};
+    if(!dia.turnos[admEditTurno]) dia.turnos[admEditTurno]={tareas:[]};
+    normalizarTareas(dia.turnos[admEditTurno]);
+  }
+  const turno=dia&&dia.turnos[admEditTurno];
+  const tareas=turno?turno.tareas:[];
+  // Stats
+  const allTareas=turno?turno.tareas:[];
+  const doneCount=allTareas.filter(ta=>reg.done[ta.id]&&reg.done[ta.id].done).length;
+  const novCount=allTareas.filter(ta=>reg.novedades[ta.id]).length;
+  const ausCount=(reg.ausencias||[]).length;
+
+  let html=`<div class="pnl-hdr"><div class="pnl-title">⚙️ Administrador</div><button class="btn-close" onclick="closeAdmin()">✕</button></div>`;
+
+  // RESUMEN
+  html+=`<div class="adm-sec"><div class="adm-sec-title">📊 Resumen de hoy</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-n" style="color:var(--verde)">${doneCount}</div><div class="stat-l">Completadas</div></div>
+      <div class="stat-card"><div class="stat-n" style="color:var(--ambar)">${novCount}</div><div class="stat-l">Con novedad</div></div>
+      <div class="stat-card"><div class="stat-n" style="color:var(--rojo)">${ausCount}</div><div class="stat-l">Ausencias</div></div>
+    </div>`;
+  if(ausCount){
+    html+=(reg.ausencias||[]).map(a=>`<div class="aus-item"><div><div class="aus-nom">${a.persona}</div><div class="aus-mot">${a.motivo||'Sin motivo'}</div></div><div class="aus-hora">${a.hora}</div></div>`).join('');
+  }
+  if(novCount){
+    html+=`<div style="margin-top:8px">`;
+    allTareas.filter(ta=>reg.novedades[ta.id]).forEach(ta=>{
+      html+=`<div style="font-size:12px;padding:6px 8px;background:rgba(230,126,34,.08);border-radius:6px;margin-bottom:4px;border-left:2px solid var(--ambar)"><strong>${ta.tarea}</strong><br><span style="color:var(--ambar)">${reg.novedades[ta.id]}</span></div>`;
+    });
+    html+=`</div>`;
+  }
+  html+=`</div>`;
+
+  // EDIT TASKS
+  html+=`<div class="adm-sec"><div class="adm-sec-title">✏️ Editar plan</div>`;
+  // Area selector
+  html+=`<div class="adm-area-tabs">${data.areas.map((a,i)=>`<div class="adm-area-chip${i===admEditArea?' on':''}" onclick="admSelArea(${i})">${a.emoji} ${a.nombre}</div>`).join('')}</div>`;
+  // Day selector
+  html+=`<div class="adm-sub-tabs">${DIAS.map(d=>`<div class="adm-sub-tab${d===admEditDia?' on':''}" onclick="admSelDia('${d}')">${DL[d]}</div>`).join('')}</div>`;
+  // Turno selector
+  const admDia=data.areas[admEditArea].dias[admEditDia];
+  // Siempre mostrar los 3 turnos en edición
+  html+=`<div class="adm-sub-tabs">${TO.map(tr=>`<div class="adm-sub-tab${tr===admEditTurno?' on':''}" onclick="admSelTurno('${tr}')">${TL[tr]}</div>`).join('')}</div>`;
+  // Tasks
+  if(turno){
+    html+=tareas.map(ta=>{
+      const personas=data.areas[admEditArea].personas;
+      const aBtns=personas.map(p=>{
+        const cur=ta.asignaciones.find(x=>x.persona===p);
+        const rol=cur?cur.rol:null;
+        return`<button class="ab-btn${rol?' '+rol.toLowerCase():''}" onclick="cycleRol('${ta.id}','${p}')" title="${p}">${p.split(' ')[0]}<br><span style="font-size:10px">${rol||'—'}</span></button>`;
+      }).join('');
+      return`<div class="te-row">
+        <div class="te-name">${ta.tarea}</div>
+        <div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;max-width:180px">${aBtns}</div>
+        <button class="btn-danger" onclick="confirmDeleteTask('${ta.id}')" style="padding:4px 7px;font-size:13px">✕</button>
+      </div>`;
+    }).join('');
+    // Add task
+    html+=`<div class="add-task-row"><input id="new-task-input" placeholder="Nueva tarea..." onkeydown="if(event.key==='Enter')addTask()"><button onclick="addTask()">＋</button></div>`;
+  }
+  html+=`</div>`;
+
+  // PERSONAS
+  html+=`<div class="adm-sec"><div class="adm-sec-title">👥 Personas del área</div>`;
+  data.areas.forEach((a,ai)=>{
+    html+=`<div style="margin-bottom:10px"><div style="font-size:12px;font-weight:800;color:var(--txt2);margin-bottom:5px">${a.emoji} ${a.nombre}</div>`;
+    html+=`<div>${a.personas.map(p=>`<span class="persona-tag">${p}<button onclick="removePers(${ai},'${p.replace(/'/g,"\\'")}')">✕</button></span>`).join('')}</div>`;
+    html+=`<div class="adm-row" style="margin-top:6px"><input class="adm-input" id="np_${ai}" placeholder="Agregar persona..."><button class="btn-save" onclick="addPers(${ai})">＋</button></div>`;
+    if(a.id!=='cocina'&&a.id!=='servicio'){
+      html+=`<button class="btn-danger" onclick="confirmDeleteArea(${ai})" style="margin-top:4px">🗑 Eliminar área</button>`;
+    }
+    html+=`</div>`;
+  });
+  html+=`</div>`;
+
+  // CONFIG
+  html+=`<div class="adm-sec"><div class="adm-sec-title">⚙️ Configuración</div>
+    <div class="adm-row"><span style="font-size:13px;color:var(--txt2);white-space:nowrap">📲 WhatsApp</span><input class="adm-input" id="wa-input" value="${cfg.whatsapp}" placeholder="57XXXXXXXXXX"><button class="btn-save" onclick="saveWA()">Guardar</button></div>
+    <div class="adm-row"><span style="font-size:13px;color:var(--txt2);white-space:nowrap">🔐 PIN</span><input class="adm-input" id="pin-input" type="password" placeholder="Nuevo PIN (4 dígitos)" maxlength="4"><button class="btn-save" onclick="savePin()">Guardar</button></div>
+  </div>`;
+
+  // MENU
+  html+=renderAdminMenuSection();
+
+  // DANGER ZONE
+  html+=`<div class="adm-sec"><div class="adm-sec-title">⚠️ Zona de riesgo</div>
+    <button class="btn-danger" onclick="confirmClearReg()" style="width:100%;padding:10px">🗑 Limpiar registros de hoy (hechos, novedades, ausencias)</button>
+  </div>`;
+
+  document.getElementById('adm-sec').innerHTML=html;
+}
+
+function admSelArea(i){admEditArea=i;admEditDia=Object.keys(data.areas[i].dias)[0]||'mie';const d=data.areas[i].dias[admEditDia];admEditTurno=d?TO.filter(tr=>d.turnos[tr])[0]||'tarde':'tarde';renderAdminPanel();}
+function admSelDia(d){admEditDia=d;const dia=data.areas[admEditArea].dias[d];if(dia){const avail=TO.filter(tr=>dia.turnos[tr]);if(avail.length)admEditTurno=avail[0];}renderAdminPanel();}
+function admSelTurno(tr){
+  admEditTurno=tr;
+  // Asegurar que el turno existe en data antes de editar
+  const area=data.areas[admEditArea];
+  if(area && area.dias[admEditDia]){
+    if(!area.dias[admEditDia].turnos) area.dias[admEditDia].turnos={};
+    if(!area.dias[admEditDia].turnos[tr]) area.dias[admEditDia].turnos[tr]={tareas:[]};
+  }
+  renderAdminPanel();
+}
+
+function cycleRol(taskId,persona){
+  const area=data.areas[admEditArea];
+  const turno=area.dias[admEditDia].turnos[admEditTurno];
+  const ta=turno.tareas.find(x=>x.id===taskId);
+  if(!ta)return;
+  const idx=ta.asignaciones.findIndex(x=>x.persona===persona);
+  if(idx===-1){ta.asignaciones.push({persona,rol:'R'});}
+  else if(ta.asignaciones[idx].rol==='R'){ta.asignaciones[idx].rol='A';}
+  else{ta.asignaciones.splice(idx,1);}
+  saveData();renderAdminPanel();renderTasks();
+}
+
+function addTask(){
+  const inp=document.getElementById('new-task-input');
+  const v=inp.value.trim();
+  if(!v)return;
+  const area=data.areas[admEditArea];
+  const turno=area.dias[admEditDia].turnos[admEditTurno];
+  normalizarTareas(turno);
+  const id=admEditArea+'_'+admEditDia+'_'+admEditTurno+'_'+Date.now();
+  turno.tareas.push({id,tarea:v,asignaciones:[]});
+  saveData();inp.value='';renderAdminPanel();renderTasks();toast('✓ Tarea agregada');
+}
+
+function confirmDeleteTask(id){
+  showConfirm('¿Eliminar tarea?','Esta acción no se puede deshacer.',()=>{deleteTask(id);});
+}
+function deleteTask(id){
+  const area=data.areas[admEditArea];
+  const turno=area.dias[admEditDia].turnos[admEditTurno];
+  turno.tareas=turno.tareas.filter(ta=>ta.id!==id);
+  saveData();renderAdminPanel();renderTasks();toast('🗑 Tarea eliminada');
+}
+
+function addPers(ai){
+  const v=document.getElementById('np_'+ai).value.trim();
+  if(!v)return;
+  if(!data.areas[ai].personas.includes(v)){data.areas[ai].personas.push(v);saveData();renderAdminPanel();renderPersonFilter();}
+}
+function removePers(ai,persona){
+  data.areas[ai].personas=data.areas[ai].personas.filter(p=>p!==persona);
+  saveData();renderAdminPanel();renderPersonFilter();
+}
+
+function submitAddArea(){
+  const nombre=document.getElementById('new-area-nombre').value.trim();
+  const emoji=document.getElementById('new-area-emoji').value.trim()||'📋';
+  const personas=document.getElementById('new-area-personas').value.split(',').map(p=>p.trim()).filter(Boolean);
+  if(!nombre)return;
+  const id='area_'+Date.now();
+  const newArea={id,nombre,emoji,lider:'',personas,dias:emptyDias()};
+  data.areas.push(newArea);
+  saveData();closeModal('add-area-modal');renderAreaTabs();renderAdminPanel();toast('✓ Área creada');
+}
+
+function confirmDeleteArea(ai){
+  showConfirm('¿Eliminar área?','Se perderán todas las tareas de esta área.',()=>{data.areas.splice(ai,1);if(curArea>=data.areas.length)curArea=0;saveData();closeModal('confirm-modal');renderAll();renderAdminPanel();});
+}
+
+function saveWA(){const v=document.getElementById('wa-input').value.trim();if(!v)return;cfg.whatsapp=v;saveCfg();toast('✓ WhatsApp actualizado');}
+function savePin(){const v=document.getElementById('pin-input').value.trim();if(v.length!==4||!/^\d{4}$/.test(v)){toast('El PIN debe ser de 4 dígitos');return;}cfg.pin=v;saveCfg();toast('✓ PIN actualizado');}
+
+function confirmClearReg(){
+  showConfirm('¿Limpiar registros de hoy?','Se borrarán todas las marcas de hecho, novedades y ausencias del día de hoy.',()=>{reg={done:{},novedades:{},ausencias:[]};saveReg();closeModal('confirm-modal');renderAdminPanel();renderTasks();toast('🗑 Registros limpiados');});
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showConfirm(title,msg,cb){
+  document.getElementById('confirm-title').textContent=title;
+  document.getElementById('confirm-msg').textContent=msg;
+  document.getElementById('confirm-ok').onclick=cb;
+  openModal('confirm-modal');
+}
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+
+// ─── MENU DATA ────────────────────────────────────────────────────────────────
+const STORAGE_MENU = 'rbMenu_data';
+const STORAGE_MENU_REG = 'rbMenu_reg_';
+
+function buildDia(plato, estimado, ingredientes){
+  return {plato, estimado, ingredientes: ingredientes||[], bebidas:[], obs:''};
+}
+
+const DEFAULT_MENU = {
+  semanaActiva: 1,
+  semanas: {
+    1: {
+      obs: '',
+      mie: buildDia('Caldo de pollo', 5, ['Pollo', 'Papa', 'Zanahoria', 'Cilantro', 'Ajo', 'Cebolla']),
+      jue: buildDia('Perro caliente', 5, ['Salchicha', 'Pan', 'Papas fritas', 'Salsas']),
+      vie: buildDia('Arepa con huevo', 5, ['Arepa', 'Huevo', 'Sal', 'Aceite']),
+      sab: buildDia('Arroz con pollo', 5, ['Pollo', 'Arroz', 'Verduras', 'Condimentos']),
+      dom: buildDia('Calentado de frijoles con huevo', 5, ['Frijoles', 'Huevo', 'Arroz', 'Hogao'])
+    },
+    2: {
+      obs: '',
+      mie: buildDia('Empanadas con arroz con pollo', 5, ['Empanadas', 'Arroz', 'Pollo', 'Ají']),
+      jue: buildDia('Burritos', 5, ['Tortilla', 'Pollo o res', 'Frijoles', 'Queso', 'Aguacate']),
+      vie: buildDia('Caldo de pollo', 5, ['Pollo', 'Papa', 'Zanahoria', 'Cilantro', 'Ajo', 'Cebolla']),
+      sab: buildDia('Arroz mixto', 5, ['Arroz', 'Verduras mixtas', 'Condimentos']),
+      dom: buildDia('Sandwich de jamón y queso', 5, ['Pan', 'Jamón', 'Queso', 'Mayonesa', 'Mostaza'])
+    },
+    3: {
+      obs: '',
+      mie: buildDia('Caldo de pollo', 5, ['Pollo', 'Papa', 'Zanahoria', 'Cilantro', 'Ajo', 'Cebolla']),
+      jue: buildDia('Perro caliente', 5, ['Salchicha', 'Pan', 'Papas fritas', 'Salsas']),
+      vie: buildDia('Arepa con huevo', 5, ['Arepa', 'Huevo', 'Sal', 'Aceite']),
+      sab: buildDia('Arroz con pollo', 5, ['Pollo', 'Arroz', 'Verduras', 'Condimentos']),
+      dom: buildDia('Calentado de frijoles con huevo', 5, ['Frijoles', 'Huevo', 'Arroz', 'Hogao'])
+    },
+    4: {
+      obs: '',
+      mie: buildDia('Empanadas con arroz con pollo', 5, ['Empanadas', 'Arroz', 'Pollo', 'Ají']),
+      jue: buildDia('Burritos', 5, ['Tortilla', 'Pollo o res', 'Frijoles', 'Queso', 'Aguacate']),
+      vie: buildDia('Caldo de pollo', 5, ['Pollo', 'Papa', 'Zanahoria', 'Cilantro', 'Ajo', 'Cebolla']),
+      sab: buildDia('Arroz mixto', 5, ['Arroz', 'Verduras mixtas', 'Condimentos']),
+      dom: buildDia('Sandwich de jamón y queso', 5, ['Pan', 'Jamón', 'Queso', 'Mayonesa', 'Mostaza'])
+    }
+  },
+  bebidas: ['Agua', 'Limonada de panela'],
+  opciones: ['Caldo de pollo','Perro caliente','Arepa con huevo','Arroz con pollo',
+    'Calentado de frijoles con huevo','Empanadas con arroz con pollo','Burritos',
+    'Arroz mixto','Sandwich de jamón y queso','Boyos de harina pan']
+};
+
+let menuData, menuReg;
+
+function loadMenu(){
+  const tk = todayKey();
+  try{ menuData = fbCache_turno.menu || JSON.parse(localStorage.getItem(STORAGE_MENU)) || JSON.parse(JSON.stringify(DEFAULT_MENU)); }
+  catch{ menuData = JSON.parse(JSON.stringify(DEFAULT_MENU)); }
+  try{ menuReg = (fbCache_turno.menuReg && fbCache_turno.menuReg[tk]) || JSON.parse(localStorage.getItem(STORAGE_MENU_REG+tk)) || {}; }
+  catch{ menuReg = {}; }
+  // ensure all dias have bebidas array
+  [1,2,3,4].forEach(s=>{
+    DIAS.forEach(d=>{
+      if(menuData.semanas[s]&&menuData.semanas[s][d]&&!menuData.semanas[s][d].bebidas)
+        menuData.semanas[s][d].bebidas=[];
+    });
+  });
+}
+function saveMenu(){
+  localStorage.setItem(STORAGE_MENU, JSON.stringify(menuData));
+  fbCache_turno.menu = menuData;
+  fbSaveTurno('menu', menuData);
+}
+function saveMenuReg(){
+  const tk = todayKey();
+  localStorage.setItem(STORAGE_MENU_REG+tk, JSON.stringify(menuReg));
+  if (!fbCache_turno.menuReg) fbCache_turno.menuReg = {};
+  fbCache_turno.menuReg[tk] = menuReg;
+  fbSaveTurno('menuReg/' + tk, menuReg);
+}
+
+// ─── MENU PANEL ───────────────────────────────────────────────────────────────
+function openMenu(){
+  loadMenu();
+  document.getElementById('menu-ov').classList.add('open');
+  renderMenuPanel();
+}
+function closeMenu(){ document.getElementById('menu-ov').classList.remove('open'); }
+
+function renderMenuPanel(){
+  const sem = menuData.semanaActiva;
+  const semObj = menuData.semanas[sem];
+  const dow = new Date().getDay(); const todayDia = DOW[dow];
+  let html = '';
+  // Semana selector
+  html += '<div class="menu-sec-label">Semana activa</div>';
+  html += '<div class="sem-selector">';
+  [1,2,3,4].forEach(s=> html += `<div class="sem-btn${s===sem?' on':''}">${s}</div>`);
+  html += '</div>';
+  // Obs semana
+  if(semObj.obs){
+    html += `<div class="sem-obs-box">📌 ${semObj.obs}</div>`;
+  }
+  // Bebidas globales
+  if(menuData.bebidas&&menuData.bebidas.length){
+    html += `<div style="margin-bottom:10px"><div class="menu-sec-label" style="margin-bottom:5px">Bebidas</div>`;
+    html += `<div class="menu-bebidas">${menuData.bebidas.map(b=>`<span class="beb-tag">🥤 ${b}</span>`).join('')}</div></div>`;
+  }
+  // Days
+  DIAS.forEach(d=>{
+    const dia = semObj[d];
+    if(!dia) return;
+    const esHoy = d===todayDia;
+    const mreg = menuReg[d]||{};
+    const faltantes = (mreg.ing||[]).filter(x=>x.falta).map(x=>x.nombre);
+    html += `<div class="menu-day${esHoy?' hoy':''}">`;
+    html += `<div class="menu-day-hdr"><span class="menu-day-label${esHoy?' hoy':''}">${DO_FULL[d]}${esHoy?' — HOY':''}</span></div>`;
+    html += `<div class="menu-plato">🍽️ ${dia.plato}</div>`;
+    // Porciones
+    html += `<div class="menu-porciones"><span class="por-est">📊 Estimado: ${dia.estimado}</span>`;
+    if(mreg.real!=null) html += `<span class="por-real">✓ Real: ${mreg.real}</span>`;
+    html += '</div>';
+    // Ingredientes
+    if(dia.ingredientes&&dia.ingredientes.length){
+      html += `<div class="menu-sec-label">Ingredientes</div><div class="ing-list">`;
+      dia.ingredientes.forEach((ing,i)=>{
+        const ireg = (mreg.ing||[]).find(x=>x.nombre===ing);
+        const estado = ireg ? ireg.falta ? 'falta' : 'ok' : '';
+        const icon = ireg ? ireg.falta ? '✕' : '✓' : '';
+        html += `<div class="ing-item">
+          <button class="ing-check ${estado}" onclick="toggleIng('${d}','${ing.replace(/'/g,"\'")}',${i})">${icon}</button>
+          <span class="ing-nombre${ireg&&ireg.falta?' falta':''}">${ing}</span>
+        </div>`;
+      });
+      html += '</div>';
+    }
+    // Obs día
+    const obsVal = mreg.obs||'';
+    html += `<div class="menu-sec-label">Observación del día</div>`;
+    html += `<textarea class="menu-obs-inp" id="mobs_${d}" placeholder="Novedad, cambio, faltante..."
+      onblur="saveMenuObsDia('${d}')">${obsVal}</textarea>`;
+    // Real porciones (only editable today)
+    if(esHoy){
+      html += `<div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:12px;color:var(--txt2)">Porciones preparadas:</span>
+        <input type="number" class="por-real-inp" id="por_real_${d}" value="${mreg.real!=null?mreg.real:''}"
+          min="0" placeholder="0" onchange="saveMenuReal('${d}',this.value)">
+      </div>`;
+    }
+    html += '</div>';
+  });
+  document.getElementById('menu-content').innerHTML = html;
+}
+
+function toggleIng(dia, ing, idx){
+  if(!menuReg[dia]) menuReg[dia]={};
+  if(!menuReg[dia].ing) menuReg[dia].ing=[];
+  const ex = menuReg[dia].ing.find(x=>x.nombre===ing);
+  if(!ex){ menuReg[dia].ing.push({nombre:ing, falta:true}); }
+  else if(ex.falta){ ex.falta=false; }
+  else { menuReg[dia].ing = menuReg[dia].ing.filter(x=>x.nombre!==ing); }
+  saveMenuReg(); renderMenuPanel();
+}
+
+function saveMenuObsDia(dia){
+  const v = document.getElementById('mobs_'+dia);
+  if(!v) return;
+  if(!menuReg[dia]) menuReg[dia]={};
+  menuReg[dia].obs = v.value.trim();
+  saveMenuReg();
+}
+
+function saveMenuReal(dia, val){
+  if(!menuReg[dia]) menuReg[dia]={};
+  menuReg[dia].real = val!==''?parseInt(val):null;
+  saveMenuReg();
+}
+
+// ─── ADMIN MENU SECTION ───────────────────────────────────────────────────────
+function renderAdminMenuSection(){
+  const sem = menuData.semanaActiva;
+  const semObj = menuData.semanas[sem];
+  let html = `<div class="adm-sec"><div class="adm-sec-title">🍽️ Menú del personal</div>`;
+  // Semana activa
+  html += `<div style="margin-bottom:10px"><div style="font-size:12px;color:var(--txt2);margin-bottom:5px">Semana activa</div>
+    <div class="sem-selector">`;
+  [1,2,3,4].forEach(s=> html += `<div class="sem-btn${s===sem?' on':''}" onclick="setMenuSem(${s})">${s}</div>`);
+  html += '</div></div>';
+  // Obs semana
+  html += `<div class="adm-row"><span style="font-size:12px;color:var(--txt2);white-space:nowrap">📌 Obs. semana</span>
+    <input class="adm-input" id="sem-obs-input" value="${(semObj.obs||'').replace(/"/g,'&quot;')}" placeholder="Observación general de la semana">
+    <button class="btn-save" onclick="saveMenuSemObs()">OK</button></div>`;
+  // Days editor
+  DIAS.forEach(d=>{
+    const dia = semObj[d];
+    if(!dia) return;
+    html += `<div style="margin-bottom:12px;padding:10px;background:var(--fondo3);border-radius:8px;border:1px solid var(--borde)">`;
+    html += `<div style="font-size:12px;font-weight:800;margin-bottom:8px;color:var(--ambar)">${DO_FULL[d]}</div>`;
+    // Plato
+    html += `<div style="margin-bottom:6px"><select class="adm-input" id="plato_${d}" style="margin-bottom:4px" onchange="menuPlatoChange('${d}',this.value)">`;
+    menuData.opciones.forEach(op=> html += `<option${op===dia.plato?' selected':''}>${op}</option>`);
+    html += `<option value="__otro">Otro...</option></select>`;
+    html += `<input class="adm-input" id="plato_custom_${d}" style="display:${menuData.opciones.includes(dia.plato)?'none':'block'}" value="${menuData.opciones.includes(dia.plato)?'':dia.plato}" placeholder="Escribe el plato..."></div>`;
+    // Estimado
+    html += `<div class="adm-row" style="margin-bottom:6px"><span style="font-size:12px;color:var(--txt2)">Porciones estimadas</span>
+      <input type="number" class="adm-input" id="est_${d}" value="${dia.estimado}" min="1" style="max-width:80px">
+      <button class="btn-save" onclick="saveMenuDia('${d}')">OK</button></div>`;
+    // Bebidas del día
+    html += `<div style="margin-bottom:6px"><div class="menu-sec-label" style="margin-bottom:4px">Bebidas del día</div>`;
+    if(dia.bebidas&&dia.bebidas.length){
+      html += `<div class="menu-bebidas">${dia.bebidas.map(b=>`<span class="beb-tag">${b} <button onclick="removeDiaBebida('${d}','${b.replace(/'/g,"\'")}') " style="background:none;border:none;color:inherit;cursor:pointer;font-size:11px">✕</button></span>`).join('')}</div>`;
+    }
+    html += `<div style="display:flex;gap:5px;margin-top:4px"><select class="adm-input" id="beb_sel_${d}" style="flex:1">`;
+    (menuData.bebidas||[]).forEach(b=> html += `<option>${b}</option>`);
+    html += `</select><button class="btn-save" onclick="addDiaBebida('${d}')">＋</button></div></div>`;
+    // Ingredientes
+    html += `<div><div class="menu-sec-label" style="margin-bottom:4px">Ingredientes</div>`;
+    html += `<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:5px">`;
+    (dia.ingredientes||[]).forEach((ing,i)=> html += `<div style="display:flex;align-items:center;gap:5px;font-size:12px;padding:4px 6px;background:var(--fondo2);border-radius:5px">
+      <span style="flex:1">${ing}</span>
+      <button onclick="removeIng('${d}',${i})" style="background:none;border:none;color:#e07070;cursor:pointer;font-size:13px">✕</button></div>`);
+    html += `</div><div style="display:flex;gap:5px"><input class="adm-input" id="ning_${d}" placeholder="Agregar ingrediente...">
+      <button class="btn-save" onclick="addIng('${d}')">＋</button></div></div>`;
+    html += '</div>';
+  });
+  // Bebidas globales
+  html += `<div style="margin-bottom:10px"><div class="adm-sec-title" style="margin-top:8px">🥤 Bebidas disponibles</div>`;
+  html += `<div class="menu-bebidas" style="margin-bottom:8px">${(menuData.bebidas||[]).map(b=>`<span class="beb-tag">${b} <button onclick="removeGlobalBebida('${b.replace(/'/g,"\'")}') " style="background:none;border:none;color:inherit;cursor:pointer">✕</button></span>`).join('')}</div>`;
+  html += `<div class="adm-row"><input class="adm-input" id="new-beb" placeholder="Nueva bebida..."><button class="btn-save" onclick="addGlobalBebida()">＋</button></div></div>`;
+  // Opciones banco
+  html += `<div><div class="adm-sec-title">📋 Banco de opciones</div>`;
+  html += `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${menuData.opciones.map(op=>`<span style="padding:3px 9px;background:var(--fondo3);border:1px solid var(--borde);border-radius:6px;font-size:12px">${op} <button onclick="removeOpcion('${op.replace(/'/g,"\'")}') " style="background:none;border:none;color:var(--txt2);cursor:pointer">✕</button></span>`).join('')}</div>`;
+  html += `<div class="adm-row"><input class="adm-input" id="new-opcion" placeholder="Nueva opción de comida..."><button class="btn-save" onclick="addOpcion()">＋</button></div></div>`;
+  html += '</div>';
+  return html;
+}
+
+function setMenuSem(s){ menuData.semanaActiva=s; saveMenu(); renderAdminPanel(); }
+function saveMenuSemObs(){ const v=document.getElementById('sem-obs-input'); if(v){ menuData.semanas[menuData.semanaActiva].obs=v.value.trim(); saveMenu(); toast('✓ Observación guardada'); } }
+
+function menuPlatoChange(dia, val){
+  const custom=document.getElementById('plato_custom_'+dia);
+  if(custom) custom.style.display = val==='__otro'?'block':'none';
+}
+
+function saveMenuDia(dia){
+  const sem=menuData.semanaActiva; const d=menuData.semanas[sem][dia];
+  const platoSel=document.getElementById('plato_'+dia);
+  const platoCustom=document.getElementById('plato_custom_'+dia);
+  const est=document.getElementById('est_'+dia);
+  if(platoSel&&platoCustom&&est){
+    d.plato = platoSel.value==='__otro' ? platoCustom.value.trim() : platoSel.value;
+    d.estimado = parseInt(est.value)||5;
+    saveMenu(); toast('✓ Guardado'); renderAdminPanel();
+  }
+}
+
+function addIng(dia){
+  const inp=document.getElementById('ning_'+dia); if(!inp||!inp.value.trim()) return;
+  menuData.semanas[menuData.semanaActiva][dia].ingredientes.push(inp.value.trim());
+  saveMenu(); inp.value=''; renderAdminPanel();
+}
+function removeIng(dia,i){
+  menuData.semanas[menuData.semanaActiva][dia].ingredientes.splice(i,1);
+  saveMenu(); renderAdminPanel();
+}
+
+function addDiaBebida(dia){
+  const sel=document.getElementById('beb_sel_'+dia); if(!sel) return;
+  const d=menuData.semanas[menuData.semanaActiva][dia];
+  if(!d.bebidas) d.bebidas=[];
+  if(!d.bebidas.includes(sel.value)){ d.bebidas.push(sel.value); saveMenu(); renderAdminPanel(); }
+}
+function removeDiaBebida(dia, beb){
+  const d=menuData.semanas[menuData.semanaActiva][dia];
+  d.bebidas=(d.bebidas||[]).filter(b=>b!==beb); saveMenu(); renderAdminPanel();
+}
+
+function addGlobalBebida(){
+  const inp=document.getElementById('new-beb'); if(!inp||!inp.value.trim()) return;
+  if(!menuData.bebidas.includes(inp.value.trim())){ menuData.bebidas.push(inp.value.trim()); saveMenu(); inp.value=''; renderAdminPanel(); }
+}
+function removeGlobalBebida(beb){ menuData.bebidas=menuData.bebidas.filter(b=>b!==beb); saveMenu(); renderAdminPanel(); }
+
+function addOpcion(){
+  const inp=document.getElementById('new-opcion'); if(!inp||!inp.value.trim()) return;
+  if(!menuData.opciones.includes(inp.value.trim())){ menuData.opciones.push(inp.value.trim()); saveMenu(); inp.value=''; renderAdminPanel(); }
+}
+function removeOpcion(op){ menuData.opciones=menuData.opciones.filter(o=>o!==op); saveMenu(); renderAdminPanel(); }
+
+// Start
+// Cargar Firebase antes de inicializar
+cargarDesdeFirebaseTurno().then(function() {
+  init();
+  // Si Firebase está conectado y no tiene data aún, guardar estado inicial
+  if (db_turno) {
+    db_turno.ref('rincon-barril/turno/data').once('value').then(function(snap) {
+      if (!snap.exists()) {
+        fbSaveTurno('data', data);
+        fbSaveTurno('cfg', cfg);
+        fbSaveTurno('menu', menuData);
+        console.log('✅ Plan de Turno: datos iniciales guardados en Firebase');
+      } else {
+        console.log('✅ Plan de Turno: Firebase conectado, datos existentes cargados');
+      }
+    });
+  }
+}).catch(function() {
+  init();
+});
+</script>
+</body>
+</html>
